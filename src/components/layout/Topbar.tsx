@@ -10,43 +10,32 @@ export default function Topbar({ title, onTitleDoubleClick }: TopbarProps) {
   const { toggleSidebar } = useUIStore();
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0,
-      height: '56px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 20px',
-      background: '#1B1D21',
-      borderBottom: '1px solid rgba(255,255,255,0.06)',
-      zIndex: 100,
-    }}>
-      <button
+    <header className="relative flex items-center justify-between h-[56px] w-full px-5 bg-[#1B1D21] border-b border-[rgba(255,255,255,0.06)] shrink-0 z-50">
+      {/* Left — Hamburger */}
+      <button 
         onClick={toggleSidebar}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EDEFF3', display: 'flex', alignItems: 'center', padding: '6px' }}
+        className="text-[#EDEFF3] hover:opacity-80 transition-opacity flex items-center justify-center p-1.5"
+        aria-label="Menu"
       >
-        <Menu size={20} />
+        <Menu size={20} strokeWidth={2} />
       </button>
 
-      <span
+      {/* Center — List Name */}
+      <div 
         onDoubleClick={onTitleDoubleClick}
-        style={{
-          color: '#EDEFF3',
-          fontSize: '16px',
-          fontWeight: 500,
-          cursor: onTitleDoubleClick ? 'text' : 'default',
-          userSelect: 'none',
-        }}
+        className={`absolute left-1/2 -translate-x-1/2 text-[#EDEFF3] text-[17px] font-normal font-['Poppins'] ${onTitleDoubleClick ? 'cursor-text select-none' : ''}`}
+        title={onTitleDoubleClick ? "Double-click to rename" : undefined}
       >
         {title}
-      </span>
+      </div>
 
-      <button
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EDEFF3', display: 'flex', alignItems: 'center', padding: '6px' }}
+      {/* Right — Profile Icon */}
+      <button 
+        className="text-[#EDEFF3] hover:opacity-80 transition-opacity flex items-center justify-center p-1.5"
+        aria-label="Profile"
       >
-        <User size={20} />
+        <User size={20} strokeWidth={2} />
       </button>
-    </div>
+    </header>
   );
 }

@@ -3,12 +3,17 @@ import SidePanel from '../components/layout/SidePanel';
 
 export default function ListPage() {
   return (
-    <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
-      <Topbar title="List" />
+    <div className="flex flex-col h-screen w-full bg-[#1B1D21] overflow-hidden font-['Poppins'] font-normal">
+      <Topbar title="Untitled List" />
       <SidePanel />
-      <div style={{ paddingTop: '56px', padding: '72px 24px 24px', color: '#7D828B' }}>
-        List — Phase 3
-      </div>
+      
+      {/* Canvas Area */}
+      <main className="flex-1 relative pt-[28px] pl-[65px]">
+        {/* Placeholder Text */}
+        <div className="text-[15px] text-[#7D828B]">
+          You can start typing here....
+        </div>
+      </main>
     </div>
   );
 }
