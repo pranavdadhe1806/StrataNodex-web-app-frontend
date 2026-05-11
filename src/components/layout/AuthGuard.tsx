@@ -9,6 +9,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    // DEV BYPASS: Skip auth redirect for local testing
+    if (import.meta.env.DEV) {
+      setChecking(false);
+      return;
+    }
+
     const token = getToken();
     if (!token) {
       window.location.href = 'https://stratanodex-landing-page.vercel.app/#auth';
