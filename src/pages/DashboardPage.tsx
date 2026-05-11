@@ -6,8 +6,8 @@ export default function DashboardPage() {
     <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
       <Topbar title="Dashboard" />
       <SidePanel />
-      <div style={{ paddingTop: '56px', padding: '72px 24px 24px', color: '#7D828B' }}>
-        Dashboard — Phase 4
+      <div style={{ paddingTop: '56px', padding: '28px 60px', color: '#7D828B', fontSize: '15px', fontWeight: 400 }}>
+        You can start typing here....
       </div>
     </div>
   );

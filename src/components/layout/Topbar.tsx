@@ -4,13 +4,14 @@ import { useUIStore } from '../../store/ui.store';
 interface TopbarProps {
   title: string;
   onTitleDoubleClick?: () => void;
+  titleSlot?: React.ReactNode;
 }
 
-export default function Topbar({ title, onTitleDoubleClick }: TopbarProps) {
+export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarProps) {
   const { toggleSidebar } = useUIStore();
 
   return (
-    <header className="relative flex items-center justify-between h-[56px] w-full px-5 bg-[#1B1D21] border-b border-[rgba(255,255,255,0.06)] shrink-0 z-50">
+    <header className="relative flex items-center justify-between h-[56px] w-full px-5 bg-[#1B1D21] shrink-0 z-50">
       {/* Left — Hamburger */}
       <button 
         onClick={toggleSidebar}
@@ -26,7 +27,7 @@ export default function Topbar({ title, onTitleDoubleClick }: TopbarProps) {
         className={`absolute left-1/2 -translate-x-1/2 text-[#EDEFF3] text-[17px] font-normal font-['Poppins'] ${onTitleDoubleClick ? 'cursor-text select-none' : ''}`}
         title={onTitleDoubleClick ? "Double-click to rename" : undefined}
       >
-        {title}
+        {titleSlot ?? title}
       </div>
 
       {/* Right — Profile Icon */}
