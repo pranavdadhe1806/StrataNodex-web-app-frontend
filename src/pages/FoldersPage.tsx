@@ -2,18 +2,20 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
-import { Folder, Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Check, Square, CheckSquare } from 'lucide-react';
+import {
+  useFolders,
+  useCreateFolder,
+  useUpdateFolder,
+  useDeleteFolder,
+} from '../hooks/useFolders';
+import type { Folder } from '../types/folder.types';
+import { Folder as FolderIcon, Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Square, CheckSquare, Loader2 } from 'lucide-react';
 
-interface FolderItem {
-  id: string;
-  name: string;
-  listCount: number;
-  isSystem?: boolean;
-}
+// System folder detection - Daily Task is always system folder
+const checkIsSystemFolder = (folder: Folder) => folder.name === 'Daily Task';
 
-const defaultFolders: FolderItem[] = [
-  { id: 'daily-task', name: 'Daily Task', listCount: 1, isSystem: true },
-];
+// Get list count from _count property
+const getListCount = (folder: Folder) => folder._count?.lists ?? 0;
 
 const glassCardStyle: React.CSSProperties = {
   background: '#32363C',
@@ -54,7 +56,11 @@ const LONG_PRESS_DURATION = 600; // ms
 
 export default function FoldersPage() {
   const navigate = useNavigate();
-  const [folders, setFolders] = useState<FolderItem[]>(defaultFolders);
+  const { data: folders = [], isLoading, error } = useFolders();
+  const createFolder = useCreateFolder();
+  const updateFolder = useUpdateFolder();
+  const deleteFolderMutation = useDeleteFolder();
+
   const [viewMode, setViewMode] = useState<'icons' | 'list'>('icons');
   const [showNewFolderPopup, setShowNewFolderPopup] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -71,7 +77,7 @@ export default function FoldersPage() {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; folderId: string } | null>(null);
 
   // Long press refs
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
   // Close context menu on click outside
@@ -85,23 +91,18 @@ export default function FoldersPage() {
     }
   }, [contextMenu]);
 
-  function handleFolderClick(folderId: string) {
+  function handleFolderClick(folder: Folder) {
     if (selectionMode) {
-      toggleSelection(folderId);
+      toggleSelection(folder.id);
       return;
     }
-    if (editingFolderId === folderId) return;
-    navigate(`/folders/${folderId}`);
+    if (editingFolderId === folder.id) return;
+    navigate(`/folders/${folder.id}`);
   }
 
-  function handleCreateFolder() {
+  async function handleCreateFolder() {
     if (newFolderName.trim()) {
-      const newFolder: FolderItem = {
-        id: `folder-${Date.now()}`,
-        name: newFolderName.trim(),
-        listCount: 0,
-      };
-      setFolders([...folders, newFolder]);
+      await createFolder.mutateAsync({ name: newFolderName.trim() });
       setNewFolderName('');
       setShowNewFolderPopup(false);
     }
@@ -136,18 +137,18 @@ export default function FoldersPage() {
     setSelectionMode(false);
   }
 
-  function deleteSelected() {
-    const newFolders = folders.filter(
-      (f) => !selectedFolders.has(f.id) || f.isSystem
+  async function deleteSelected() {
+    const toDelete = Array.from(selectedFolders).filter(
+      (id) => !checkIsSystemFolder(folders.find((f) => f.id === id)!)
     );
-    setFolders(newFolders);
+    await Promise.all(toDelete.map((id) => deleteFolderMutation.mutateAsync(id)));
     clearSelection();
   }
 
-  function deleteFolder(folderId: string) {
+  async function handleDeleteFolder(folderId: string) {
     const folder = folders.find((f) => f.id === folderId);
-    if (folder?.isSystem) return;
-    setFolders(folders.filter((f) => f.id !== folderId));
+    if (folder && checkIsSystemFolder(folder)) return;
+    await deleteFolderMutation.mutateAsync(folderId);
     setContextMenu(null);
     if (selectedFolders.has(folderId)) {
       const newSelected = new Set(selectedFolders);
@@ -174,20 +175,16 @@ export default function FoldersPage() {
   }, []);
 
   // Rename logic
-  function startRename(folder: FolderItem) {
-    if (folder.isSystem) return;
+  function startRename(folder: Folder) {
+    if (checkIsSystemFolder(folder)) return;
     setEditingFolderId(folder.id);
     setEditName(folder.name);
     setContextMenu(null);
   }
 
-  function saveRename() {
+  async function saveRename() {
     if (editName.trim() && editingFolderId) {
-      setFolders(
-        folders.map((f) =>
-          f.id === editingFolderId ? { ...f, name: editName.trim() } : f
-        )
-      );
+      await updateFolder.mutateAsync({ id: editingFolderId, data: { name: editName.trim() } });
     }
     setEditingFolderId(null);
     setEditName('');
@@ -199,24 +196,30 @@ export default function FoldersPage() {
   }
 
   // Context menu
-  function handleRightClick(e: React.MouseEvent, folder: FolderItem) {
+  function handleRightClick(e: React.MouseEvent, folder: Folder) {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, folderId: folder.id });
   }
 
-  function handleDoubleClick(folder: FolderItem) {
+  function handleDoubleClick(folder: Folder) {
     if (selectionMode) return;
-    if (!folder.isSystem) {
+    if (!checkIsSystemFolder(folder)) {
       startRename(folder);
     }
   }
 
   const selectedFolder = contextMenu ? folders.find((f) => f.id === contextMenu.folderId) : null;
-  const isSystemFolder = selectedFolder?.isSystem ?? false;
+  const selectedIsSystem = selectedFolder ? checkIsSystemFolder(selectedFolder) : false;
 
   return (
     <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
       <Topbar title="Your Folders" />
       <SidePanel />
 
@@ -407,270 +410,290 @@ export default function FoldersPage() {
           </div>
         </div>
 
-        {/* Folders Grid/List */}
-        {viewMode === 'icons' ? (
-          /* Icon View */
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-              gap: '24px',
-            }}
-          >
-            {folders.map((folder) => {
-              const isSelected = selectedFolders.has(folder.id);
-              const isEditing = editingFolderId === folder.id;
-
-              return (
-                <div
-                  key={folder.id}
-                  onClick={() => handleFolderClick(folder.id)}
-                  onContextMenu={(e) => handleRightClick(e, folder)}
-                  onDoubleClick={() => handleDoubleClick(folder)}
-                  onMouseDown={() => startLongPress(folder.id)}
-                  onMouseUp={endLongPress}
-                  onMouseLeave={endLongPress}
-                  onTouchStart={() => startLongPress(folder.id)}
-                  onTouchEnd={endLongPress}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    cursor: selectionMode || isEditing ? 'default' : 'pointer',
-                    padding: '16px',
-                    borderRadius: '16px',
-                    transition: 'all 0.2s ease',
-                    background: isSelected ? 'rgba(0, 191, 255, 0.1)' : 'transparent',
-                    border: isSelected ? '1px solid rgba(0, 191, 255, 0.3)' : '1px solid transparent',
-                    position: 'relative',
-                  }}
-                >
-                  {/* Selection Checkbox (Icon View) */}
-                  {selectionMode && (
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleSelection(folder.id);
-                      }}
-                      style={{
-                        position: 'absolute',
-                        top: '8px',
-                        right: '8px',
-                        color: isSelected ? '#00bfff' : '#8A8F98',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
-                    </div>
-                  )}
-
-                  {/* Folder Icon */}
-                  <div
-                    style={{
-                      width: '80px',
-                      height: '80px',
-                      borderRadius: '20px',
-                      background: '#32363C',
-                      border: folder.isSystem
-                        ? '1px solid rgba(255, 107, 53, 0.3)'
-                        : '1px solid rgba(255, 255, 255, 0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <Folder
-                      size={40}
-                      style={{ color: folder.isSystem ? '#FF6B35' : '#00bfff' }}
-                    />
-                  </div>
-
-                  {/* Folder Name / Edit Input */}
-                  {isEditing ? (
-                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveRename();
-                          if (e.key === 'Escape') cancelRename();
-                        }}
-                        onBlur={saveRename}
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          width: '90px',
-                          padding: '4px 8px',
-                          background: '#1B1D21',
-                          border: '1px solid rgba(0, 191, 255, 0.5)',
-                          borderRadius: '6px',
-                          color: '#EDEFF3',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: '12px',
-                          outline: 'none',
-                          textAlign: 'center',
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <span
-                      style={{
-                        color: folder.isSystem ? '#FF6B35' : '#D5D8DE',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        fontWeight: 500,
-                        textAlign: 'center',
-                        marginTop: '12px',
-                        maxWidth: '100px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                      title={folder.isSystem ? 'System folder (cannot rename or delete)' : folder.name}
-                    >
-                      {folder.name}
-                    </span>
-                  )}
-
-                  <span
-                    style={{
-                      color: '#8A8F98',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '11px',
-                      textAlign: 'center',
-                      marginTop: '4px',
-                    }}
-                  >
-                    {folder.listCount} {folder.listCount === 1 ? 'list' : 'lists'}
-                  </span>
-                </div>
-              );
-            })}
+        {/* Loading State */}
+        {isLoading && (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
+            <Loader2 size={32} style={{ color: '#00bfff', animation: 'spin 1s linear infinite' }} />
           </div>
-        ) : (
-          /* List View */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {folders.map((folder) => {
-              const isSelected = selectedFolders.has(folder.id);
-              const isEditing = editingFolderId === folder.id;
+        )}
 
-              return (
-                <div
-                  key={folder.id}
-                  onClick={() => handleFolderClick(folder.id)}
-                  onContextMenu={(e) => handleRightClick(e, folder)}
-                  onDoubleClick={() => handleDoubleClick(folder)}
-                  onMouseDown={() => startLongPress(folder.id)}
-                  onMouseUp={endLongPress}
-                  onMouseLeave={endLongPress}
-                  onTouchStart={() => startLongPress(folder.id)}
-                  onTouchEnd={endLongPress}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '16px 20px',
-                    background: isSelected ? 'rgba(0, 191, 255, 0.1)' : '#32363C',
-                    border: isSelected
-                      ? '1px solid rgba(0, 191, 255, 0.3)'
-                      : folder.isSystem
-                      ? '1px solid rgba(255, 107, 53, 0.2)'
-                      : '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    cursor: selectionMode || isEditing ? 'default' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                  }}
-                >
-                  {/* Selection Checkbox (List View) */}
-                  {selectionMode && (
+        {/* Error State */}
+        {error && (
+          <div style={{ color: '#FF6B35', textAlign: 'center', padding: '48px' }}>
+            Failed to load folders. Please try again.
+          </div>
+        )}
+
+        {/* Folders Grid/List */}
+        {!isLoading && !error && (
+          viewMode === 'icons' ? (
+            /* Icon View */
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                gap: '24px',
+              }}
+            >
+              {folders.map((folder) => {
+                const isSelected = selectedFolders.has(folder.id);
+                const isEditing = editingFolderId === folder.id;
+                const folderIsSystem = checkIsSystemFolder(folder);
+                const listCount = getListCount(folder);
+
+                return (
+                  <div
+                    key={folder.id}
+                    onClick={() => handleFolderClick(folder)}
+                    onContextMenu={(e) => handleRightClick(e, folder)}
+                    onDoubleClick={() => handleDoubleClick(folder)}
+                    onMouseDown={() => startLongPress(folder.id)}
+                    onMouseUp={endLongPress}
+                    onMouseLeave={endLongPress}
+                    onTouchStart={() => startLongPress(folder.id)}
+                    onTouchEnd={endLongPress}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      cursor: selectionMode || isEditing ? 'default' : 'pointer',
+                      padding: '16px',
+                      borderRadius: '16px',
+                      transition: 'all 0.2s ease',
+                      background: isSelected ? 'rgba(0, 191, 255, 0.1)' : 'transparent',
+                      border: isSelected ? '1px solid rgba(0, 191, 255, 0.3)' : '1px solid transparent',
+                      position: 'relative',
+                    }}
+                  >
+                    {/* Selection Checkbox (Icon View) */}
+                    {selectionMode && (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelection(folder.id);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '8px',
+                          color: isSelected ? '#00bfff' : '#8A8F98',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
+                      </div>
+                    )}
+
+                    {/* Folder Icon */}
                     <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleSelection(folder.id);
-                      }}
                       style={{
-                        color: isSelected ? '#00bfff' : '#8A8F98',
-                        cursor: 'pointer',
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '20px',
+                        background: '#32363C',
+                        border: folderIsSystem
+                          ? '1px solid rgba(255, 107, 53, 0.3)'
+                          : '1px solid rgba(255, 255, 255, 0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
-                    </div>
-                  )}
-
-                  <Folder
-                    size={24}
-                    style={{ color: folder.isSystem ? '#FF6B35' : '#00bfff', flexShrink: 0 }}
-                  />
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveRename();
-                          if (e.key === 'Escape') cancelRename();
-                        }}
-                        onBlur={saveRename}
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          width: '100%',
-                          maxWidth: '300px',
-                          padding: '6px 12px',
-                          background: '#1B1D21',
-                          border: '1px solid rgba(0, 191, 255, 0.5)',
-                          borderRadius: '8px',
-                          color: '#EDEFF3',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: '14px',
-                          outline: 'none',
-                        }}
+                      <FolderIcon
+                        size={40}
+                        style={{ color: folderIsSystem ? '#FF6B35' : '#00bfff' }}
                       />
+                    </div>
+
+                    {/* Folder Name / Edit Input */}
+                    {isEditing ? (
+                      <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveRename();
+                            if (e.key === 'Escape') cancelRename();
+                          }}
+                          onBlur={saveRename}
+                          autoFocus
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            width: '90px',
+                            padding: '4px 8px',
+                            background: '#1B1D21',
+                            border: '1px solid rgba(0, 191, 255, 0.5)',
+                            borderRadius: '6px',
+                            color: '#EDEFF3',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '12px',
+                            outline: 'none',
+                            textAlign: 'center',
+                          }}
+                        />
+                      </div>
                     ) : (
-                      <div
+                      <span
                         style={{
-                          color: folder.isSystem ? '#FF6B35' : '#EDEFF3',
+                          color: folderIsSystem ? '#FF6B35' : '#D5D8DE',
                           fontFamily: 'Poppins, sans-serif',
-                          fontSize: '15px',
+                          fontSize: '13px',
                           fontWeight: 500,
+                          textAlign: 'center',
+                          marginTop: '12px',
+                          maxWidth: '100px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
                         }}
-                        title={folder.isSystem ? 'System folder (cannot rename or delete)' : folder.name}
+                        title={folderIsSystem ? 'System folder (cannot rename or delete)' : folder.name}
                       >
                         {folder.name}
-                      </div>
+                      </span>
                     )}
-                  </div>
 
-                  <span
+                    <span
+                      style={{
+                        color: '#8A8F98',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '11px',
+                        textAlign: 'center',
+                        marginTop: '4px',
+                      }}
+                    >
+                      {listCount} {listCount === 1 ? 'list' : 'lists'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* List View */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {folders.map((folder) => {
+                const isSelected = selectedFolders.has(folder.id);
+                const isEditing = editingFolderId === folder.id;
+                const folderIsSystem = checkIsSystemFolder(folder);
+                const listCount = getListCount(folder);
+
+                return (
+                  <div
+                    key={folder.id}
+                    onClick={() => handleFolderClick(folder)}
+                    onContextMenu={(e) => handleRightClick(e, folder)}
+                    onDoubleClick={() => handleDoubleClick(folder)}
+                    onMouseDown={() => startLongPress(folder.id)}
+                    onMouseUp={endLongPress}
+                    onMouseLeave={endLongPress}
+                    onTouchStart={() => startLongPress(folder.id)}
+                    onTouchEnd={endLongPress}
                     style={{
-                      color: '#8A8F98',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '13px',
-                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      padding: '16px 20px',
+                      background: isSelected ? 'rgba(0, 191, 255, 0.1)' : '#32363C',
+                      border: isSelected
+                        ? '1px solid rgba(0, 191, 255, 0.3)'
+                        : folderIsSystem
+                        ? '1px solid rgba(255, 107, 53, 0.2)'
+                        : '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '12px',
+                      cursor: selectionMode || isEditing ? 'default' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    {folder.listCount} {folder.listCount === 1 ? 'list' : 'lists'}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                    {/* Selection Checkbox (List View) */}
+                    {selectionMode && (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelection(folder.id);
+                        }}
+                        style={{
+                          color: isSelected ? '#00bfff' : '#8A8F98',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
+                      </div>
+                    )}
+
+                    <FolderIcon
+                      size={24}
+                      style={{ color: folderIsSystem ? '#FF6B35' : '#00bfff', flexShrink: 0 }}
+                    />
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveRename();
+                            if (e.key === 'Escape') cancelRename();
+                          }}
+                          onBlur={saveRename}
+                          autoFocus
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            width: '100%',
+                            maxWidth: '300px',
+                            padding: '6px 12px',
+                            background: '#1B1D21',
+                            border: '1px solid rgba(0, 191, 255, 0.5)',
+                            borderRadius: '8px',
+                            color: '#EDEFF3',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                            outline: 'none',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            color: folderIsSystem ? '#FF6B35' : '#EDEFF3',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '15px',
+                            fontWeight: 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                          title={folderIsSystem ? 'System folder (cannot rename or delete)' : folder.name}
+                        >
+                          {folder.name}
+                        </div>
+                      )}
+                    </div>
+
+                    <span
+                      style={{
+                        color: '#8A8F98',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {listCount} {listCount === 1 ? 'list' : 'lists'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )
         )}
       </div>
 
       {/* Context Menu */}
       {contextMenu && selectedFolder && (
         <div style={{ ...contextMenuStyle, left: contextMenu.x, top: contextMenu.y }}>
-          {!isSystemFolder && (
+          {!selectedIsSystem && (
             <div
               onClick={() => startRename(selectedFolder)}
               style={{
@@ -697,9 +720,9 @@ export default function FoldersPage() {
             </div>
           )}
 
-          {!isSystemFolder && (
+          {!selectedIsSystem && (
             <div
-              onClick={() => deleteFolder(selectedFolder.id)}
+              onClick={() => handleDeleteFolder(selectedFolder.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -726,7 +749,7 @@ export default function FoldersPage() {
             </div>
           )}
 
-          {isSystemFolder && (
+          {selectedIsSystem && (
             <div
               style={{
                 padding: '10px 12px',
