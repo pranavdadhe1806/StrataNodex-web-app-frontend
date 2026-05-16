@@ -2,7 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Menu, User, LayoutDashboard, Folder, CalendarDays, BarChart3, Settings, LogOut, Trash2 } from 'lucide-react';
 import { useUIStore } from '../../store/ui.store';
 import { useAuthStore } from '../../store/auth.store';
+import { getToken } from '../../utils/token';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+// In dev, redirect to local landing page; in prod, to deployed Vercel app
+const LANDING_AUTH_URL =
+  import.meta.env.VITE_LANDING_URL
+    ? `${import.meta.env.VITE_LANDING_URL}/#auth`
+    : 'https://stratanodex-landing-page.vercel.app/#auth';
 
 interface TopbarProps {
   title: string;
@@ -111,6 +118,15 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
   function handleLogout() {
     logout();
     setProfileOpen(false);
+  }
+
+  function handleProfileClick() {
+    // If not authenticated, send to landing page login
+    if (!getToken()) {
+      window.location.href = LANDING_AUTH_URL;
+      return;
+    }
+    setProfileOpen((v) => !v);
   }
 
   return (
@@ -263,7 +279,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
       <div className="relative">
         <button
           ref={profileBtnRef}
-          onClick={() => setProfileOpen(!profileOpen)}
+          onClick={handleProfileClick}
           className="text-[#EDEFF3] hover:opacity-80 transition-opacity flex items-center justify-center p-1.5"
           aria-label="Profile"
         >

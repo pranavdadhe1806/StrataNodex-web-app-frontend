@@ -9,6 +9,7 @@ import {
   useDeleteFolder,
 } from '../hooks/useFolders';
 import type { Folder } from '../types/folder.types';
+import { useRecentsStore } from '../store/recents.store';
 import { Folder as FolderIcon, Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Square, CheckSquare, Loader2 } from 'lucide-react';
 
 // System folder detection - Daily Task is always system folder
@@ -60,6 +61,7 @@ export default function FoldersPage() {
   const createFolder = useCreateFolder();
   const updateFolder = useUpdateFolder();
   const deleteFolderMutation = useDeleteFolder();
+  const recordOpen = useRecentsStore((s) => s.recordOpen);
 
   const [viewMode, setViewMode] = useState<'icons' | 'list'>('icons');
   const [showNewFolderPopup, setShowNewFolderPopup] = useState(false);
@@ -97,6 +99,7 @@ export default function FoldersPage() {
       return;
     }
     if (editingFolderId === folder.id) return;
+    recordOpen({ id: folder.id, name: folder.name, type: 'folder' });
     navigate(`/folders/${folder.id}`);
   }
 

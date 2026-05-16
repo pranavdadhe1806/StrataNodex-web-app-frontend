@@ -1,39 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import RecentCard from './RecentCard';
-
-interface RecentItem {
-  id: string;
-  name: string;
-  type: 'folder' | 'list';
-}
-
-const mockRecents: RecentItem[] = [
-  { id: '1', name: 'GATE Prep', type: 'folder' },
-  { id: '2', name: 'Daily Tasks', type: 'list' },
-  { id: '3', name: 'Personal', type: 'folder' },
-  { id: '4', name: 'Maths', type: 'list' },
-  { id: '5', name: 'Work', type: 'folder' },
-  { id: '6', name: 'Science', type: 'list' },
-  { id: '7', name: 'College', type: 'folder' },
-  { id: '8', name: 'Physics', type: 'list' },
-  { id: '9', name: 'Side Projects', type: 'folder' },
-  { id: '10', name: 'Gym', type: 'list' },
-];
+import { MAX_RECENTS, useRecentsStore } from '../../store/recents.store';
 
 export default function Recents() {
   const navigate = useNavigate();
+  const items = useRecentsStore((s) => s.items).slice(0, MAX_RECENTS);
 
-  function handleCardClick(item: RecentItem) {
+  function handleCardClick(item: (typeof items)[number]) {
     if (item.type === 'folder') {
       navigate(`/folders/${item.id}`);
     } else {
-      navigate(`/list/${item.id}`);
+      navigate(`/list/${item.id}`, { state: { listName: item.name } });
     }
   }
 
+  const columnCount = Math.min(items.length, MAX_RECENTS);
+
   return (
-    <div>
-      {/* Section Header */}
+    <div style={{ width: '100%' }}>
       <h2
         style={{
           color: '#EDEFF3',
@@ -46,33 +30,37 @@ export default function Recents() {
         Recents
       </h2>
 
-      {/* Horizontal Scroll Row */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: '12px',
-          overflowX: 'auto',
-          paddingBottom: '8px',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        <style>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-        {mockRecents.map((item) => (
-          <RecentCard
-            key={item.id}
-            id={item.id}
-            name={item.name}
-            type={item.type}
-            onClick={() => handleCardClick(item)}
-          />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <p
+          style={{
+            color: '#8A8F98',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '14px',
+            margin: 0,
+            padding: '24px 0',
+          }}
+        >
+          Open a folder or list to see it here.
+        </p>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+            gap: '12px',
+            width: '100%',
+          }}
+        >
+          {items.map((item) => (
+            <RecentCard
+              key={`${item.type}-${item.id}`}
+              name={item.name}
+              type={item.type}
+              onClick={() => handleCardClick(item)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

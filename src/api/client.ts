@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { getToken, clearToken } from '../utils/token';
 
-const LANDING_AUTH_URL = 'https://stratanodex-landing-page.vercel.app/#auth';
+// In dev, redirect to local landing page; in prod, to deployed Vercel app
+const LANDING_AUTH_URL =
+  import.meta.env.VITE_LANDING_URL
+    ? `${import.meta.env.VITE_LANDING_URL}/#auth`
+    : 'https://stratanodex-landing-page.vercel.app/#auth';
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

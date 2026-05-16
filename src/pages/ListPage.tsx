@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
 import NodeTree from '../components/canvas/NodeTree';
@@ -6,10 +7,40 @@ import ProgressWidget from '../components/canvas/ProgressWidget';
 import { useCanvasStore } from '../store/canvas.store';
 import type { Node } from '../types/node.types';
 import { flattenTree } from '../utils/tree';
+import { useRecordRecent } from '../hooks/useRecordRecent';
+import { useRecentsStore } from '../store/recents.store';
+import { useUIStore } from '../store/ui.store';
 
 export default function ListPage() {
+  const { listId } = useParams<{ listId: string }>();
+  const location = useLocation();
+  const listNameFromState = (location.state as { listName?: string } | null)?.listName;
+  const folderIdFromState = (location.state as { folderId?: string; folderName?: string } | null);
+  const storedList = useRecentsStore((s) =>
+    listId ? s.getEntry('list', listId) : undefined
+  );
+  const resolvedListName = listNameFromState ?? storedList?.name ?? 'Untitled List';
+
+  const setActiveContext = useUIStore((s) => s.setActiveContext);
+  useRecordRecent('list', listId, resolvedListName);
+
+  useEffect(() => {
+    if (listId) {
+      setActiveContext({
+        listId,
+        listName: resolvedListName,
+        folderId: folderIdFromState?.folderId,
+        folderName: folderIdFromState?.folderName,
+      });
+    }
+  }, [listId, resolvedListName, folderIdFromState, setActiveContext]);
+
   // Title editing state
-  const [listTitle, setListTitle] = useState('Untitled List');
+  const [listTitle, setListTitle] = useState(resolvedListName);
+
+  useEffect(() => {
+    setListTitle(resolvedListName);
+  }, [resolvedListName]);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(listTitle);
   const titleInputRef = useRef<HTMLInputElement>(null);
