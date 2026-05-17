@@ -15,6 +15,9 @@ export const listApi = {
   getByFolder: (folderId: string) =>
     client.get<List[]>(`/folders/${folderId}/lists`).then(r => r.data),
 
+  getById: (listId: string) =>
+    client.get<List>(`/lists/${listId}`).then(r => r.data),
+
   create: (data: CreateListInput) =>
     client.post<List>('/lists', data).then(r => r.data),
 

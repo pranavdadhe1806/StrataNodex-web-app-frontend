@@ -54,6 +54,7 @@ export default function Recents() {
           {items.map((item) => (
             <RecentCard
               key={`${item.type}-${item.id}`}
+              id={item.id}
               name={item.name}
               type={item.type}
               onClick={() => handleCardClick(item)}

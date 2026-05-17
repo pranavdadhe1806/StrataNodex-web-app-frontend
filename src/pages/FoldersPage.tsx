@@ -67,6 +67,7 @@ export default function FoldersPage() {
   const [viewMode, setViewMode] = useState<'icons' | 'list'>('icons');
   const [showNewFolderPopup, setShowNewFolderPopup] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
+  const [hoveredFolderId, setHoveredFolderId] = useState<string | null>(null);
 
   // Selection state
   const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
@@ -457,7 +458,8 @@ export default function FoldersPage() {
                     onDoubleClick={() => handleDoubleClick(folder)}
                     onMouseDown={() => startLongPress(folder.id)}
                     onMouseUp={endLongPress}
-                    onMouseLeave={endLongPress}
+                    onMouseEnter={() => setHoveredFolderId(folder.id)}
+                    onMouseLeave={() => { endLongPress(); setHoveredFolderId(null); }}
                     onTouchStart={() => startLongPress(folder.id)}
                     onTouchEnd={endLongPress}
                     style={{
@@ -467,9 +469,21 @@ export default function FoldersPage() {
                       cursor: selectionMode || isEditing ? 'default' : 'pointer',
                       padding: '16px',
                       borderRadius: '16px',
-                      transition: 'all 0.2s ease',
-                      background: isSelected ? 'rgba(0, 191, 255, 0.1)' : 'transparent',
-                      border: isSelected ? '1px solid rgba(0, 191, 255, 0.3)' : '1px solid transparent',
+                      transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                      background: isSelected
+                        ? 'rgba(0, 191, 255, 0.1)'
+                        : hoveredFolderId === folder.id
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'transparent',
+                      border: isSelected
+                        ? '1px solid rgba(0, 191, 255, 0.3)'
+                        : hoveredFolderId === folder.id
+                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                        : '1px solid transparent',
+                      boxShadow: hoveredFolderId === folder.id && !isSelected
+                        ? '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)'
+                        : 'none',
+                      transform: hoveredFolderId === folder.id ? 'translateY(-4px) scale(1.04)' : 'translateY(0) scale(1)',
                       position: 'relative',
                     }}
                   >

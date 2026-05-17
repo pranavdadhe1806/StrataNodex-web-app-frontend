@@ -4,6 +4,18 @@ import type { List } from '../types/list.types';
 
 const LISTS_KEY = 'lists';
 
+export function useListPreview(listId: string | null) {
+  return useQuery<List, Error>({
+    queryKey: [LISTS_KEY, 'preview', listId],
+    queryFn: () => {
+      if (!listId) throw new Error('List ID is required');
+      return listApi.getById(listId);
+    },
+    enabled: !!listId,
+    staleTime: 30_000,
+  });
+}
+
 export function useLists(folderId: string | null) {
   return useQuery<List[], Error>({
     queryKey: [LISTS_KEY, folderId],

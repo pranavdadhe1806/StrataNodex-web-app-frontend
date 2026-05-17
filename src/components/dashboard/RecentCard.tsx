@@ -1,13 +1,25 @@
-import { ListDuotone } from '../ui/icons';
 import MacFolderIcon from '../ui/MacFolderIcon';
+import ListMiniThumb from '../ui/ListMiniThumb';
+import { useListPreview } from '../../hooks/useLists';
 
 interface RecentCardProps {
+  id: string;
   name: string;
   type: 'folder' | 'list';
   onClick: () => void;
 }
 
-export default function RecentCard({ name, type, onClick }: RecentCardProps) {
+function ListThumb({ id }: { id: string }) {
+  const { data } = useListPreview(id);
+  return (
+    <ListMiniThumb
+      nodeCount={data?._count?.nodes ?? 0}
+      previewNodes={data?.nodes}
+    />
+  );
+}
+
+export default function RecentCard({ id, name, type, onClick }: RecentCardProps) {
   const isFolder = type === 'folder';
 
   return (
@@ -19,10 +31,10 @@ export default function RecentCard({ name, type, onClick }: RecentCardProps) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '10px',
+        gap: '8px',
         width: '100%',
         minWidth: 0,
-        padding: '12px 6px',
+        padding: '10px 6px',
         border: 'none',
         background: 'transparent',
         cursor: 'pointer',
@@ -41,7 +53,7 @@ export default function RecentCard({ name, type, onClick }: RecentCardProps) {
       {isFolder ? (
         <MacFolderIcon size={64} />
       ) : (
-        <ListDuotone size={56} weight="duotone" color="#00c896" />
+        <ListThumb id={id} />
       )}
       <span
         style={{
