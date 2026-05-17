@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, Calendar, Clock, Tag as TagIcon, FileText, Flag, CircleDot } from 'lucide-react';
 import type { Node, NodeStatus, Priority } from '../../types/node.types';
+import RichTextEditor from '../ui/RichTextEditor';
+import CustomSelect from '../ui/CustomSelect';
+import CustomDatePicker from '../ui/CustomDatePicker';
+import CustomTimePicker from '../ui/CustomTimePicker';
 
 interface NodeDetailPanelProps {
   node: Node;
@@ -10,20 +14,6 @@ interface NodeDetailPanelProps {
   onDelete: (id: string) => void;
   onAddSubtask: (parentId: string) => void;
 }
-
-const fieldInputStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.05)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  borderRadius: '8px',
-  color: '#EDEFF3',
-  fontFamily: 'Poppins, sans-serif',
-  fontSize: '13px',
-  padding: '8px 12px',
-  width: '100%',
-  outline: 'none',
-  boxSizing: 'border-box',
-  colorScheme: 'dark' as React.CSSProperties['colorScheme'],
-};
 
 const labelStyle: React.CSSProperties = {
   fontFamily: 'Poppins, sans-serif',
@@ -36,11 +26,16 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
 };
 
-function handleFocus(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-  e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
-}
-function handleBlurReset(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+function PropertyRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: '#8A8F98' }}>
+        {icon}
+        <span style={{ ...labelStyle, marginBottom: 0 }}>{label}</span>
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onAddSubtask }: NodeDetailPanelProps) {
@@ -140,18 +135,17 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
     >
       <motion.div
         onClick={e => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 8 }}
-        transition={{ duration: 0.18, ease: 'easeOut' }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         style={{
-          width: '480px',
-          maxHeight: '580px',
-          borderRadius: '16px',
-          background: '#32363C',
-          border: '1px solid rgba(255, 255, 255, 0.10)',
-          boxShadow: '0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-          backdropFilter: 'blur(12px)',
+          width: 'min(760px, 92vw)',
+          maxHeight: '88vh',
+          borderRadius: '18px',
+          background: '#2A2D33',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -159,34 +153,33 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
       >
         {/* ── Header ── */}
         <div style={{
-          padding: '20px 20px 16px',
+          padding: '24px 28px 18px',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           gap: '12px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
         }}>
           <input
             value={localTitle}
             onChange={e => setLocalTitle(e.target.value)}
-            onBlur={e => { handleTitleBlur(); e.currentTarget.style.borderBottomColor = 'rgba(255,255,255,0.1)'; }}
-            onFocus={e => { e.currentTarget.style.borderBottomColor = 'rgba(0,191,255,0.5)'; }}
+            onBlur={handleTitleBlur}
+            placeholder="Untitled task"
             style={{
               flex: 1,
               background: 'transparent',
               border: 'none',
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
               color: '#EDEFF3',
               fontFamily: 'Poppins, sans-serif',
-              fontSize: '17px',
-              fontWeight: 500,
-              padding: '4px 0',
+              fontSize: '24px',
+              fontWeight: 600,
+              padding: '2px 0',
               outline: 'none',
-              transition: 'border-color 0.15s',
+              letterSpacing: '-0.01em',
             }}
           />
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '6px', flexShrink: 0 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', borderRadius: '8px', flexShrink: 0, marginTop: '2px' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'none')}
           >
@@ -194,97 +187,53 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           </button>
         </div>
 
-        {/* ── Fields (non-scrolling) ── */}
-        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* ── Scrollable body ── */}
+        <div style={{ overflowY: 'auto', flex: 1, padding: '20px 28px 8px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
-          {/* Status + Priority */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={labelStyle}>Status</label>
-              <select
+          {/* Properties grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>
+            <PropertyRow icon={<CircleDot size={14} />} label="Status">
+              <CustomSelect
                 value={localStatus}
-                onChange={e => handleStatusChange(e.target.value as NodeStatus)}
-                onFocus={handleFocus}
-                onBlur={handleBlurReset}
-                style={{ ...fieldInputStyle, cursor: 'pointer', appearance: 'none' }}
-              >
-                <option value="TODO">To Do</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="DONE">Done</option>
-              </select>
-            </div>
-            <div>
-              <label style={labelStyle}>Priority</label>
-              <select
+                onChange={v => handleStatusChange(v as NodeStatus)}
+                options={[
+                  { value: 'TODO', label: 'To Do', color: '#8A8F98' },
+                  { value: 'IN_PROGRESS', label: 'In Progress', color: '#00bfff' },
+                  { value: 'DONE', label: 'Done', color: '#00c896' },
+                ]}
+              />
+            </PropertyRow>
+
+            <PropertyRow icon={<Flag size={14} />} label="Priority">
+              <CustomSelect
                 value={localPriority}
-                onChange={e => handlePriorityChange(e.target.value as Priority | '')}
-                onFocus={handleFocus}
-                onBlur={handleBlurReset}
-                style={{ ...fieldInputStyle, cursor: 'pointer', appearance: 'none' }}
-              >
-                <option value="">None</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-              </select>
-            </div>
-          </div>
+                onChange={v => handlePriorityChange(v as Priority | '')}
+                options={[
+                  { value: '', label: 'None', color: '#4A4F57' },
+                  { value: 'LOW', label: 'Low', color: '#00c896' },
+                  { value: 'MEDIUM', label: 'Medium', color: '#f7b955' },
+                  { value: 'HIGH', label: 'High', color: '#f85149' },
+                ]}
+              />
+            </PropertyRow>
 
-          {/* Start Date + Time */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={labelStyle}>Start Date</label>
-              <input
-                type="date"
-                value={localStartDate}
-                onChange={e => setLocalStartDate(e.target.value)}
-                onBlur={e => { handleDateTimeBlur(); handleBlurReset(e); }}
-                onFocus={handleFocus}
-                style={fieldInputStyle}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Start Time</label>
-              <input
-                type="time"
-                value={localStartTime}
-                onChange={e => setLocalStartTime(e.target.value)}
-                onBlur={e => { handleDateTimeBlur(); handleBlurReset(e); }}
-                onFocus={handleFocus}
-                style={fieldInputStyle}
-              />
-            </div>
-          </div>
+            <PropertyRow icon={<Calendar size={14} />} label="Start Date">
+              <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '8px' }}>
+                <CustomDatePicker value={localStartDate} onChange={v => { setLocalStartDate(v); setTimeout(handleDateTimeBlur, 0); }} />
+                <CustomTimePicker value={localStartTime} onChange={v => { setLocalStartTime(v); setTimeout(handleDateTimeBlur, 0); }} />
+              </div>
+            </PropertyRow>
 
-          {/* End Date + Time */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={labelStyle}>End Date</label>
-              <input
-                type="date"
-                value={localEndDate}
-                onChange={e => setLocalEndDate(e.target.value)}
-                onBlur={e => { handleDateTimeBlur(); handleBlurReset(e); }}
-                onFocus={handleFocus}
-                style={fieldInputStyle}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>End Time</label>
-              <input
-                type="time"
-                value={localEndTime}
-                onChange={e => setLocalEndTime(e.target.value)}
-                onBlur={e => { handleDateTimeBlur(); handleBlurReset(e); }}
-                onFocus={handleFocus}
-                style={fieldInputStyle}
-              />
-            </div>
+            <PropertyRow icon={<Clock size={14} />} label="End Date">
+              <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '8px' }}>
+                <CustomDatePicker value={localEndDate} onChange={v => { setLocalEndDate(v); setTimeout(handleDateTimeBlur, 0); }} />
+                <CustomTimePicker value={localEndTime} onChange={v => { setLocalEndTime(v); setTimeout(handleDateTimeBlur, 0); }} />
+              </div>
+            </PropertyRow>
           </div>
 
           {/* Tags */}
-          <div>
-            <label style={labelStyle}>Tags</label>
+          <PropertyRow icon={<TagIcon size={14} />} label="Tags">
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -293,8 +242,8 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               background: 'rgba(255, 255, 255, 0.03)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '8px',
-              padding: '6px 10px',
-              minHeight: '38px',
+              padding: '7px 10px',
+              minHeight: '40px',
             }}>
               {localTags.map(tag => (
                 <span key={tag} style={{
@@ -319,59 +268,39 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                 </span>
               ))}
               <input
-                placeholder="+ add tag"
+                placeholder={localTags.length === 0 ? '+ add tag (press Enter)' : '+'}
                 value={tagInput}
                 onChange={e => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#7D828B',
+                  color: '#D5D8DE',
                   fontFamily: 'Poppins, sans-serif',
-                  fontSize: '12px',
+                  fontSize: '12.5px',
                   outline: 'none',
-                  minWidth: '70px',
+                  minWidth: '90px',
                   flex: 1,
                 }}
               />
             </div>
-          </div>
-        </div>
+          </PropertyRow>
 
-        {/* ── Notes (scrollable section) ── */}
-        <div style={{
-          padding: '0 20px 14px',
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          paddingTop: '14px',
-        }}>
-          <label style={labelStyle}>Notes</label>
-          <textarea
-            value={localNotes}
-            onChange={e => setLocalNotes(e.target.value)}
-            onBlur={e => { handleNotesBlur(); handleBlurReset(e); }}
-            onFocus={handleFocus}
-            placeholder="Add a note..."
-            style={{
-              flex: 1,
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '8px',
-              color: '#D5D8DE',
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '13px',
-              padding: '10px 12px',
-              resize: 'none',
-              outline: 'none',
-              lineHeight: 1.6,
-              overflowY: 'auto',
-              minHeight: '80px',
-              maxHeight: '140px',
-            }}
-          />
+          {/* Notes — rich text */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: '#8A8F98' }}>
+              <FileText size={14} />
+              <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 500, letterSpacing: '0.3px', textTransform: 'uppercase' }}>Notes</span>
+            </div>
+            <RichTextEditor
+              value={localNotes}
+              onChange={setLocalNotes}
+              onBlur={handleNotesBlur}
+              placeholder="Write notes, ideas, or anything important…"
+              minHeight={180}
+              maxHeight={340}
+            />
+          </div>
         </div>
 
         {/* ── Footer ── */}
@@ -379,8 +308,9 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '14px 20px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          padding: '14px 24px',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          background: 'rgba(0,0,0,0.15)',
           flexShrink: 0,
         }}>
           <button
