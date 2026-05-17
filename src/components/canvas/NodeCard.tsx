@@ -85,8 +85,8 @@ export default function NodeCard({
   }
 
   return (
-    <div style={{ ...getCardStyles(), ...style }} onClick={onTextClick}>
-      {/* Status circle / done indicator */}
+    <div style={{ ...getCardStyles(), ...style }}>
+      {/* Status circle — toggles status only, does NOT open popup */}
       <div
         style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         onClick={(e) => { e.stopPropagation(); onCircleClick(); }}
@@ -98,27 +98,33 @@ export default function NodeCard({
         )}
       </div>
 
-      {/* Numbering prefix */}
-      <span style={{ fontSize: '12px', color: '#7D828B', fontFamily: 'Poppins, sans-serif' }}>
-        {numbering}
-      </span>
+      {/* Text area — opens popup */}
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}
+        onClick={(e) => { e.stopPropagation(); onTextClick(); }}
+      >
+        {/* Numbering prefix */}
+        <span style={{ fontSize: '12px', color: '#7D828B', fontFamily: 'Poppins, sans-serif', flexShrink: 0 }}>
+          {numbering}
+        </span>
 
-      {/* Title */}
-      <span style={textStyles}>{node.title}</span>
+        {/* Title */}
+        <span style={{ ...textStyles, flex: 1 }}>{node.title}</span>
 
-      {/* Expand/collapse chevron for nodes with children */}
-      {hasChildren && (
-        <ChevronRight
-          size={14}
-          color="#8A8F98"
-          style={{
-            flexShrink: 0,
-            marginLeft: 'auto',
-            transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
-          }}
-        />
-      )}
+        {/* Expand/collapse chevron for nodes with children */}
+        {hasChildren && (
+          <ChevronRight
+            size={14}
+            color="#8A8F98"
+            style={{
+              flexShrink: 0,
+              marginLeft: 'auto',
+              transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease',
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

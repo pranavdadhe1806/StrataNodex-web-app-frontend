@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
 import NodeTree from '../components/canvas/NodeTree';
+import NodeDetailPanel from '../components/canvas/NodeDetailPanel';
 import ProgressWidget from '../components/canvas/ProgressWidget';
 import { useCanvasStore } from '../store/canvas.store';
 import type { Node } from '../types/node.types';
-import { flattenTree, buildTree } from '../utils/tree';
+import { flattenTree, buildTree, findNode } from '../utils/tree';
 import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
 import { useUIStore } from '../store/ui.store';
-import { useNodes, useCreateNode, useCreateSubNode, useUpdateNode } from '../hooks/useNodes';
+import { useNodes, useCreateNode, useCreateSubNode, useUpdateNode, useDeleteNode } from '../hooks/useNodes';
 
 export default function ListPage() {
   const { listId } = useParams<{ listId: string }>();
@@ -41,6 +43,7 @@ export default function ListPage() {
   const createNodeMutation = useCreateNode();
   const createSubNodeMutation = useCreateSubNode();
   const updateNodeMutation = useUpdateNode();
+  const deleteNodeMutation = useDeleteNode();
 
   // ── Local optimistic node tree ────────────────────────────────────────────
   // Seeded from server on first load, then updated locally for zero lag
@@ -90,7 +93,11 @@ export default function ListPage() {
   const panStart = useRef({ x: 0, y: 0 });
 
   // Canvas store for selection
-  const { selectedNodeId, selectNode } = useCanvasStore();
+  const { selectedNodeId } = useCanvasStore();
+
+  // Popup state
+  const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
+  const detailNode = detailNodeId ? findNode(nodes, detailNodeId) : null;
 
   // Computed stats
   const flatNodes = flattenTree(nodes);
@@ -292,6 +299,49 @@ export default function ListPage() {
     }
   }
 
+  // ── Update node in local tree ─────────────────────────────────────────────
+  function updateNodeInTree(updated: Node) {
+    setNodes(prev => {
+      function walk(list: Node[]): Node[] {
+        return list.map(n => {
+          if (n.id === updated.id) return { ...updated, children: n.children };
+          return { ...n, children: walk(n.children ?? []) };
+        });
+      }
+      return walk(prev);
+    });
+    // Sync to server in background
+    updateNodeMutation.mutate({ id: updated.id, data: {
+      title: updated.title,
+      status: updated.status,
+      priority: updated.priority,
+      notes: updated.notes ?? undefined,
+      startAt: updated.startAt,
+      endAt: updated.endAt,
+    }});
+  }
+
+  // ── Delete node + all children from local tree ────────────────────────────
+  function deleteNodeFromTree(id: string) {
+    setNodes(prev => {
+      function walk(list: Node[]): Node[] {
+        return list.filter(n => n.id !== id).map(n => ({ ...n, children: walk(n.children ?? []) }));
+      }
+      return walk(prev);
+    });
+    setDetailNodeId(null);
+    deleteNodeMutation.mutate(id);
+  }
+
+  // ── Add subtask from popup ─────────────────────────────────────────────────
+  function addSubtaskFromPopup(parentId: string) {
+    // Set up input state to type a child of the clicked node
+    setCurrentParentId(parentId);
+    setCurrentDepth(1);
+    setIsTyping(true);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }
+
   // ── Toggle status: optimistic + background save ───────────────────────────
   function toggleNodeStatus(id: string) {
     // Optimistic update immediately
@@ -351,6 +401,17 @@ export default function ListPage() {
 
   return (
     <div style={{ background: '#1B1D21', height: '100vh', overflow: 'hidden' }}>
+      <AnimatePresence>
+        {detailNode && (
+          <NodeDetailPanel
+            node={detailNode}
+            onClose={() => setDetailNodeId(null)}
+            onUpdate={updateNodeInTree}
+            onDelete={deleteNodeFromTree}
+            onAddSubtask={addSubtaskFromPopup}
+          />
+        )}
+      </AnimatePresence>
       <Topbar
         title={isEditingTitle ? '' : listTitle}
         onTitleDoubleClick={handleTitleDoubleClick}
@@ -470,7 +531,7 @@ export default function ListPage() {
               nodes={nodes}
               selectedNodeId={selectedNodeId}
               onNodeCircleClick={toggleNodeStatus}
-              onNodeTextClick={selectNode}
+              onNodeTextClick={(id) => setDetailNodeId(id)}
             />
           )}
         </div>{/* End pannable content */}
