@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { scoreApi } from '../api/score.api';
-import type { DailyScore, StreakData } from '../types/score.types';
+import type { DailyScore } from '../types/score.types';
 
 const SCORES_KEY = 'scores';
 
-export function useScores() {
+export function useScores(limit = 90) {
   return useQuery<DailyScore[], Error>({
-    queryKey: [SCORES_KEY],
-    queryFn: scoreApi.getAll,
+    queryKey: [SCORES_KEY, limit],
+    queryFn: () => scoreApi.getAll(limit),
   });
 }
 
 export function useStreak() {
-  return useQuery<StreakData, Error>({
+  return useQuery<{ streak: number }, Error>({
     queryKey: [SCORES_KEY, 'streak'],
     queryFn: scoreApi.getStreak,
   });

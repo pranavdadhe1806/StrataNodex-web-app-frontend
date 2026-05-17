@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -9,46 +9,34 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from 'recharts';
+import { useScores } from '../../hooks/useScores';
+import type { DailyScore } from '../../types/score.types';
 
 interface DayScore {
   date: string;
-  points: number;
+  points: number | null;
 }
 
 type TimeRange = '14D' | '30D' | '90D';
 
-const mockData14D: DayScore[] = [
-  { date: 'Apr 28', points: 1 },
-  { date: 'Apr 29', points: 0 },
-  { date: 'Apr 30', points: -1 },
-  { date: 'May 1', points: 2 },
-  { date: 'May 2', points: 1 },
-  { date: 'May 3', points: 3 },
-  { date: 'May 4', points: 2 },
-  { date: 'May 5', points: -1 },
-  { date: 'May 6', points: 0 },
-  { date: 'May 7', points: 1 },
-  { date: 'May 8', points: 2 },
-  { date: 'May 9', points: 3 },
-  { date: 'May 10', points: 3 },
-  { date: 'May 11', points: 2 },
-];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const mockData30D: DayScore[] = [
-  ...Array.from({ length: 16 }, (_, i) => ({
-    date: `Apr ${i + 12}`,
-    points: Math.floor(Math.random() * 5) - 1,
-  })),
-  ...mockData14D,
-];
+function formatLabel(iso: string): string {
+  const [, m, d] = iso.split('-').map(Number);
+  return `${MONTHS[m - 1]} ${d}`;
+}
 
-const mockData90D: DayScore[] = [
-  ...Array.from({ length: 76 }, (_, i) => ({
-    date: i < 60 ? `Feb ${i + 1}` : `Mar ${i - 59}`,
-    points: Math.floor(Math.random() * 5) - 1,
-  })),
-  ...mockData14D,
-];
+function buildChartData(scores: DailyScore[], days: number): DayScore[] {
+  const scoreMap = new Map(scores.map(s => [s.date, s.points]));
+  const result: DayScore[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const iso = d.toISOString().split('T')[0];
+    result.push({ date: formatLabel(iso), points: scoreMap.get(iso) ?? null });
+  }
+  return result;
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -90,8 +78,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function MainGraph() {
   const [range, setRange] = useState<TimeRange>('14D');
+  const { data: rawScores = [], isLoading } = useScores(90);
 
-  const data = range === '14D' ? mockData14D : range === '30D' ? mockData30D : mockData90D;
+  const days = range === '14D' ? 14 : range === '30D' ? 30 : 90;
+  const data = useMemo(() => buildChartData(rawScores, days), [rawScores, days]);
+
+  const hasAnyData = rawScores.length > 0;
+  const tickInterval = range === '14D' ? 1 : range === '30D' ? 4 : 13;
 
   const toggleStyle = (isActive: boolean): React.CSSProperties => ({
     padding: '4px 10px',
@@ -162,44 +155,55 @@ export default function MainGraph() {
 
       {/* Graph */}
       <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-          <defs>
-            <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#00bfff" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#00bfff" stopOpacity={0.02} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="rgba(255,255,255,0.04)"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="date"
-            tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            domain={[-1, 3]}
-            ticks={[-1, 0, 1, 2, 3]}
-            tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
-            axisLine={false}
-            tickLine={false}
-            width={24}
-          />
-          <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="4 4" />
-          <Tooltip content={<CustomTooltip />} />
-          <Area
-            type="monotone"
-            dataKey="points"
-            stroke="#00bfff"
-            strokeWidth={2}
-            fill="url(#cyanGradient)"
-            dot={false}
-            activeDot={{ r: 5, fill: '#00bfff', stroke: '#1B1D21', strokeWidth: 2 }}
-          />
-        </AreaChart>
+        {isLoading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#7D828B', fontFamily: 'Poppins', fontSize: '12px' }}>
+            Loading…
+          </div>
+        ) : !hasAnyData ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#7D828B', fontFamily: 'Poppins', fontSize: '12px' }}>
+            No score data yet
+          </div>
+        ) : (
+          <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#00bfff" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#00bfff" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="rgba(255,255,255,0.04)"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="date"
+              tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
+              axisLine={false}
+              tickLine={false}
+              interval={tickInterval}
+            />
+            <YAxis
+              domain={[-1, 3]}
+              ticks={[-1, 0, 1, 2, 3]}
+              tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
+              axisLine={false}
+              tickLine={false}
+              width={24}
+            />
+            <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="4 4" />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="points"
+              stroke="#00bfff"
+              strokeWidth={2}
+              fill="url(#cyanGradient)"
+              dot={false}
+              activeDot={{ r: 5, fill: '#00bfff', stroke: '#1B1D21', strokeWidth: 2 }}
+            />
+          </AreaChart>
+        )}
       </ResponsiveContainer>
     </div>
   );
