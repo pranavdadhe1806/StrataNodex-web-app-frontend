@@ -1,3 +1,9 @@
+export interface ListNodePreview {
+  id: string;
+  title: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+}
+
 export interface List {
   id: string;
   name: string;
@@ -8,4 +14,5 @@ export interface List {
   _count?: {
     nodes: number;
   };
+  nodes?: ListNodePreview[];
 }

@@ -9,6 +9,7 @@ import {
 import type { Node } from '../types/node.types';
 
 const NODES_KEY = 'nodes';
+const LISTS_KEY = 'lists';
 
 export function useNodes(listId: string | null) {
   return useQuery<Node[], Error>({
@@ -39,6 +40,7 @@ export function useCreateNode() {
     mutationFn: ({ listId, data }) => nodeApi.create(listId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY, variables.listId] });
+      queryClient.invalidateQueries({ queryKey: [LISTS_KEY] });
     },
   });
 }
@@ -50,6 +52,7 @@ export function useCreateSubNode() {
     mutationFn: ({ parentId, data }) => nodeApi.createChild(parentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LISTS_KEY] });
     },
   });
 }
@@ -72,6 +75,7 @@ export function useDeleteNode() {
     mutationFn: nodeApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LISTS_KEY] });
     },
   });
 }

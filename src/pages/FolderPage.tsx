@@ -522,6 +522,7 @@ export default function FolderPage() {
                   <ListPreviewCard
                     name={list.name}
                     nodeCount={list._count?.nodes ?? 0}
+                    previewNodes={list.nodes}
                     isSelected={isSelected}
                     isEditing={isEditing}
                     editNameValue={editName}
