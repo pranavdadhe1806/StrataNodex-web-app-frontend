@@ -94,6 +94,10 @@ export default function FoldersPage() {
   }, [contextMenu]);
 
   function handleFolderClick(folder: Folder) {
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return;
+    }
     if (selectionMode) {
       toggleSelection(folder.id);
       return;

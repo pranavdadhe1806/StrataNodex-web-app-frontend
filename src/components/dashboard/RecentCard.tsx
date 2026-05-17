@@ -1,4 +1,4 @@
-import { Folder, List } from 'lucide-react';
+import { FolderDuotone, ListDuotone } from '../ui/icons';
 
 interface RecentCardProps {
   name: string;
@@ -55,9 +55,9 @@ export default function RecentCard({ name, type, onClick }: RecentCardProps) {
         }}
       >
         {isFolder ? (
-          <Folder size={28} style={{ color: '#00bfff', flexShrink: 0 }} />
+          <FolderDuotone size={32} weight="duotone" color="#00bfff" />
         ) : (
-          <List size={28} style={{ color: '#00c896', flexShrink: 0 }} />
+          <ListDuotone size={32} weight="duotone" color="#00c896" />
         )}
         <span
           style={{

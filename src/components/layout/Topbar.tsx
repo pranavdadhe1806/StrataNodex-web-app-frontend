@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu, User, LayoutDashboard, Folder, CalendarDays, BarChart3, Settings, LogOut, Trash2 } from 'lucide-react';
+import { Menu, User, Trash2 } from '../ui/icons';
+import { HouseDuotone, FolderDuotone, CalendarDuotone, ChartLineUpDuotone, GearDuotone } from '../ui/icons';
 import { useUIStore } from '../../store/ui.store';
 import { useAuthStore } from '../../store/auth.store';
 import { getToken } from '../../utils/token';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ProfileMenu from './ProfileMenu';
 
 // In dev, redirect to local landing page; in prod, to deployed Vercel app
 const LANDING_AUTH_URL =
@@ -30,18 +32,6 @@ const glassMenuStyle: React.CSSProperties = {
   zIndex: 100,
 };
 
-const glassProfileStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '48px',
-  right: '12px',
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
-  borderRadius: '14px',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
-  padding: '8px',
-  minWidth: '180px',
-  zIndex: 100,
-};
 
 const menuItemStyle: React.CSSProperties = {
   display: 'flex',
@@ -156,7 +146,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
               }}
               style={menuItemStyle}
             >
-              <LayoutDashboard size={18} style={{ color: '#00bfff' }} />
+              <HouseDuotone size={18} weight="duotone" color="#00bfff" />
               <span>Dashboard</span>
             </div>
 
@@ -171,7 +161,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
               }}
               style={menuItemStyle}
             >
-              <Folder size={18} style={{ color: '#FF6B35' }} />
+              <FolderDuotone size={18} weight="duotone" color="#00bfff" />
               <span>Your Folders</span>
             </div>
 
@@ -186,7 +176,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
               }}
               style={menuItemStyle}
             >
-              <CalendarDays size={18} style={{ color: '#00c896' }} />
+              <CalendarDuotone size={18} weight="duotone" color="#00bfff" />
               <span>Today</span>
             </div>
 
@@ -201,7 +191,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
               }}
               style={menuItemStyle}
             >
-              <BarChart3 size={18} style={{ color: '#00bfff' }} />
+              <ChartLineUpDuotone size={18} weight="duotone" color="#00bfff" />
               <span>Stats</span>
             </div>
 
@@ -221,7 +211,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
                   }}
                   style={menuItemStyle}
                 >
-                  <Folder size={18} style={{ color: '#8B92A1' }} />
+                  <FolderDuotone size={18} weight="duotone" color="#8A8F98" />
                   <span style={{ fontSize: '13px' }}>Open {activeFolderName || 'Folder'}</span>
                 </div>
 
@@ -259,7 +249,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
               }}
               style={menuItemStyle}
             >
-              <Settings size={18} style={{ color: '#8A8F98' }} />
+              <GearDuotone size={18} weight="duotone" color="#8A8F98" />
               <span>Settings</span>
             </div>
           </div>
@@ -288,69 +278,12 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
 
         {/* Profile Dropdown */}
         {profileOpen && (
-          <div ref={profileRef} style={glassProfileStyle}>
-            {/* Name */}
-            <div style={{ padding: '8px 12px 4px' }}>
-              <div
-                style={{
-                  color: '#EDEFF3',
-                  fontFamily: 'Poppins, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                }}
-              >
-                {user?.name || 'User'}
-              </div>
-              <div
-                style={{
-                  color: '#8A8F98',
-                  fontFamily: 'Poppins, sans-serif',
-                  fontSize: '12px',
-                  marginTop: '2px',
-                }}
-              >
-                @{user?.username || user?.email?.split('@')[0] || 'username'}
-              </div>
-            </div>
-
-            {/* Separator */}
-            <div style={separatorStyle} />
-
-            {/* Profile Settings */}
-            <div
-              onClick={() => handleNavigate('/profile')}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-              }}
-              style={menuItemStyle}
-            >
-              <Settings size={16} style={{ color: '#8A8F98' }} />
-              <span style={{ fontSize: '13px' }}>Profile Settings</span>
-            </div>
-
-            {/* Separator */}
-            <div style={separatorStyle} />
-
-            {/* Logout */}
-            <div
-              onClick={handleLogout}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)';
-                e.currentTarget.style.color = '#FF6B35';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#D5D8DE';
-              }}
-              style={menuItemStyle}
-            >
-              <LogOut size={16} style={{ color: '#FF6B35' }} />
-              <span style={{ fontSize: '13px' }}>Logout</span>
-            </div>
-          </div>
+          <ProfileMenu
+            ref={profileRef}
+            user={user}
+            onNavigate={(path) => { navigate(path); setProfileOpen(false); }}
+            onLogout={handleLogout}
+          />
         )}
       </div>
     </header>

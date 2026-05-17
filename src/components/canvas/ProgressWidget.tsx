@@ -1,3 +1,5 @@
+import { CheckCircle } from '@phosphor-icons/react';
+
 interface ProgressWidgetProps {
   total: number;
   done: number;
@@ -68,8 +70,12 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
           fontFamily: 'Poppins, sans-serif',
           fontSize: '12px',
           color: '#8A8F98',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
         }}
       >
+        <CheckCircle size={16} weight="duotone" color="#00c896" />
         Total Task Completed: {done}/{total}
       </div>
     </div>

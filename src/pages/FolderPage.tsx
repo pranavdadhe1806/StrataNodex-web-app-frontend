@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
 import { useFolders } from '../hooks/useFolders';
-import { useLists, useCreateList } from '../hooks/useLists';
+import { useLists, useCreateList, useUpdateList, useDeleteList } from '../hooks/useLists';
 import { useUIStore } from '../store/ui.store';
 import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
-import { Plus, List as ListIcon, Loader2, X } from 'lucide-react';
+import type { List } from '../types/list.types';
+import { Plus, List as ListIcon, Loader2, X, Trash2, Edit2, Square, CheckSquare } from 'lucide-react';
 
 const glassCardStyle: React.CSSProperties = {
   background: '#32363C',
@@ -32,6 +33,19 @@ const popupStyle: React.CSSProperties = {
   minWidth: '320px',
   maxWidth: '90vw',
 };
+
+const contextMenuStyle: React.CSSProperties = {
+  position: 'fixed',
+  background: '#32363C',
+  border: '1px solid rgba(255, 255, 255, 0.12)',
+  borderRadius: '12px',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+  padding: '6px',
+  minWidth: '160px',
+  zIndex: 150,
+};
+
+const LONG_PRESS_DURATION = 600;
 
 const newListButtonStyle: React.CSSProperties = {
   display: 'flex',
@@ -60,10 +74,27 @@ export default function FolderPage() {
 
   const { data: lists = [], isLoading, error, refetch } = useLists(folderId || null);
   const createList = useCreateList();
+  const updateList = useUpdateList();
+  const deleteList = useDeleteList();
 
   const [showNewListPopup, setShowNewListPopup] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [createError, setCreateError] = useState<string | null>(null);
+
+  // Selection state
+  const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  // Rename state
+  const [editingListId, setEditingListId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; listId: string } | null>(null);
+
+  // Long press refs
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPress = useRef(false);
 
   const recordOpen = useRecentsStore((s) => s.recordOpen);
 
@@ -75,12 +106,110 @@ export default function FolderPage() {
     }
   }, [folder, setActiveContext]);
 
-  function openList(list: { id: string; name: string }) {
+  // Close context menu on outside click
+  useEffect(() => {
+    function handleOutsideClick() {
+      setContextMenu(null);
+    }
+    if (contextMenu) {
+      document.addEventListener('click', handleOutsideClick);
+      return () => document.removeEventListener('click', handleOutsideClick);
+    }
+  }, [contextMenu]);
+
+  // Long press handlers
+  const startLongPress = useCallback((listId: string) => {
+    isLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
+      setSelectionMode(true);
+      setSelectedLists(new Set([listId]));
+    }, LONG_PRESS_DURATION);
+  }, []);
+
+  const endLongPress = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  // Selection logic
+  function toggleSelection(listId: string) {
+    const next = new Set(selectedLists);
+    if (next.has(listId)) {
+      next.delete(listId);
+    } else {
+      next.add(listId);
+    }
+    setSelectedLists(next);
+    if (next.size === 0) setSelectionMode(false);
+  }
+
+  function clearSelection() {
+    setSelectedLists(new Set());
+    setSelectionMode(false);
+  }
+
+  async function deleteSelected() {
+    await Promise.all(Array.from(selectedLists).map((id) => deleteList.mutateAsync(id)));
+    clearSelection();
+  }
+
+  async function handleDeleteList(listId: string) {
+    await deleteList.mutateAsync(listId);
+    setContextMenu(null);
+  }
+
+  // Rename logic
+  function startRename(list: List) {
+    setEditingListId(list.id);
+    setEditName(list.name);
+    setContextMenu(null);
+  }
+
+  async function saveRename() {
+    if (editName.trim() && editingListId) {
+      await updateList.mutateAsync({ id: editingListId, data: { name: editName.trim() } });
+    }
+    setEditingListId(null);
+    setEditName('');
+  }
+
+  function cancelRename() {
+    setEditingListId(null);
+    setEditName('');
+  }
+
+  // Context menu
+  function handleRightClick(e: React.MouseEvent, list: List) {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, listId: list.id });
+  }
+
+  function handleDoubleClick(list: List) {
+    if (selectionMode) return;
+    startRename(list);
+  }
+
+  function openList(list: List) {
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return;
+    }
+    if (selectionMode) {
+      toggleSelection(list.id);
+      return;
+    }
+    if (editingListId === list.id) return;
     recordOpen({ id: list.id, name: list.name, type: 'list' });
     navigate(`/list/${list.id}`, {
       state: { listName: list.name, folderId: folder?.id, folderName: folder?.name },
     });
   }
+
+  const contextMenuList = contextMenu ? lists.find((l) => l.id === contextMenu.listId) : null;
 
   function openNewListPopup() {
     setCreateError(null);
@@ -150,27 +279,84 @@ export default function FolderPage() {
             }}
           >
             {folder ? folder.name : 'Loading folder…'}
+            {selectionMode && (
+              <span style={{ color: '#8A8F98', fontSize: '14px', fontWeight: 400, marginLeft: '12px' }}>
+                ({selectedLists.size} selected)
+              </span>
+            )}
           </h1>
 
-          <button
-            type="button"
-            onClick={openNewListPopup}
-            disabled={!folderId}
-            style={{
-              ...newListButtonStyle,
-              opacity: folderId ? 1 : 0.5,
-              cursor: folderId ? 'pointer' : 'not-allowed',
-            }}
-            onMouseEnter={(e) => {
-              if (folderId) e.currentTarget.style.background = '#3A3F45';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#32363C';
-            }}
-          >
-            <Plus size={18} />
-            New List
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {selectionMode && selectedLists.size > 0 && (
+              <button
+                type="button"
+                onClick={deleteSelected}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  background: 'rgba(255, 107, 53, 0.15)',
+                  border: '1px solid rgba(255, 107, 53, 0.3)',
+                  borderRadius: '10px',
+                  color: '#FF6B35',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.25)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)'; }}
+              >
+                <Trash2 size={18} />
+                Delete ({selectedLists.size})
+              </button>
+            )}
+            {selectionMode && (
+              <button
+                type="button"
+                onClick={clearSelection}
+                style={{
+                  padding: '10px 16px',
+                  background: 'transparent',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '10px',
+                  color: '#8A8F98',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#D5D8DE'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#8A8F98'; e.currentTarget.style.background = 'transparent'; }}
+              >
+                Cancel
+              </button>
+            )}
+            {!selectionMode && (
+              <button
+                type="button"
+                onClick={openNewListPopup}
+                disabled={!folderId}
+                style={{
+                  ...newListButtonStyle,
+                  opacity: folderId ? 1 : 0.5,
+                  cursor: folderId ? 'pointer' : 'not-allowed',
+                }}
+                onMouseEnter={(e) => {
+                  if (folderId) e.currentTarget.style.background = '#3A3F45';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#32363C';
+                }}
+              >
+                <Plus size={18} />
+                New List
+              </button>
+            )}
+          </div>
         </div>
 
         {isLoading ? (
@@ -283,91 +469,191 @@ export default function FolderPage() {
               gap: '20px',
             }}
           >
-            {lists.map((list) => (
-              <div
-                key={list.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => openList(list)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    openList(list);
-                  }
-                }}
+            {lists.map((list) => {
+              const isSelected = selectedLists.has(list.id);
+              const isEditing = editingListId === list.id;
+              return (
+                <div
+                  key={list.id}
+                  onClick={() => openList(list)}
+                  onContextMenu={(e) => handleRightClick(e, list)}
+                  onDoubleClick={() => handleDoubleClick(list)}
+                  onMouseDown={() => startLongPress(list.id)}
+                  onMouseUp={endLongPress}
+                  onMouseLeave={endLongPress}
+                  onTouchStart={() => startLongPress(list.id)}
+                  onTouchEnd={endLongPress}
+                  style={{
+                    padding: '24px',
+                    ...glassCardStyle,
+                    cursor: selectionMode || isEditing ? 'default' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    background: isSelected ? 'rgba(0, 191, 255, 0.08)' : '#32363C',
+                    border: isSelected
+                      ? '1px solid rgba(0, 191, 255, 0.4)'
+                      : '1px solid rgba(255, 255, 255, 0.08)',
+                    position: 'relative',
+                    userSelect: 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected && !selectionMode) {
+                      e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }
+                  }}
+                >
+                  {/* Checkbox in selection mode */}
+                  {selectionMode && (
+                    <div
+                      onClick={(e) => { e.stopPropagation(); toggleSelection(list.id); }}
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        color: isSelected ? '#00bfff' : '#8A8F98',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{ padding: '8px', background: isSelected ? 'rgba(0, 191, 255, 0.2)' : 'rgba(0, 191, 255, 0.1)', borderRadius: '10px', flexShrink: 0 }}>
+                      <ListIcon size={20} style={{ color: '#00bfff' }} />
+                    </div>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveRename();
+                          if (e.key === 'Escape') cancelRename();
+                        }}
+                        onBlur={saveRename}
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          background: '#1B1D21',
+                          border: '1px solid rgba(0, 191, 255, 0.5)',
+                          borderRadius: '8px',
+                          color: '#EDEFF3',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '15px',
+                          outline: 'none',
+                        }}
+                      />
+                    ) : (
+                      <h3
+                        style={{
+                          color: '#EDEFF3',
+                          margin: 0,
+                          fontSize: '16px',
+                          fontWeight: 500,
+                          fontFamily: 'Poppins, sans-serif',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {list.name}
+                      </h3>
+                    )}
+                  </div>
+                  <div style={{ color: '#8A8F98', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                    {list._count?.nodes ?? 0} tasks
+                  </div>
+                </div>
+              );
+            })}
+
+            {!selectionMode && (
+              <button
+                type="button"
+                onClick={openNewListPopup}
                 style={{
                   padding: '24px',
-                  ...glassCardStyle,
+                  minHeight: '120px',
+                  background: 'transparent',
+                  border: '2px dashed rgba(255, 255, 255, 0.12)',
+                  borderRadius: '16px',
                   cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  color: '#8A8F98',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.color = '#00bfff';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                  e.currentTarget.style.color = '#8A8F98';
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ padding: '8px', background: 'rgba(0, 191, 255, 0.1)', borderRadius: '10px' }}>
-                    <ListIcon size={20} style={{ color: '#00bfff' }} />
-                  </div>
-                  <h3
-                    style={{
-                      color: '#EDEFF3',
-                      margin: 0,
-                      fontSize: '16px',
-                      fontWeight: 500,
-                      fontFamily: 'Poppins, sans-serif',
-                    }}
-                  >
-                    {list.name}
-                  </h3>
-                </div>
-                <div style={{ color: '#8A8F98', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                  {list._count?.nodes ?? 0} tasks
-                </div>
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={openNewListPopup}
-              style={{
-                padding: '24px',
-                minHeight: '120px',
-                background: 'transparent',
-                border: '2px dashed rgba(255, 255, 255, 0.12)',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                color: '#8A8F98',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '14px',
-                fontWeight: 500,
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
-                e.currentTarget.style.color = '#00bfff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-                e.currentTarget.style.color = '#8A8F98';
-              }}
-            >
-              <Plus size={28} />
-              New List
-            </button>
+                <Plus size={28} />
+                New List
+              </button>
+            )}
           </div>
         )}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && contextMenuList && (
+        <div style={{ ...contextMenuStyle, left: contextMenu.x, top: contextMenu.y }}>
+          <div
+            onClick={() => startRename(contextMenuList)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: '#D5D8DE',
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '13px',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Edit2 size={16} style={{ color: '#00bfff' }} />
+            Rename
+          </div>
+          <div
+            onClick={() => handleDeleteList(contextMenuList.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: '#D5D8DE',
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '13px',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)'; e.currentTarget.style.color = '#FF6B35'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D5D8DE'; }}
+          >
+            <Trash2 size={16} style={{ color: '#FF6B35' }} />
+            Delete
+          </div>
+        </div>
+      )}
 
       {showNewListPopup && (
         <div style={popupOverlayStyle} onClick={closeNewListPopup}>

@@ -1,9 +1,12 @@
+import { ChevronRight } from '../ui/icons';
+import { CheckCircle } from '@phosphor-icons/react';
 import type { Node } from '../../types/node.types';
 
 interface NodeCardProps {
   node: Node;
   isFocused: boolean;
   numbering: string;
+  isExpanded?: boolean;
   onCircleClick: () => void;
   onTextClick: () => void;
   style?: React.CSSProperties;
@@ -13,6 +16,7 @@ export default function NodeCard({
   node,
   isFocused,
   numbering,
+  isExpanded = true,
   onCircleClick,
   onTextClick,
   style,
@@ -60,25 +64,7 @@ export default function NodeCard({
     };
   };
 
-  // Status circle styles
-  const circleStyles: React.CSSProperties = {
-    width: '18px',
-    height: '18px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    cursor: 'pointer',
-  };
-
-  if (isDone) {
-    circleStyles.background = '#00c896';
-    circleStyles.border = 'none';
-  } else {
-    circleStyles.border = '1.5px solid #8A8F98';
-    circleStyles.background = 'transparent';
-  }
+  const hasChildren = (node.children?.length ?? 0) > 0;
 
   // Text styles
   const textStyles: React.CSSProperties = {
@@ -100,12 +86,15 @@ export default function NodeCard({
 
   return (
     <div style={{ ...getCardStyles(), ...style }} onClick={onTextClick}>
-      {/* Status Circle */}
-      <div style={circleStyles} onClick={(e) => { e.stopPropagation(); onCircleClick(); }}>
-        {isDone && (
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1.5" stroke="#1B1D21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+      {/* Status circle / done indicator */}
+      <div
+        style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        onClick={(e) => { e.stopPropagation(); onCircleClick(); }}
+      >
+        {isDone ? (
+          <CheckCircle size={20} weight="duotone" color="#00c896" />
+        ) : (
+          <div style={{ width: 18, height: 18, borderRadius: '50%', border: '1.5px solid #8A8F98' }} />
         )}
       </div>
 
@@ -116,6 +105,20 @@ export default function NodeCard({
 
       {/* Title */}
       <span style={textStyles}>{node.title}</span>
+
+      {/* Expand/collapse chevron for nodes with children */}
+      {hasChildren && (
+        <ChevronRight
+          size={14}
+          color="#8A8F98"
+          style={{
+            flexShrink: 0,
+            marginLeft: 'auto',
+            transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 0.2s ease',
+          }}
+        />
+      )}
     </div>
   );
 }
