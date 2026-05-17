@@ -77,19 +77,28 @@ export default function NodeTree({
     return { positionedNodes: posNodes, connectors: conns };
   }, [nodes]);
 
+  // Size the SVG to fit all node content so connectors never clip
+  const NODE_CARD_WIDTH = 320; // matches NodeCard maxWidth
+  const PADDING = 40;
+  const contentWidth = positionedNodes.length === 0 ? 800
+    : Math.max(...positionedNodes.map(n => n.x + NODE_CARD_WIDTH)) + PADDING;
+  const contentHeight = positionedNodes.length === 0 ? 600
+    : Math.max(...positionedNodes.map(n => n.y + 40)) + PADDING;
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: 'relative', width: contentWidth, height: contentHeight }}>
       {/* SVG Connectors Layer */}
       <svg
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
           pointerEvents: 'none',
           zIndex: 0,
+          overflow: 'visible',
         }}
+        width={contentWidth}
+        height={contentHeight}
       >
         <defs>
           <filter id="connectorShadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -124,7 +133,7 @@ export default function NodeTree({
       </svg>
 
       {/* Node Cards Layer */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, width: contentWidth, height: contentHeight, zIndex: 1 }}>
         {positionedNodes.map((node) => (
           <NodeCard
             key={node.id}

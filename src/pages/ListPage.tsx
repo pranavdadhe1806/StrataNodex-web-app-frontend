@@ -252,10 +252,6 @@ export default function ListPage() {
     };
 
     saveToServer().catch(rollback);
-
-    if (currentDepth > 0) {
-      setCurrentParentId(tempId);
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listId, nodes, currentParentId, currentDepth]);
 
@@ -310,14 +306,14 @@ export default function ListPage() {
       }
       return walk(prev);
     });
-    // Sync to server in background
+    // Sync to server in background — omit null fields (Zod rejects null for datetime/string)
     updateNodeMutation.mutate({ id: updated.id, data: {
       title: updated.title,
       status: updated.status,
-      priority: updated.priority,
-      notes: updated.notes ?? undefined,
-      startAt: updated.startAt,
-      endAt: updated.endAt,
+      ...(updated.priority != null ? { priority: updated.priority } : {}),
+      ...(updated.notes != null ? { notes: updated.notes } : {}),
+      ...(updated.startAt != null ? { startAt: updated.startAt } : {}),
+      ...(updated.endAt != null ? { endAt: updated.endAt } : {}),
     }});
   }
 
