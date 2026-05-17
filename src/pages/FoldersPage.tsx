@@ -10,7 +10,8 @@ import {
 } from '../hooks/useFolders';
 import type { Folder } from '../types/folder.types';
 import { useRecentsStore } from '../store/recents.store';
-import { Folder as FolderIcon, Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Square, CheckSquare, Loader2 } from 'lucide-react';
+import { Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Square, CheckSquare, Loader2 } from 'lucide-react';
+import MacFolderIcon from '../components/ui/MacFolderIcon';
 
 // System folder detection - Daily Task is always system folder
 const checkIsSystemFolder = (folder: Folder) => folder.name === 'Daily Task';
@@ -438,7 +439,7 @@ export default function FoldersPage() {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
                 gap: '24px',
               }}
             >
@@ -491,28 +492,8 @@ export default function FoldersPage() {
                       </div>
                     )}
 
-                    {/* Folder Icon */}
-                    <div
-                      style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '20px',
-                        background: '#32363C',
-                        border: folderIsSystem
-                          ? '1px solid rgba(255, 107, 53, 0.3)'
-                          : '1px solid rgba(255, 255, 255, 0.08)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      <FolderIcon
-                        size={40}
-                        style={{ color: folderIsSystem ? '#FF6B35' : '#00bfff' }}
-                      />
-                    </div>
+                    {/* macOS-style folder icon */}
+                    <MacFolderIcon size={84} isSystem={folderIsSystem} />
 
                     {/* Folder Name / Edit Input */}
                     {isEditing ? (
@@ -550,7 +531,7 @@ export default function FoldersPage() {
                           fontSize: '13px',
                           fontWeight: 500,
                           textAlign: 'center',
-                          marginTop: '12px',
+                          marginTop: '6px',
                           maxWidth: '100px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -630,10 +611,7 @@ export default function FoldersPage() {
                       </div>
                     )}
 
-                    <FolderIcon
-                      size={24}
-                      style={{ color: folderIsSystem ? '#FF6B35' : '#00bfff', flexShrink: 0 }}
-                    />
+                    <MacFolderIcon size={32} isSystem={folderIsSystem} />
 
                     <div style={{ flex: 1, minWidth: 0 }}>
                       {isEditing ? (

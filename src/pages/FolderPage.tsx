@@ -8,7 +8,8 @@ import { useUIStore } from '../store/ui.store';
 import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
 import type { List } from '../types/list.types';
-import { Plus, List as ListIcon, Loader2, X, Trash2, Edit2, Square, CheckSquare } from 'lucide-react';
+import { Plus, Loader2, X, Trash2, Edit2, Square, CheckSquare } from 'lucide-react';
+import ListPreviewCard from '../components/ui/ListPreviewCard';
 
 const glassCardStyle: React.CSSProperties = {
   background: '#32363C',
@@ -409,7 +410,7 @@ export default function FolderPage() {
               borderStyle: 'dashed',
             }}
           >
-            <ListIcon size={48} style={{ color: '#8A8F98', marginBottom: '16px' }} />
+            <Plus size={48} style={{ color: '#8A8F98', marginBottom: '16px' }} />
             <h3
               style={{
                 color: '#EDEFF3',
@@ -465,7 +466,7 @@ export default function FolderPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
               gap: '20px',
             }}
           >
@@ -480,26 +481,25 @@ export default function FolderPage() {
                   onDoubleClick={() => handleDoubleClick(list)}
                   onMouseDown={() => startLongPress(list.id)}
                   onMouseUp={endLongPress}
-                  onMouseLeave={endLongPress}
                   onTouchStart={() => startLongPress(list.id)}
                   onTouchEnd={endLongPress}
                   style={{
-                    padding: '24px',
-                    ...glassCardStyle,
                     cursor: selectionMode || isEditing ? 'default' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: isSelected ? 'rgba(0, 191, 255, 0.08)' : '#32363C',
-                    border: isSelected
-                      ? '1px solid rgba(0, 191, 255, 0.4)'
-                      : '1px solid rgba(255, 255, 255, 0.08)',
-                    position: 'relative',
                     userSelect: 'none',
+                    position: 'relative',
+                    borderRadius: '16px',
+                    padding: '4px',
+                    background: isSelected ? 'rgba(0, 191, 255, 0.06)' : 'transparent',
+                    transition: 'background 0.15s ease, transform 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
                     if (!isSelected && !selectionMode) {
-                      e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
                       e.currentTarget.style.transform = 'translateY(-2px)';
                     }
+                  }}
+                  onMouseLeave={(e) => {
+                    endLongPress();
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   {/* Checkbox in selection mode */}
@@ -508,64 +508,31 @@ export default function FolderPage() {
                       onClick={(e) => { e.stopPropagation(); toggleSelection(list.id); }}
                       style={{
                         position: 'absolute',
-                        top: '12px',
-                        right: '12px',
+                        top: '8px',
+                        right: '8px',
                         color: isSelected ? '#00bfff' : '#8A8F98',
                         cursor: 'pointer',
+                        zIndex: 2,
                       }}
                     >
-                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
+                      {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{ padding: '8px', background: isSelected ? 'rgba(0, 191, 255, 0.2)' : 'rgba(0, 191, 255, 0.1)', borderRadius: '10px', flexShrink: 0 }}>
-                      <ListIcon size={20} style={{ color: '#00bfff' }} />
-                    </div>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveRename();
-                          if (e.key === 'Escape') cancelRename();
-                        }}
-                        onBlur={saveRename}
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          background: '#1B1D21',
-                          border: '1px solid rgba(0, 191, 255, 0.5)',
-                          borderRadius: '8px',
-                          color: '#EDEFF3',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: '15px',
-                          outline: 'none',
-                        }}
-                      />
-                    ) : (
-                      <h3
-                        style={{
-                          color: '#EDEFF3',
-                          margin: 0,
-                          fontSize: '16px',
-                          fontWeight: 500,
-                          fontFamily: 'Poppins, sans-serif',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {list.name}
-                      </h3>
-                    )}
-                  </div>
-                  <div style={{ color: '#8A8F98', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                    {list._count?.nodes ?? 0} tasks
-                  </div>
+                  <ListPreviewCard
+                    name={list.name}
+                    nodeCount={list._count?.nodes ?? 0}
+                    isSelected={isSelected}
+                    isEditing={isEditing}
+                    editNameValue={editName}
+                    onEditChange={(v) => setEditName(v)}
+                    onEditKeyDown={(e) => {
+                      if (e.key === 'Enter') saveRename();
+                      if (e.key === 'Escape') cancelRename();
+                    }}
+                    onEditBlur={saveRename}
+                    onEditClick={(e) => e.stopPropagation()}
+                  />
                 </div>
               );
             })}

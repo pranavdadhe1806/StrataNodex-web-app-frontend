@@ -1,4 +1,5 @@
-import { FolderDuotone, ListDuotone } from '../ui/icons';
+import { ListDuotone } from '../ui/icons';
+import MacFolderIcon from '../ui/MacFolderIcon';
 
 interface RecentCardProps {
   name: string;
@@ -18,66 +19,47 @@ export default function RecentCard({ name, type, onClick }: RecentCardProps) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        gap: '10px',
         width: '100%',
         minWidth: 0,
-        padding: 0,
+        padding: '12px 6px',
         border: 'none',
         background: 'transparent',
         cursor: 'pointer',
+        borderRadius: '10px',
+        transition: 'background 0.15s ease, transform 0.15s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
+      {isFolder ? (
+        <MacFolderIcon size={64} />
+      ) : (
+        <ListDuotone size={56} weight="duotone" color="#00c896" />
+      )}
       <span
         style={{
+          color: '#D5D8DE',
+          fontFamily: 'Poppins, sans-serif',
+          fontSize: '12px',
+          fontWeight: 500,
+          textAlign: 'center',
           width: '100%',
-          maxWidth: '96px',
-          aspectRatio: '5 / 6',
-          margin: '0 auto',
-          background: '#32363C',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '12px',
-          boxShadow:
-            '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '12px 8px',
-          transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-          e.currentTarget.style.transform = 'translateY(-2px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-          e.currentTarget.style.transform = 'translateY(0)';
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          lineHeight: '1.3',
         }}
       >
-        {isFolder ? (
-          <FolderDuotone size={32} weight="duotone" color="#00bfff" />
-        ) : (
-          <ListDuotone size={32} weight="duotone" color="#00c896" />
-        )}
-        <span
-          style={{
-            color: '#D5D8DE',
-            fontFamily: 'Poppins, sans-serif',
-            fontSize: '11px',
-            fontWeight: 500,
-            textAlign: 'center',
-            marginTop: '8px',
-            width: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            lineHeight: '1.3',
-          }}
-        >
-          {name}
-        </span>
+        {name}
       </span>
     </button>
   );

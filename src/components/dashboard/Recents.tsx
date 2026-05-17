@@ -46,8 +46,8 @@ export default function Recents() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
-            gap: '12px',
+            gridTemplateColumns: `repeat(${columnCount}, minmax(80px, 1fr))`,
+            gap: '8px',
             width: '100%',
           }}
         >
