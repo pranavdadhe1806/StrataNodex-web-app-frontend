@@ -4,6 +4,8 @@ export interface User {
   name: string | null;
   username?: string;
   isEmailVerified: boolean;
+  dailyFolderId: string | null;
+  dailyListId: string | null;
   createdAt: string;
   updatedAt: string;
 }

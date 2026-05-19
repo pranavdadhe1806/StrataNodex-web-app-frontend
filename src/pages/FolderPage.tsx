@@ -7,6 +7,7 @@ import { useLists, useCreateList, useUpdateList, useDeleteList } from '../hooks/
 import { useUIStore } from '../store/ui.store';
 import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
+import { useAuthStore } from '../store/auth.store';
 import type { List } from '../types/list.types';
 import { Plus, Loader2, X, Trash2, Edit2, Square, CheckSquare } from 'lucide-react';
 import ListPreviewCard from '../components/ui/ListPreviewCard';
@@ -68,6 +69,8 @@ const newListButtonStyle: React.CSSProperties = {
 export default function FolderPage() {
   const { folderId } = useParams<{ folderId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isSystemList = (list: List) => list.id === user?.dailyListId;
   const setActiveContext = useUIStore((s) => s.setActiveContext);
 
   const { data: folders = [] } = useFolders();
@@ -153,17 +156,24 @@ export default function FolderPage() {
   }
 
   async function deleteSelected() {
-    await Promise.all(Array.from(selectedLists).map((id) => deleteList.mutateAsync(id)));
+    await Promise.all(
+      Array.from(selectedLists)
+        .filter(id => !isSystemList(lists.find(l => l.id === id) ?? { id } as List))
+        .map(id => deleteList.mutateAsync(id))
+    );
     clearSelection();
   }
 
   async function handleDeleteList(listId: string) {
+    const list = lists.find(l => l.id === listId);
+    if (list && isSystemList(list)) return;
     await deleteList.mutateAsync(listId);
     setContextMenu(null);
   }
 
   // Rename logic
   function startRename(list: List) {
+    if (isSystemList(list)) return;
     setEditingListId(list.id);
     setEditName(list.name);
     setContextMenu(null);
@@ -191,7 +201,7 @@ export default function FolderPage() {
 
   function handleDoubleClick(list: List) {
     if (selectionMode) return;
-    startRename(list);
+    if (!isSystemList(list)) startRename(list);
   }
 
   function openList(list: List) {
@@ -580,46 +590,42 @@ export default function FolderPage() {
       {/* Context Menu */}
       {contextMenu && contextMenuList && (
         <div style={{ ...contextMenuStyle, left: contextMenu.x, top: contextMenu.y }}>
-          <div
-            onClick={() => startRename(contextMenuList)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: '#D5D8DE',
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '13px',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-          >
-            <Edit2 size={16} style={{ color: '#00bfff' }} />
-            Rename
-          </div>
-          <div
-            onClick={() => handleDeleteList(contextMenuList.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: '#D5D8DE',
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '13px',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)'; e.currentTarget.style.color = '#FF6B35'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D5D8DE'; }}
-          >
-            <Trash2 size={16} style={{ color: '#FF6B35' }} />
-            Delete
-          </div>
+          {isSystemList(contextMenuList) ? (
+            <div style={{ padding: '10px 12px', color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+              System list — cannot rename or delete
+            </div>
+          ) : (
+            <>
+              <div
+                onClick={() => startRename(contextMenuList)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 12px', borderRadius: '8px', cursor: 'pointer',
+                  color: '#D5D8DE', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <Edit2 size={16} style={{ color: '#00bfff' }} />
+                Rename
+              </div>
+              <div
+                onClick={() => handleDeleteList(contextMenuList.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 12px', borderRadius: '8px', cursor: 'pointer',
+                  color: '#D5D8DE', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)'; e.currentTarget.style.color = '#FF6B35'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D5D8DE'; }}
+              >
+                <Trash2 size={16} style={{ color: '#FF6B35' }} />
+                Delete
+              </div>
+            </>
+          )}
         </div>
       )}
 

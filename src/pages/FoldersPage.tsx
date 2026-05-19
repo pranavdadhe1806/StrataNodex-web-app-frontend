@@ -10,11 +10,9 @@ import {
 } from '../hooks/useFolders';
 import type { Folder } from '../types/folder.types';
 import { useRecentsStore } from '../store/recents.store';
+import { useAuthStore } from '../store/auth.store';
 import { Plus, LayoutGrid, List as ListIcon, X, Trash2, Edit2, Square, CheckSquare, Loader2 } from 'lucide-react';
 import MacFolderIcon from '../components/ui/MacFolderIcon';
-
-// System folder detection - Daily Task is always system folder
-const checkIsSystemFolder = (folder: Folder) => folder.name === 'Daily Task';
 
 // Get list count from _count property
 const getListCount = (folder: Folder) => folder._count?.lists ?? 0;
@@ -58,7 +56,10 @@ const LONG_PRESS_DURATION = 600; // ms
 
 export default function FoldersPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const { data: folders = [], isLoading, error } = useFolders();
+
+  const checkIsSystemFolder = (folder: Folder) => folder.id === user?.dailyFolderId;
   const createFolder = useCreateFolder();
   const updateFolder = useUpdateFolder();
   const deleteFolderMutation = useDeleteFolder();
@@ -148,7 +149,7 @@ export default function FoldersPage() {
 
   async function deleteSelected() {
     const toDelete = Array.from(selectedFolders).filter(
-      (id) => !checkIsSystemFolder(folders.find((f) => f.id === id)!)
+      (id) => !checkIsSystemFolder(folders.find((f) => f.id === id) ?? { id } as Folder)
     );
     await Promise.all(toDelete.map((id) => deleteFolderMutation.mutateAsync(id)));
     clearSelection();
