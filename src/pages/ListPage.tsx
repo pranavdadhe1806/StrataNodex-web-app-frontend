@@ -194,6 +194,8 @@ export default function ListPage() {
       position,
       listId,
       parentId: currentParentId,
+      sourceNodeId: null,
+      source: null,
       children: [],
       tags: [],
       createdAt: new Date().toISOString(),

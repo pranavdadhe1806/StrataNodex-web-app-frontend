@@ -1,8 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { dailyApi, ComputeScoreInput } from '../api/daily.api';
+import { dailyApi, ComputeScoreInput, DailyListResponse } from '../api/daily.api';
 import type { Node } from '../types/node.types';
 
 const DAILY_KEY = 'daily';
+
+export function useDailyList() {
+  return useQuery<DailyListResponse, Error>({
+    queryKey: [DAILY_KEY, 'list'],
+    queryFn: dailyApi.getDailyList,
+  });
+}
+
+export function useAddToDaily() {
+  const queryClient = useQueryClient();
+  return useMutation<Node, Error, string>({
+    mutationFn: dailyApi.addToDaily,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [DAILY_KEY, 'list'] });
+    },
+  });
+}
+
+export function useRemoveFromDaily() {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (nodeId) => dailyApi.removeFromDaily(nodeId).then(() => {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [DAILY_KEY, 'list'] });
+    },
+  });
+}
 
 export function useTodayNodes() {
   return useQuery<Node[], Error>({

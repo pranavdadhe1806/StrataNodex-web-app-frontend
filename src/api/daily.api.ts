@@ -1,5 +1,6 @@
 import client from './client';
 import type { Node } from '../types/node.types';
+import type { List } from '../types/list.types';
 
 export interface DailyScore {
   date: string;
@@ -10,7 +11,21 @@ export interface ComputeScoreInput {
   date: string;
 }
 
+export interface DailyListResponse {
+  list: List;
+  nodes: Node[];
+}
+
 export const dailyApi = {
+  getDailyList: () =>
+    client.get<DailyListResponse>('/daily/list').then(r => r.data),
+
+  addToDaily: (nodeId: string) =>
+    client.post<Node>(`/daily/add/${nodeId}`).then(r => r.data),
+
+  removeFromDaily: (nodeId: string) =>
+    client.delete(`/daily/remove/${nodeId}`),
+
   getToday: () =>
     client.get<Node[]>('/daily/today').then(r => r.data),
 

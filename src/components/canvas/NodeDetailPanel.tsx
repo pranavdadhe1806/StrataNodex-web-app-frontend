@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, Trash2, Calendar, Clock, Tag as TagIcon, FileText, Flag, CircleDot } from 'lucide-react';
+import { X, Plus, Trash2, Calendar, Clock, Tag as TagIcon, FileText, Flag, CircleDot, CalendarDays } from 'lucide-react';
 import type { Node, NodeStatus, Priority } from '../../types/node.types';
 import RichTextEditor from '../ui/RichTextEditor';
 import CustomSelect from '../ui/CustomSelect';
 import CustomDatePicker from '../ui/CustomDatePicker';
 import CustomTimePicker from '../ui/CustomTimePicker';
+import { useAddToDaily, useRemoveFromDaily, useDailyList } from '../../hooks/useDaily';
 
 interface NodeDetailPanelProps {
   node: Node;
@@ -39,6 +40,13 @@ function PropertyRow({ icon, label, children }: { icon: React.ReactNode; label: 
 }
 
 export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onAddSubtask }: NodeDetailPanelProps) {
+  const { data: dailyData } = useDailyList();
+  const addToDaily = useAddToDaily();
+  const removeFromDaily = useRemoveFromDaily();
+
+  const isInDaily = dailyData?.nodes.some(
+    n => n.id === node.id || n.sourceNodeId === node.id
+  ) ?? false;
   const [localTitle, setLocalTitle] = useState(node.title);
   const [localStatus, setLocalStatus] = useState<NodeStatus>(node.status);
   const [localPriority, setLocalPriority] = useState<Priority | ''>(node.priority ?? '');
@@ -334,6 +342,24 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           >
             <Plus size={14} />
             Add Sub-task
+          </button>
+
+          <button
+            onClick={() => isInDaily ? removeFromDaily.mutate(node.id) : addToDaily.mutate(node.id)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: isInDaily ? 'rgba(0,200,150,0.08)' : 'rgba(0,191,255,0.08)',
+              border: isInDaily ? '1px solid rgba(0,200,150,0.25)' : '1px solid rgba(0,191,255,0.2)',
+              borderRadius: '8px',
+              color: isInDaily ? '#00c896' : '#00bfff',
+              fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+              padding: '8px 14px', cursor: 'pointer', transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = isInDaily ? 'rgba(0,200,150,0.14)' : 'rgba(0,191,255,0.14)')}
+            onMouseLeave={e => (e.currentTarget.style.background = isInDaily ? 'rgba(0,200,150,0.08)' : 'rgba(0,191,255,0.08)')}
+          >
+            <CalendarDays size={14} />
+            {isInDaily ? 'Remove from Daily' : 'Add to Daily'}
           </button>
 
           <button

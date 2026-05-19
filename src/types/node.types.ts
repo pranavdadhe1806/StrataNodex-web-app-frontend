@@ -15,6 +15,8 @@ export interface Node {
   position: number;
   listId: string;
   parentId: string | null;
+  sourceNodeId: string | null;
+  source: { id: string; title: string; listId: string; list: { id: string; name: string } } | null;
   tags: import('./tag.types').Tag[];
   children: Node[];
   createdAt: string;
