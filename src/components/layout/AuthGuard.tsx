@@ -59,10 +59,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           setStoredUser({ name: u.name ?? undefined, email: u.email });
           setChecking(false);
         })
-        .catch((err) => {
-          console.error('Auth check failed:', err);
-          // If it was a 401, client.ts interceptor already cleared token and is redirecting.
-          // We just stop checking so the UI doesn't spin forever if it's a network error.
+        .catch(() => {
+          // If 401, the Axios interceptor already cleared the token and is redirecting
+          // to the landing page. Don't fight it — just bail.
+          if (!getToken()) return;
+          // Non-401 error (network issue, 500, etc.) — stop spinner, show error UI
           setChecking(false);
         });
       return;
@@ -75,8 +76,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         setStoredUser({ name: u.name ?? undefined, email: u.email });
         setChecking(false);
       })
-      .catch((err) => {
-        console.error('Auth check failed:', err);
+      .catch(() => {
+        // Same guard: if the interceptor already cleared the token, let its redirect win
+        if (!getToken()) return;
         setChecking(false);
       });
   }, []);
