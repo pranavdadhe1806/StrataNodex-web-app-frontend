@@ -4,3 +4,4 @@ export * from './useNodes';
 export * from './useDaily';
 export * from './useScores';
 export * from './useTags';
+export * from './useNotifications';

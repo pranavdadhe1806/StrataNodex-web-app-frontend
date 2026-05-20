@@ -7,6 +7,7 @@ import FolderPage from './pages/FolderPage';
 import ListPage from './pages/ListPage';
 import DailyPage from './pages/DailyPage';
 import StatsPage from './pages/StatsPage';
+import SettingsPage from './pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function GuardedRoutes() {
         <Route path="/list/:listId" element={<ListPage />} />
         <Route path="/daily" element={<DailyPage />} />
         <Route path="/stats" element={<StatsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AuthGuard>
