@@ -25,7 +25,7 @@ client.interceptors.response.use(
       clearToken();
       // Include ?redirect= so the landing page can bounce the user back after login
       const returnTo = encodeURIComponent(window.location.href);
-      window.location.href = `${LANDING_BASE_URL}/?redirect=${returnTo}#auth`;
+      window.location.href = `${LANDING_BASE_URL}/auth?redirect=${returnTo}`;
     }
     return Promise.reject(error);
   }

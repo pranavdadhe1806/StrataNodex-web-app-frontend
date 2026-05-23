@@ -10,8 +10,8 @@ const LANDING_BASE_URL =
 
 function getLandingAuthUrl() {
   // Encode the current page so the landing page can bounce back after login
-  const returnTo = encodeURIComponent(window.location.href);
-  return `${LANDING_BASE_URL}/?redirect=${returnTo}#auth`;
+  const redirect = encodeURIComponent(window.location.href);
+  return `${LANDING_BASE_URL}/auth?redirect=${redirect}`;
 }
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {

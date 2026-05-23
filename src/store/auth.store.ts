@@ -5,8 +5,8 @@ import { clearToken, setToken as setTokenUtil } from '../utils/token';
 // In dev, redirect to local landing page; in prod, to the custom domain
 const LANDING_AUTH_URL =
   import.meta.env.VITE_LANDING_URL
-    ? `${import.meta.env.VITE_LANDING_URL}/#auth`
-    : 'https://stratanodex.online/#auth';
+    ? `${import.meta.env.VITE_LANDING_URL}/auth`
+    : 'https://stratanodex.online/auth';
 
 interface AuthStore {
   token: string | null;
