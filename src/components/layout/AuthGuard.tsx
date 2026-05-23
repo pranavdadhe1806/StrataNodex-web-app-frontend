@@ -4,9 +4,9 @@ import { authApi } from '../../api/auth.api';
 import { getToken, setToken, setStoredUser, getStoredUser } from '../../utils/token';
 import Spinner from '../ui/Spinner';
 
-// In dev, redirect to local landing page; in prod, to deployed Vercel app
+// In dev, redirect to local landing page; in prod, to the custom domain
 const LANDING_BASE_URL =
-  import.meta.env.VITE_LANDING_URL ?? 'https://stratanodex-landing-page.vercel.app';
+  import.meta.env.VITE_LANDING_URL ?? 'https://stratanodex.online';
 
 function getLandingAuthUrl() {
   // Encode the current page so the landing page can bounce back after login

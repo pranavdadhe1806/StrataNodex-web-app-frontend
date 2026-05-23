@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import type { User } from '../types/auth.types';
 import { clearToken, setToken as setTokenUtil } from '../utils/token';
 
-// In dev, redirect to local landing page; in prod, to deployed Vercel app
+// In dev, redirect to local landing page; in prod, to the custom domain
 const LANDING_AUTH_URL =
   import.meta.env.VITE_LANDING_URL
     ? `${import.meta.env.VITE_LANDING_URL}/#auth`
-    : 'https://stratanodex-landing-page.vercel.app/#auth';
+    : 'https://stratanodex.online/#auth';
 
 interface AuthStore {
   token: string | null;

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { getToken, clearToken } from '../utils/token';
 
-// In dev, redirect to local landing page; in prod, to deployed Vercel app
+// In dev, redirect to local landing page; in prod, to the custom domain
 const LANDING_BASE_URL =
-  import.meta.env.VITE_LANDING_URL ?? 'https://stratanodex-landing-page.vercel.app';
+  import.meta.env.VITE_LANDING_URL ?? 'https://stratanodex.online';
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
