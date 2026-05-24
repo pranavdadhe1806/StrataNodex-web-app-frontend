@@ -21,3 +21,23 @@ export interface ScoreBreakdown {
   total: number;
   points: number;
 }
+
+export interface ListStat {
+  id: string;
+  name: string;
+  totalTasks: number;
+  doneTasks: number;
+  inProgressTasks: number;
+  completionPct: number;
+}
+
+export interface FolderStat {
+  id: string;
+  name: string;
+  totalTasks: number;
+  doneTasks: number;
+  completionPct: number;
+  lists: ListStat[];
+}
+
+export type ScoreSummary = FolderStat[];

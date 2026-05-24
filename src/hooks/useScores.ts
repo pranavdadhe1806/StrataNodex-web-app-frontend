@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { scoreApi } from '../api/score.api';
-import type { DailyScore } from '../types/score.types';
+import type { DailyScore, ScoreSummary } from '../types/score.types';
 
 const SCORES_KEY = 'scores';
 
@@ -15,5 +15,12 @@ export function useStreak() {
   return useQuery<{ streak: number }, Error>({
     queryKey: [SCORES_KEY, 'streak'],
     queryFn: scoreApi.getStreak,
+  });
+}
+
+export function useScoreSummary() {
+  return useQuery<ScoreSummary, Error>({
+    queryKey: [SCORES_KEY, 'summary'],
+    queryFn: scoreApi.getSummary,
   });
 }

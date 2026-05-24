@@ -1,5 +1,5 @@
 import client from './client';
-import type { DailyScore } from '../types/score.types';
+import type { DailyScore, ScoreSummary } from '../types/score.types';
 
 export const scoreApi = {
   getAll: (limit = 90) =>
@@ -7,4 +7,7 @@ export const scoreApi = {
 
   getStreak: () =>
     client.get<{ streak: number }>('/scores/streak').then(r => r.data),
+
+  getSummary: () =>
+    client.get<ScoreSummary>('/scores/summary').then(r => r.data),
 };
