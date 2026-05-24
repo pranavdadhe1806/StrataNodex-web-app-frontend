@@ -1,346 +1,225 @@
 import { useState } from 'react';
+import { Shield, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
 
-const cardStyle: React.CSSProperties = {
-  background: '#2A2D33',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
-  borderRadius: '14px',
-  padding: '28px',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)',
-};
-
-const labelStyle: React.CSSProperties = {
-  color: '#9CA3AF',
-  fontSize: '13px',
-  fontWeight: 500,
-  fontFamily: 'Poppins, sans-serif',
-  marginBottom: '8px',
-  display: 'block',
-};
-
-const inputStyle: React.CSSProperties = {
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  borderRadius: '10px',
-  color: '#EDEFF3',
-  padding: '12px 14px',
-  fontSize: '14px',
-  fontFamily: 'Poppins, sans-serif',
-  outline: 'none',
-  width: '100%',
-  boxSizing: 'border-box' as const,
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  color: '#EDEFF3',
-  fontSize: '16px',
-  fontWeight: 600,
-  fontFamily: 'Poppins, sans-serif',
-};
-
-function OtpBoxes({
-  otp,
-  onChange,
-}: {
-  otp: string[];
-  onChange: (index: number, value: string) => void;
-}) {
-  const refs = Array.from({ length: 6 }, () => null) as (HTMLInputElement | null)[];
-  return (
-    <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginBottom: '20px' }}>
-      {otp.map((digit, i) => (
-        <input
-          key={i}
-          ref={(el) => { refs[i] = el; }}
-          type="text"
-          inputMode="numeric"
-          value={digit}
-          maxLength={1}
-          onChange={(e) => {
-            const val = e.target.value.replace(/\D/g, '');
-            onChange(i, val);
-            if (val && i < 5) (e.target.nextSibling as HTMLInputElement)?.focus();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Backspace' && !digit && i > 0)
-              (e.currentTarget.previousSibling as HTMLInputElement)?.focus();
-          }}
-          style={{
-            width: '44px',
-            height: '52px',
-            textAlign: 'center',
-            fontSize: '18px',
-            fontWeight: 600,
-            fontFamily: 'Poppins, sans-serif',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '8px',
-            color: '#EDEFF3',
-            outline: 'none',
-          }}
-          onFocus={(e) => (e.target.style.borderColor = 'rgba(0,191,255,0.4)')}
-          onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '24px',
-        right: '24px',
-        zIndex: 1000,
-        padding: '12px 20px',
-        borderRadius: '10px',
-        background: type === 'success' ? 'rgba(0, 200, 150, 0.15)' : 'rgba(248, 81, 73, 0.15)',
-        border: `1px solid ${type === 'success' ? 'rgba(0,200,150,0.3)' : 'rgba(248,81,73,0.3)'}`,
-        color: type === 'success' ? '#00c896' : '#f85149',
-        fontFamily: 'Poppins, sans-serif',
-        fontSize: '14px',
-        fontWeight: 500,
-      }}
-    >
-      {message}
-    </div>
-  );
-}
-
-type ChangePasswordStep = 'idle' | 'sending' | 'otp';
+type PwStep = 'idle' | 'otp';
 
 export default function SecuritySettings() {
   const { user, setUser } = useAuthStore();
 
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+  const flash = (msg: string, ok: boolean) => { setToast({ msg, ok }); setTimeout(() => setToast(null), 2800); };
 
-  // ── 2FA state ──
   const [twoFaLoading, setTwoFaLoading] = useState(false);
 
-  const handle2FAToggle = async () => {
+  const toggle2FA = async () => {
     if (!user) return;
     setTwoFaLoading(true);
     try {
-      if (user.twoFactorEnabled) {
-        const updated = await authApi.disable2FA();
-        setUser(updated);
-        showToast('✅ Two-factor authentication disabled', 'success');
-      } else {
-        const updated = await authApi.enable2FA('EMAIL');
-        setUser(updated);
-        showToast('✅ Two-factor authentication enabled (Email OTP)', 'success');
-      }
+      const updated = user.twoFactorEnabled
+        ? await authApi.disable2FA()
+        : await authApi.enable2FA('EMAIL');
+      setUser(updated);
+      flash(user.twoFactorEnabled ? '2FA disabled' : '2FA enabled — email OTP', true);
     } catch {
-      showToast('❌ Failed to update 2FA settings', 'error');
+      flash('Could not update 2FA', false);
     } finally {
       setTwoFaLoading(false);
     }
   };
 
-  // ── Change password state ──
-  const [pwStep, setPwStep] = useState<ChangePasswordStep>('idle');
-  const [pwLoading, setPwLoading] = useState(false);
+  const [pwStep, setPwStep] = useState<PwStep>('idle');
+  const [pwBusy, setPwBusy] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [pwError, setPwError] = useState('');
+  const [pwErr, setPwErr] = useState('');
 
-  const handleSendResetCode = async () => {
+  const sendCode = async () => {
     if (!user?.email) return;
-    setPwLoading(true);
-    setPwError('');
+    setPwBusy(true); setPwErr('');
     try {
       await authApi.forgotPassword(user.email);
       setPwStep('otp');
       setOtp(['', '', '', '', '', '']);
-    } catch {
-      setPwError('Failed to send reset code. Try again.');
-    } finally {
-      setPwLoading(false);
-    }
+    } catch { setPwErr('Failed to send code'); }
+    finally { setPwBusy(false); }
   };
 
-  const handleResetPassword = async () => {
+  const submitReset = async () => {
     const code = otp.join('');
-    if (code.length !== 6) { setPwError('Please enter the full 6-digit code.'); return; }
-    if (newPassword.length < 6) { setPwError('Password must be at least 6 characters.'); return; }
-    if (newPassword !== confirmPassword) { setPwError('Passwords do not match.'); return; }
+    if (code.length !== 6) { setPwErr('Enter the full 6-digit code'); return; }
+    if (newPw.length < 6) { setPwErr('Min 6 characters'); return; }
+    if (newPw !== confirmPw) { setPwErr('Passwords don\'t match'); return; }
     if (!user?.email) return;
-    setPwLoading(true);
-    setPwError('');
+    setPwBusy(true); setPwErr('');
     try {
-      await authApi.resetPassword(user.email, code, newPassword);
-      showToast('✅ Password changed successfully', 'success');
-      setPwStep('idle');
-      setOtp(['', '', '', '', '', '']);
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch {
-      setPwError('Invalid or expired code. Please try again.');
-    } finally {
-      setPwLoading(false);
-    }
+      await authApi.resetPassword(user.email, code, newPw);
+      flash('Password updated', true);
+      resetPwForm();
+    } catch { setPwErr('Invalid or expired code'); }
+    finally { setPwBusy(false); }
   };
 
-  const btnBase: React.CSSProperties = {
-    fontFamily: 'Poppins, sans-serif',
-    fontSize: '14px',
-    fontWeight: 500,
-    padding: '10px 18px',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    transition: 'opacity 0.15s',
-    border: 'none',
+  const resetPwForm = () => {
+    setPwStep('idle'); setOtp(['', '', '', '', '', '']); setNewPw(''); setConfirmPw(''); setPwErr('');
+  };
+
+  const handleOtp = (i: number, v: string) => {
+    const next = [...otp]; next[i] = v; setOtp(next);
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {toast && <Toast message={toast.message} type={toast.type} />}
+    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 999,
+          padding: '10px 18px', borderRadius: 8,
+          background: toast.ok ? 'rgba(0,200,150,0.12)' : 'rgba(248,81,73,0.12)',
+          border: `1px solid ${toast.ok ? 'rgba(0,200,150,0.25)' : 'rgba(248,81,73,0.25)'}`,
+          color: toast.ok ? '#00c896' : '#f85149', fontSize: 13, fontWeight: 500,
+        }}>{toast.msg}</div>
+      )}
 
-      {/* ── Two-Factor Authentication ── */}
-      <div style={cardStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-          <div>
-            <div style={sectionTitleStyle}>🔐 Two-Factor Authentication</div>
-            <p style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginTop: '6px', lineHeight: 1.6 }}>
-              {user?.twoFactorEnabled
-                ? 'Enabled — a one-time code will be required at every login.'
-                : 'Disabled — enable to require an email OTP every time you sign in.'}
-            </p>
-          </div>
+      {/* ── 2FA ── */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <span style={{ color: '#EDEFF3', fontSize: 15, fontWeight: 500 }}>Two-factor authentication</span>
           <button
-            onClick={handle2FAToggle}
+            onClick={toggle2FA}
             disabled={twoFaLoading}
             style={{
-              ...btnBase,
-              flexShrink: 0,
-              background: user?.twoFactorEnabled ? 'rgba(248,81,73,0.1)' : 'rgba(0,191,255,0.1)',
-              border: `1px solid ${user?.twoFactorEnabled ? 'rgba(248,81,73,0.3)' : 'rgba(0,191,255,0.3)'}`,
-              color: user?.twoFactorEnabled ? '#f85149' : '#00bfff',
-              opacity: twoFaLoading ? 0.6 : 1,
+              width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer',
+              background: user?.twoFactorEnabled ? '#00bfff' : '#3A3F47',
+              position: 'relative', transition: 'background 0.2s', opacity: twoFaLoading ? 0.5 : 1,
             }}
           >
-            {twoFaLoading ? '...' : user?.twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+            <span style={{
+              position: 'absolute', top: 2, width: 18, height: 18, borderRadius: '50%', background: '#fff',
+              left: user?.twoFactorEnabled ? 20 : 2, transition: 'left 0.2s',
+            }} />
           </button>
         </div>
-
+        <p style={{ color: '#6B7280', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+          {user?.twoFactorEnabled
+            ? 'A one-time code is sent to your email on every sign-in.'
+            : 'Require an email code each time you log in.'}
+        </p>
         {user?.twoFactorEnabled && (
-          <div
-            style={{
-              marginTop: '16px',
-              padding: '12px 16px',
-              background: 'rgba(0,191,255,0.06)',
-              border: '1px solid rgba(0,191,255,0.15)',
-              borderRadius: '10px',
-              color: '#00bfff',
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '13px',
-            }}
-          >
-            ✅ Active — method: <strong>Email OTP</strong>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 10,
+            padding: '5px 12px', borderRadius: 6,
+            background: 'rgba(0,191,255,0.06)', color: '#00bfff', fontSize: 12, fontWeight: 500,
+          }}>
+            <Shield size={13} /> Email OTP active
           </div>
         )}
       </div>
 
-      {/* ── Change Password ── */}
-      <div style={cardStyle}>
-        <div style={sectionTitleStyle}>🔑 Change Password</div>
-        <p style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginTop: '6px', marginBottom: '20px', lineHeight: 1.6 }}>
-          A one-time code will be sent to <strong style={{ color: '#9CA3AF' }}>{user?.email}</strong>.
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 32 }} />
+
+      {/* ── Change password ── */}
+      <div>
+        <span style={{ color: '#EDEFF3', fontSize: 15, fontWeight: 500, display: 'block', marginBottom: 4 }}>Change password</span>
+        <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 16px' }}>
+          We'll send a verification code to {user?.email}
         </p>
 
         {pwStep === 'idle' && (
           <button
-            onClick={handleSendResetCode}
-            disabled={pwLoading}
+            onClick={sendCode} disabled={pwBusy}
             style={{
-              ...btnBase,
-              background: 'rgba(0,191,255,0.1)',
-              border: '1px solid rgba(0,191,255,0.3)',
-              color: '#00bfff',
-              opacity: pwLoading ? 0.6 : 1,
+              background: 'none', border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 8, color: '#EDEFF3', fontSize: 13, fontWeight: 500,
+              padding: '8px 16px', cursor: 'pointer', opacity: pwBusy ? 0.5 : 1,
+              transition: 'border-color 0.15s',
             }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
           >
-            {pwLoading ? 'Sending...' : 'Send Reset Code'}
+            {pwBusy ? 'Sending...' : 'Send verification code'}
           </button>
         )}
 
         {pwStep === 'otp' && (
-          <div>
-            <p style={{ color: '#9CA3AF', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginBottom: '16px' }}>
-              Enter the 6-digit code sent to your email, then set a new password.
-            </p>
+          <div style={{ maxWidth: 360 }}>
+            <label style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 8 }}>
+              Verification code
+            </label>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
+              {otp.map((d, i) => (
+                <input
+                  key={i} type="text" inputMode="numeric" maxLength={1} value={d}
+                  onChange={e => {
+                    const v = e.target.value.replace(/\D/g, '');
+                    handleOtp(i, v);
+                    if (v && i < 5) (e.target.nextSibling as HTMLInputElement)?.focus();
+                  }}
+                  onKeyDown={e => { if (e.key === 'Backspace' && !d && i > 0) (e.currentTarget.previousSibling as HTMLInputElement)?.focus(); }}
+                  style={{
+                    width: 40, height: 44, textAlign: 'center', fontSize: 16, fontWeight: 600,
+                    fontFamily: 'Poppins, sans-serif',
+                    background: '#25282E', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
+                    color: '#EDEFF3', outline: 'none', transition: 'border-color 0.15s',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(0,191,255,0.35)')}
+                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+                />
+              ))}
+            </div>
 
-            <OtpBoxes
-              otp={otp}
-              onChange={(i, val) => {
-                const next = [...otp];
-                next[i] = val;
-                setOtp(next);
+            <label style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 6 }}>New password</label>
+            <div style={{ position: 'relative', marginBottom: 12 }}>
+              <input
+                type={showPw ? 'text' : 'password'} value={newPw}
+                onChange={e => setNewPw(e.target.value)} placeholder="Min 6 characters"
+                style={{
+                  width: '100%', boxSizing: 'border-box', padding: '10px 40px 10px 12px',
+                  background: '#25282E', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
+                  color: '#EDEFF3', fontSize: 13, fontFamily: 'Poppins, sans-serif', outline: 'none',
+                }}
+                onFocus={e => (e.target.style.borderColor = 'rgba(0,191,255,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              />
+              <button type="button" onClick={() => setShowPw(!showPw)}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#6B7280', cursor: 'pointer', padding: 0 }}>
+                {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+
+            <label style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 6 }}>Confirm password</label>
+            <input
+              type="password" value={confirmPw}
+              onChange={e => setConfirmPw(e.target.value)} placeholder="Re-enter password"
+              style={{
+                width: '100%', boxSizing: 'border-box', padding: '10px 12px',
+                background: '#25282E', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
+                color: '#EDEFF3', fontSize: 13, fontFamily: 'Poppins, sans-serif', outline: 'none',
+                marginBottom: 16,
               }}
+              onFocus={e => (e.target.style.borderColor = 'rgba(0,191,255,0.35)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
 
-            <div style={{ marginBottom: '14px' }}>
-              <label style={labelStyle}>New Password</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPw ? 'text' : 'password'}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Min. 6 characters"
-                  style={{ ...inputStyle, paddingRight: '44px' }}
-                  onFocus={(e) => (e.target.style.borderColor = 'rgba(0,191,255,0.4)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw(!showPw)}
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#7D828B', cursor: 'pointer', padding: 0 }}
-                >
-                  {showPw ? '🙈' : '👁'}
-                </button>
-              </div>
-            </div>
+            {pwErr && <p style={{ color: '#f85149', fontSize: 12, margin: '0 0 12px' }}>{pwErr}</p>}
 
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Confirm New Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter new password"
-                style={inputStyle}
-                onFocus={(e) => (e.target.style.borderColor = 'rgba(0,191,255,0.4)')}
-                onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
-              />
-            </div>
-
-            {pwError && (
-              <p style={{ color: '#f85149', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginBottom: '14px' }}>
-                {pwError}
-              </p>
-            )}
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={handleResetPassword}
-                disabled={pwLoading}
-                style={{ ...btnBase, background: '#00bfff', color: '#fff', opacity: pwLoading ? 0.6 : 1 }}
-              >
-                {pwLoading ? 'Saving...' : 'Change Password'}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={submitReset} disabled={pwBusy}
+                style={{
+                  background: '#00bfff', border: 'none', borderRadius: 8,
+                  color: '#fff', fontSize: 13, fontWeight: 500,
+                  padding: '9px 20px', cursor: 'pointer', opacity: pwBusy ? 0.5 : 1,
+                }}>
+                {pwBusy ? 'Updating...' : 'Update password'}
               </button>
-              <button
-                onClick={() => { setPwStep('idle'); setPwError(''); setOtp(['', '', '', '', '', '']); setNewPassword(''); setConfirmPassword(''); }}
-                style={{ ...btnBase, background: 'rgba(255,255,255,0.05)', color: '#9CA3AF', border: '1px solid rgba(255,255,255,0.08)' }}
-              >
+              <button onClick={resetPwForm}
+                style={{
+                  background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
+                  color: '#9CA3AF', fontSize: 13, padding: '9px 16px', cursor: 'pointer',
+                }}>
                 Cancel
               </button>
             </div>
