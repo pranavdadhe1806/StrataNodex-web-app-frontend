@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Bell, User } from 'lucide-react';
+import { Bell, User, ShieldCheck } from 'lucide-react';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
 import NotificationSettings from '../components/settings/NotificationSettings';
+import SecuritySettings from '../components/settings/SecuritySettings';
 
 const tabs = [
   { id: 'general' as const, label: 'General', icon: User },
+  { id: 'security' as const, label: 'Security', icon: ShieldCheck },
   { id: 'notifications' as const, label: 'Notifications', icon: Bell },
 ];
 
@@ -90,6 +92,7 @@ export default function SettingsPage() {
                 General settings — coming soon
               </div>
             )}
+            {activeTab === 'security' && <SecuritySettings />}
             {activeTab === 'notifications' && <NotificationSettings />}
           </div>
         </div>
