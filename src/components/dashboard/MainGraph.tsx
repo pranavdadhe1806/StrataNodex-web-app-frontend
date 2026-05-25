@@ -172,7 +172,7 @@ export default function MainGraph() {
             Loading…
           </div>
         ) : (
-          <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+          <AreaChart data={data} margin={{ top: 5, right: 28, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#00bfff" stopOpacity={0.25} />
@@ -190,6 +190,7 @@ export default function MainGraph() {
               axisLine={false}
               tickLine={false}
               interval={tickInterval}
+              padding={{ left: 8, right: 8 }}
             />
             <YAxis
               domain={[-1, 3]}

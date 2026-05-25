@@ -15,6 +15,7 @@ export interface RecentEntry {
 interface RecentsStore {
   items: RecentEntry[];
   recordOpen: (entry: Pick<RecentEntry, 'id' | 'name' | 'type'>) => void;
+  removeItem: (type: RecentType, id: string) => void;
   getEntry: (type: RecentType, id: string) => RecentEntry | undefined;
 }
 
@@ -39,6 +40,11 @@ export const useRecentsStore = create<RecentsStore>()(
         ].slice(0, MAX_RECENTS);
 
         set({ items: next });
+      },
+
+      removeItem: (type, id) => {
+        const key = recentKey(type, id);
+        set({ items: get().items.filter((i) => recentKey(i.type, i.id) !== key) });
       },
 
       getEntry: (type, id) =>

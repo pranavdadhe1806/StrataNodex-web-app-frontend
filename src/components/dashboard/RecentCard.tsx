@@ -7,6 +7,7 @@ interface RecentCardProps {
   name: string;
   type: 'folder' | 'list';
   onClick: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
 function ListThumb({ id }: { id: string }) {
@@ -19,13 +20,14 @@ function ListThumb({ id }: { id: string }) {
   );
 }
 
-export default function RecentCard({ id, name, type, onClick }: RecentCardProps) {
+export default function RecentCard({ id, name, type, onClick, onContextMenu }: RecentCardProps) {
   const isFolder = type === 'folder';
 
   return (
     <button
       type="button"
       onClick={onClick}
+      onContextMenu={onContextMenu}
       title={name}
       style={{
         display: 'flex',

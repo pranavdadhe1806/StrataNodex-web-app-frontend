@@ -1,12 +1,35 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecentCard from './RecentCard';
-import { MAX_RECENTS, useRecentsStore } from '../../store/recents.store';
+import { MAX_RECENTS, useRecentsStore, type RecentEntry } from '../../store/recents.store';
+
+interface CtxMenu {
+  x: number;
+  y: number;
+  item: RecentEntry;
+}
 
 export default function Recents() {
   const navigate = useNavigate();
   const items = useRecentsStore((s) => s.items).slice(0, MAX_RECENTS);
+  const removeItem = useRecentsStore((s) => s.removeItem);
 
-  function handleCardClick(item: (typeof items)[number]) {
+  const [ctxMenu, setCtxMenu] = useState<CtxMenu | null>(null);
+
+  const closeMenu = useCallback(() => setCtxMenu(null), []);
+
+  useEffect(() => {
+    if (!ctxMenu) return;
+    const handler = () => closeMenu();
+    window.addEventListener('click', handler);
+    window.addEventListener('scroll', handler, true);
+    return () => {
+      window.removeEventListener('click', handler);
+      window.removeEventListener('scroll', handler, true);
+    };
+  }, [ctxMenu, closeMenu]);
+
+  function handleCardClick(item: RecentEntry) {
     if (item.type === 'folder') {
       navigate(`/folders/${item.id}`);
     } else {
@@ -14,10 +37,16 @@ export default function Recents() {
     }
   }
 
+  function handleContextMenu(e: React.MouseEvent, item: RecentEntry) {
+    e.preventDefault();
+    e.stopPropagation();
+    setCtxMenu({ x: e.clientX, y: e.clientY, item });
+  }
+
   const columnCount = Math.min(items.length, MAX_RECENTS);
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', position: 'relative' }}>
       <h2
         style={{
           color: '#EDEFF3',
@@ -58,8 +87,43 @@ export default function Recents() {
               name={item.name}
               type={item.type}
               onClick={() => handleCardClick(item)}
+              onContextMenu={(e) => handleContextMenu(e, item)}
             />
           ))}
+        </div>
+      )}
+
+      {/* Context menu */}
+      {ctxMenu && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'fixed',
+            top: ctxMenu.y,
+            left: ctxMenu.x,
+            zIndex: 1000,
+            background: '#2A2D33',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+            minWidth: 168,
+            overflow: 'hidden',
+            fontFamily: 'Poppins, sans-serif',
+          }}
+        >
+          <button
+            onClick={() => { removeItem(ctxMenu.item.type, ctxMenu.item.id); closeMenu(); }}
+            style={{
+              display: 'block', width: '100%', textAlign: 'left',
+              padding: '9px 14px', background: 'none', border: 'none',
+              color: '#f85149', fontSize: 13, cursor: 'pointer',
+              transition: 'background 0.1s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(248,81,73,0.08)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+          >
+            Remove from recents
+          </button>
         </div>
       )}
     </div>
