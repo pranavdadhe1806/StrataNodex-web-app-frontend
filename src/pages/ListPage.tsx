@@ -397,6 +397,19 @@ export default function ListPage() {
 
   function handleMouseLeave() { setIsDragging(false); }
 
+  // Scroll-to-pan — non-passive so we can prevent default page scroll
+  const canvasRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
   return (
     <div style={{ background: '#1B1D21', height: '100vh', overflow: 'hidden' }}>
       <AnimatePresence>
@@ -443,6 +456,7 @@ export default function ListPage() {
 
       {/* Canvas */}
       <div
+        ref={canvasRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
