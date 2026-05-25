@@ -71,6 +71,15 @@ export default function SecuritySettings() {
     const next = [...otp]; next[i] = v; setOtp(next);
   };
 
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6).split('');
+    if (!digits.length) return;
+    const next = ['', '', '', '', '', ''];
+    digits.forEach((d, i) => { next[i] = d; });
+    setOtp(next);
+  };
+
   return (
     <div style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* toast */}
@@ -159,6 +168,7 @@ export default function SecuritySettings() {
                     if (v && i < 5) (e.target.nextSibling as HTMLInputElement)?.focus();
                   }}
                   onKeyDown={e => { if (e.key === 'Backspace' && !d && i > 0) (e.currentTarget.previousSibling as HTMLInputElement)?.focus(); }}
+                  onPaste={i === 0 ? handleOtpPaste : undefined}
                   style={{
                     width: 40, height: 44, textAlign: 'center', fontSize: 16, fontWeight: 600,
                     fontFamily: 'Poppins, sans-serif',
