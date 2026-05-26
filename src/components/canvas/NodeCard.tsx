@@ -85,7 +85,10 @@ export default function NodeCard({
   }
 
   return (
-    <div style={{ ...getCardStyles(), ...style }}>
+    <div
+      style={{ ...getCardStyles(), ...style }}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       {/* Status circle — toggles status only, does NOT open popup */}
       <div
         style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}

@@ -196,7 +196,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
         </div>
 
         {/* ── Scrollable body ── */}
-        <div style={{ overflowY: 'auto', flex: 1, padding: '20px 28px 8px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div data-scroll-container="true" style={{ overflowY: 'auto', flex: 1, padding: '20px 28px 8px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
           {/* Properties grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Topbar from '../components/layout/Topbar';
@@ -91,6 +91,8 @@ export default function ListPage() {
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const panStart = useRef({ x: 0, y: 0 });
+  // Ref for the pannable content div — used to detect background vs node-card clicks
+  const pannableRef = useRef<HTMLDivElement>(null);
   const contentBoundsRef = useRef({ contentWidth: 800, contentHeight: 600 });
 
   // Canvas store for selection
@@ -379,7 +381,7 @@ export default function ListPage() {
     setCurrentParentId(parentId);
     setCurrentDepth(1);
     setIsTyping(true);
-    requestAnimationFrame(() => inputRef.current?.focus());
+    requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
   }
 
   // ── Toggle status: optimistic + background save ───────────────────────────
@@ -430,27 +432,48 @@ export default function ListPage() {
     if (!isDragging) return;
     const dx = Math.abs(e.clientX - dragStart.current.x);
     const dy = Math.abs(e.clientY - dragStart.current.y);
-    if (dx < 5 && dy < 5 && !isTyping) {
+    // Only open the typing input when the click lands directly on the canvas background
+    // or the pannable content div — NOT on a node card or any of its children.
+    // Without this check every node-card click triggers setIsTyping(true) and jumps
+    // the textarea focus to the very bottom of the canvas (28 + N*70 px).
+    const isBackgroundClick =
+      e.target === canvasRef.current || e.target === pannableRef.current;
+    if (dx < 5 && dy < 5 && !isTyping && isBackgroundClick) {
       setIsTyping(true);
-      requestAnimationFrame(() => inputRef.current?.focus());
+      requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     }
     setIsDragging(false);
   }
 
   function handleMouseLeave() { setIsDragging(false); }
 
-  // Scroll-to-pan — non-passive so we can prevent default page scroll
+  // Wheel-to-pan: listen on window so it works even when a fixed overlay (NodeDetailPanel)
+  // sits above the canvas and intercepts events on canvasRef.
+  // We skip panning when the scroll originates inside the detail panel's own scrollable body
+  // (marked with data-scroll-container) so that panel still scrolls normally.
   const canvasRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const el = canvasRef.current;
-    if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      const target = e.target as Element;
+      if (target.closest('[data-scroll-container]')) return; // let panel body scroll
       e.preventDefault();
       setPan(prev => clampPan(prev.x - e.deltaX, prev.y - e.deltaY));
     };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
   }, [clampPan]);
+
+  // CRITICAL: Chrome sets scrollTop on overflow:hidden ancestors when focus() is called on a
+  // deeply-positioned element (e.g. the textarea at top: 13,000+px inside the pannable div).
+  // This causes the visual canvas content to jump even though pan.y hasn’t changed.
+  // We reset scrollTop to 0 after every render to guarantee it stays at 0.
+  // preventScroll:true on focus() calls prevents the initial scroll, but this is a safety net.
+  useLayoutEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.scrollTop = 0;
+      canvasRef.current.scrollLeft = 0;
+    }
+  });
 
   return (
     <div style={{ background: '#1B1D21', height: '100vh', overflow: 'hidden' }}>
@@ -516,6 +539,7 @@ export default function ListPage() {
       >
         {/* Pannable content container */}
         <div
+          ref={pannableRef}
           style={{
             position: 'absolute',
             top: 0,
@@ -574,7 +598,6 @@ export default function ListPage() {
               margin: 0,
               zIndex: 100,
             }}
-            autoFocus
             rows={1}
           />
         )}
@@ -585,7 +608,14 @@ export default function ListPage() {
               nodes={nodes}
               selectedNodeId={selectedNodeId}
               onNodeCircleClick={toggleNodeStatus}
-              onNodeTextClick={(id) => setDetailNodeId(id)}
+              onNodeTextClick={(id) => {
+                // Close typing mode before opening the detail panel.
+                // If the textarea was active, its blur fires setIsTyping(false) anyway,
+                // but doing it explicitly here prevents any intermediate render with isTyping=true
+                // that could trigger a Chrome scroll to the textarea position.
+                setIsTyping(false);
+                setDetailNodeId(id);
+              }}
             />
           )}
         </div>{/* End pannable content */}
