@@ -91,6 +91,7 @@ export default function ListPage() {
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const panStart = useRef({ x: 0, y: 0 });
+  const contentBoundsRef = useRef({ contentWidth: 800, contentHeight: 600 });
 
   // Canvas store for selection
   const { selectedNodeId } = useCanvasStore();
@@ -103,6 +104,47 @@ export default function ListPage() {
   const flatNodes = flattenTree(nodes);
   const doneCount = flatNodes.filter(n => n.status === 'DONE').length;
   const totalCount = flatNodes.length;
+
+  // Keep content bounds ref up-to-date (mirrors NodeTree layout constants)
+  useEffect(() => {
+    if (nodes.length === 0) {
+      contentBoundsRef.current = { contentWidth: 800, contentHeight: 600 };
+      return;
+    }
+    const NODE_CARD_WIDTH = 320;
+    const PADDING = 40;
+    const VERTICAL_GAP = 70;
+    const NODE_HEIGHT = 40;
+    let maxX = 60 + NODE_CARD_WIDTH;
+    let currentY = 28;
+    function walk(nodeList: Node[], depth: number) {
+      for (const node of nodeList) {
+        const x = 60 + depth * 90;
+        if (x + NODE_CARD_WIDTH > maxX) maxX = x + NODE_CARD_WIDTH;
+        currentY += VERTICAL_GAP;
+        if (node.children?.length > 0) walk(node.children, depth + 1);
+      }
+    }
+    walk(nodes, 0);
+    contentBoundsRef.current = {
+      contentWidth: maxX + PADDING,
+      contentHeight: currentY + NODE_HEIGHT + PADDING,
+    };
+  }, [nodes]);
+
+  // Clamp pan so viewport never strays beyond content boundaries
+  const clampPan = useCallback((x: number, y: number): { x: number; y: number } => {
+    const el = canvasRef.current;
+    if (!el) return { x, y };
+    const vw = el.clientWidth;
+    const vh = el.clientHeight;
+    const { contentWidth, contentHeight } = contentBoundsRef.current;
+    const PAD = 40;
+    return {
+      x: Math.min(PAD, Math.max(contentWidth > vw ? -(contentWidth - vw + PAD) : 0, x)),
+      y: Math.min(PAD, Math.max(contentHeight > vh ? -(contentHeight - vh + PAD) : 0, y)),
+    };
+  }, []);
 
   // Title editing handlers
   function handleTitleDoubleClick() {
@@ -378,10 +420,10 @@ export default function ListPage() {
 
   function handleMouseMove(e: React.MouseEvent) {
     if (!isDragging) return;
-    setPan({
-      x: panStart.current.x + (e.clientX - dragStart.current.x),
-      y: panStart.current.y + (e.clientY - dragStart.current.y),
-    });
+    setPan(clampPan(
+      panStart.current.x + (e.clientX - dragStart.current.x),
+      panStart.current.y + (e.clientY - dragStart.current.y),
+    ));
   }
 
   function handleMouseUp(e: React.MouseEvent) {
@@ -404,11 +446,11 @@ export default function ListPage() {
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
+      setPan(prev => clampPan(prev.x - e.deltaX, prev.y - e.deltaY));
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, []);
+  }, [clampPan]);
 
   return (
     <div style={{ background: '#1B1D21', height: '100vh', overflow: 'hidden' }}>
