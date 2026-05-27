@@ -2,20 +2,177 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-base: #1B1D21;
-  --bg-node: #32363C;
-  --text-primary: #EDEFF3;
-  --text-secondary: #D5D8DE;
-  --text-muted: #8A8F98;
-  --text-placeholder: #7D828B;
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-glass-bright: rgba(255, 255, 255, 0.15);
-  --connector-color: #8B92A1;
-  --accent-cyan: #00bfff;
-  --accent-teal: #00c896;
+/* ══════════════════════════════════════════════════════════════
+   THEME: DARK  (true black, Apple-style)
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-base:          #000000;
+  --bg-surface:       #1A1A1A;
+  --bg-card:          #1C1C1E;
+  --bg-elevated:      #2C2C2E;
+  --bg-input:         #111111;
+
+  --text-primary:     #FFFFFF;
+  --text-secondary:   #D1D1D6;
+  --text-muted:       #8E8E93;
+  --text-placeholder: #636366;
+
+  --accent:           #2477C6;
+  --accent-teal:      #30D158;
+  --accent-danger:    #FF453A;
+  --accent-warning:   #FFD60A;
+
+  --border:           rgba(255,255,255,0.10);
+  --border-bright:    rgba(255,255,255,0.18);
+  --divider:          rgba(255,255,255,0.06);
+  --overlay:          rgba(0,0,0,0.85);
+
+  --shadow-card:      0 2px 8px rgba(0,0,0,0.5);
+  --shadow-elevated:  0 8px 32px rgba(0,0,0,0.7);
+
+  --connector-color:  #48484A;
+  --node-bg:          #1C1C1E;
+  --node-border:      rgba(255,255,255,0.10);
+  --node-border-focused: rgba(255,255,255,0.20);
+  --node-text:        #D1D1D6;
+  --node-text-focused:#FFFFFF;
+  --node-text-done:   #636366;
+  --node-circle-border: #636366;
+  --node-numbering:   #636366;
+
+  --scrollbar-thumb:  rgba(255,255,255,0.15);
+  --scrollbar-hover:  rgba(255,255,255,0.25);
+  --selection-bg:     rgba(36,119,198,0.30);
+
+  --prose-heading:    #FFFFFF;
+  --prose-link:       #2477C6;
+  --prose-quote-border: rgba(36,119,198,0.4);
+  --prose-quote-text: #A8ADB5;
+  --prose-code-bg:    rgba(255,255,255,0.06);
+  --prose-code-border:rgba(255,255,255,0.08);
+  --prose-code-color: #f7b955;
+  --prose-pre-bg:     #111111;
+  --prose-pre-code:   #D1D1D6;
+  --prose-strong:     #FFFFFF;
+
+  color-scheme: dark;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   THEME: WHITE  (Apple light)
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="white"] {
+  --bg-base:          #FFFFFF;
+  --bg-surface:       #F2F2F7;
+  --bg-card:          #FFFFFF;
+  --bg-elevated:      #F9F9F9;
+  --bg-input:         #EBEBF0;
+
+  --text-primary:     #1C1C1E;
+  --text-secondary:   #48484A;
+  --text-muted:       #8E8E93;
+  --text-placeholder: #AEAEB2;
+
+  --accent:           #2477C6;
+  --accent-teal:      #34C759;
+  --accent-danger:    #FF3B30;
+  --accent-warning:   #FF9500;
+
+  --border:           rgba(0,0,0,0.08);
+  --border-bright:    rgba(0,0,0,0.15);
+  --divider:          rgba(0,0,0,0.06);
+  --overlay:          rgba(0,0,0,0.35);
+
+  --shadow-card:      0 1px 4px rgba(0,0,0,0.08);
+  --shadow-elevated:  0 4px 16px rgba(0,0,0,0.10);
+
+  --connector-color:  #C7C7CC;
+  --node-bg:          #FFFFFF;
+  --node-border:      rgba(0,0,0,0.08);
+  --node-border-focused: rgba(0,0,0,0.15);
+  --node-text:        #1C1C1E;
+  --node-text-focused:#000000;
+  --node-text-done:   #AEAEB2;
+  --node-circle-border: #AEAEB2;
+  --node-numbering:   #AEAEB2;
+
+  --scrollbar-thumb:  rgba(0,0,0,0.15);
+  --scrollbar-hover:  rgba(0,0,0,0.25);
+  --selection-bg:     rgba(36,119,198,0.25);
+
+  --prose-heading:    #1C1C1E;
+  --prose-link:       #2477C6;
+  --prose-quote-border: rgba(36,119,198,0.5);
+  --prose-quote-text: #636366;
+  --prose-code-bg:    rgba(0,0,0,0.05);
+  --prose-code-border:rgba(0,0,0,0.08);
+  --prose-code-color: #AF5200;
+  --prose-pre-bg:     #F2F2F7;
+  --prose-pre-code:   #48484A;
+  --prose-strong:     #1C1C1E;
+
+  color-scheme: light;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME: GREY  (#151515 base)
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="grey"] {
+  --bg-base:          #151515;
+  --bg-surface:       #1E1E1E;
+  --bg-card:          #252525;
+  --bg-elevated:      #2D2D2D;
+  --bg-input:         #181818;
+
+  --text-primary:     #E8E8E8;
+  --text-secondary:   #B8B8B8;
+  --text-muted:       #707070;
+  --text-placeholder: #555555;
+
+  --accent:           #2477C6;
+  --accent-teal:      #32D74B;
+  --accent-danger:    #FF453A;
+  --accent-warning:   #FFD60A;
+
+  --border:           rgba(255,255,255,0.08);
+  --border-bright:    rgba(255,255,255,0.14);
+  --divider:          rgba(255,255,255,0.05);
+  --overlay:          rgba(0,0,0,0.85);
+
+  --shadow-card:      0 2px 8px rgba(0,0,0,0.6);
+  --shadow-elevated:  0 8px 32px rgba(0,0,0,0.8);
+
+  --connector-color:  #3A3A3C;
+  --node-bg:          #252525;
+  --node-border:      rgba(255,255,255,0.08);
+  --node-border-focused: rgba(255,255,255,0.16);
+  --node-text:        #B8B8B8;
+  --node-text-focused:#E8E8E8;
+  --node-text-done:   #555555;
+  --node-circle-border: #555555;
+  --node-numbering:   #555555;
+
+  --scrollbar-thumb:  rgba(255,255,255,0.12);
+  --scrollbar-hover:  rgba(255,255,255,0.20);
+  --selection-bg:     rgba(36,119,198,0.30);
+
+  --prose-heading:    #E8E8E8;
+  --prose-link:       #2477C6;
+  --prose-quote-border: rgba(36,119,198,0.4);
+  --prose-quote-text: #808080;
+  --prose-code-bg:    rgba(255,255,255,0.06);
+  --prose-code-border:rgba(255,255,255,0.08);
+  --prose-code-color: #f7b955;
+  --prose-pre-bg:     #181818;
+  --prose-pre-code:   #B8B8B8;
+  --prose-strong:     #E8E8E8;
+
+  color-scheme: dark;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL RESETS
+   ══════════════════════════════════════════════════════════════ */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -44,11 +201,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--scrollbar-hover);
 }
 
 /* Remove default input/button styles */
@@ -59,8 +216,8 @@ input, textarea, button, select {
 
 /* Selection color */
 ::selection {
-  background: rgba(0, 191, 255, 0.25);
-  color: #EDEFF3;
+  background: var(--selection-bg);
+  color: var(--text-primary);
 }
 
 /* Spinner animation */
@@ -68,7 +225,9 @@ input, textarea, button, select {
   to { transform: rotate(360deg); }
 }
 
-/* ── TipTap rich text editor ── */
+/* ══════════════════════════════════════════════════════════════
+   TipTap Rich Text Editor
+   ══════════════════════════════════════════════════════════════ */
 .ProseMirror {
   outline: none;
   min-height: 100%;
@@ -76,7 +235,7 @@ input, textarea, button, select {
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: #6B6F77;
+  color: var(--text-placeholder);
   pointer-events: none;
   height: 0;
 }
@@ -84,19 +243,19 @@ input, textarea, button, select {
   font-size: 22px;
   font-weight: 600;
   margin: 12px 0 6px;
-  color: #EDEFF3;
+  color: var(--prose-heading);
 }
 .ProseMirror h2 {
   font-size: 18px;
   font-weight: 600;
   margin: 10px 0 6px;
-  color: #EDEFF3;
+  color: var(--prose-heading);
 }
 .ProseMirror h3 {
   font-size: 15px;
   font-weight: 600;
   margin: 8px 0 4px;
-  color: #EDEFF3;
+  color: var(--prose-heading);
 }
 .ProseMirror p {
   margin: 4px 0;
@@ -110,25 +269,25 @@ input, textarea, button, select {
 }
 .ProseMirror li > p { margin: 0; }
 .ProseMirror blockquote {
-  border-left: 3px solid rgba(0, 191, 255, 0.4);
+  border-left: 3px solid var(--prose-quote-border);
   padding: 4px 12px;
   margin: 8px 0;
-  color: #A8ADB5;
-  background: rgba(255,255,255,0.02);
+  color: var(--prose-quote-text);
+  background: var(--prose-code-bg);
   border-radius: 0 6px 6px 0;
 }
 .ProseMirror code {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--prose-code-bg);
+  border: 1px solid var(--prose-code-border);
   padding: 1px 5px;
   border-radius: 4px;
   font-family: 'JetBrains Mono', Consolas, monospace;
   font-size: 12px;
-  color: #f7b955;
+  color: var(--prose-code-color);
 }
 .ProseMirror pre {
-  background: #1B1D21;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--prose-pre-bg);
+  border: 1px solid var(--divider);
   border-radius: 6px;
   padding: 10px 12px;
   margin: 8px 0;
@@ -140,8 +299,8 @@ input, textarea, button, select {
   background: none;
   border: none;
   padding: 0;
-  color: #D5D8DE;
+  color: var(--prose-pre-code);
 }
-.ProseMirror strong { font-weight: 700; color: #EDEFF3; }
+.ProseMirror strong { font-weight: 700; color: var(--prose-strong); }
 .ProseMirror em { font-style: italic; }
-.ProseMirror a { color: #00bfff; text-decoration: underline; cursor: pointer; }
+.ProseMirror a { color: var(--prose-link); text-decoration: underline; cursor: pointer; }

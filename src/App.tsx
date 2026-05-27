@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// Import theme store so its module-level side effect (reading localStorage + setting data-theme) runs before first paint
+import './store/theme.store';
 import AuthGuard from './components/layout/AuthGuard';
 import DashboardPage from './pages/DashboardPage';
 import FoldersPage from './pages/FoldersPage';
