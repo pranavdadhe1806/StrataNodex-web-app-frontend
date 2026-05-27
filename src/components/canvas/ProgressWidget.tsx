@@ -18,10 +18,10 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
         top: '72px', // 56px topbar + 16px gap
         right: '24px',
         zIndex: 50,
-        background: '#32363C',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+        boxShadow: 'var(--shadow-card)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         padding: '14px 18px',
@@ -34,7 +34,7 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
           fontFamily: 'Poppins, sans-serif',
           fontSize: '13px',
           fontWeight: 500,
-          color: '#D5D8DE',
+          color: 'var(--text-secondary)',
           marginBottom: '8px',
         }}
       >
@@ -46,7 +46,7 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
         style={{
           width: '100%',
           height: '6px',
-          background: 'rgba(255, 255, 255, 0.08)',
+          background: 'var(--border)',
           borderRadius: '3px',
           overflow: 'hidden',
           marginBottom: '8px',
@@ -57,7 +57,7 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
           style={{
             width: `${percentage}%`,
             height: '100%',
-            background: '#00bfff',
+            background: 'var(--accent)',
             borderRadius: '3px',
             transition: 'width 0.4s ease',
           }}
@@ -69,13 +69,13 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
         style={{
           fontFamily: 'Poppins, sans-serif',
           fontSize: '12px',
-          color: '#8A8F98',
+          color: 'var(--text-muted)',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
         }}
       >
-        <CheckCircle size={16} weight="duotone" color="#00c896" />
+        <CheckCircle size={16} weight="duotone" style={{ color: 'var(--accent-teal)' }} />
         Total Task Completed: {done}/{total}
       </div>
     </div>

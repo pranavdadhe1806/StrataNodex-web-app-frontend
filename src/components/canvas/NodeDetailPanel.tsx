@@ -19,7 +19,7 @@ interface NodeDetailPanelProps {
 const labelStyle: React.CSSProperties = {
   fontFamily: 'Poppins, sans-serif',
   fontSize: '11px',
-  color: '#7D828B',
+  color: 'var(--text-placeholder)',
   fontWeight: 500,
   marginBottom: '6px',
   textTransform: 'uppercase',
@@ -30,7 +30,7 @@ const labelStyle: React.CSSProperties = {
 function PropertyRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: '#8A8F98' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: 'var(--text-muted)' }}>
         {icon}
         <span style={{ ...labelStyle, marginBottom: 0 }}>{label}</span>
       </div>
@@ -134,7 +134,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(27, 29, 33, 0.85)',
+        background: 'var(--overlay)',
         zIndex: 300,
         display: 'flex',
         alignItems: 'center',
@@ -151,9 +151,9 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           width: 'min(760px, 92vw)',
           maxHeight: '88vh',
           borderRadius: '18px',
-          background: '#2A2D33',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-elevated)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -165,7 +165,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           display: 'flex',
           alignItems: 'flex-start',
           gap: '12px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          borderBottom: '1px solid var(--divider)',
         }}>
           <input
             value={localTitle}
@@ -176,7 +176,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               flex: 1,
               background: 'transparent',
               border: 'none',
-              color: '#EDEFF3',
+              color: 'var(--text-primary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '24px',
               fontWeight: 600,
@@ -188,10 +188,10 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           <button
             onClick={onClose}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', borderRadius: '8px', flexShrink: 0, marginTop: '2px' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--divider)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'none')}
           >
-            <X size={18} color="#8A8F98" />
+            <X size={18} style={{ color: 'var(--text-muted)' }} />
           </button>
         </div>
 
@@ -205,9 +205,9 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                 value={localStatus}
                 onChange={v => handleStatusChange(v as NodeStatus)}
                 options={[
-                  { value: 'TODO', label: 'To Do', color: '#8A8F98' },
-                  { value: 'IN_PROGRESS', label: 'In Progress', color: '#00bfff' },
-                  { value: 'DONE', label: 'Done', color: '#00c896' },
+                  { value: 'TODO', label: 'To Do', color: 'var(--text-muted)' },
+                  { value: 'IN_PROGRESS', label: 'In Progress', color: 'var(--accent)' },
+                  { value: 'DONE', label: 'Done', color: 'var(--accent-teal)' },
                 ]}
               />
             </PropertyRow>
@@ -217,8 +217,8 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                 value={localPriority}
                 onChange={v => handlePriorityChange(v as Priority | '')}
                 options={[
-                  { value: '', label: 'None', color: '#4A4F57' },
-                  { value: 'LOW', label: 'Low', color: '#00c896' },
+                  { value: '', label: 'None', color: 'var(--text-placeholder)' },
+                  { value: 'LOW', label: 'Low', color: 'var(--accent-teal)' },
                   { value: 'MEDIUM', label: 'Medium', color: '#f7b955' },
                   { value: 'HIGH', label: 'High', color: '#f85149' },
                 ]}
@@ -247,18 +247,18 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               flexWrap: 'wrap',
               gap: '6px',
               alignItems: 'center',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
               padding: '7px 10px',
               minHeight: '40px',
             }}>
               {localTags.map(tag => (
                 <span key={tag} style={{
-                  background: 'rgba(0, 191, 255, 0.12)',
-                  border: '1px solid rgba(0, 191, 255, 0.25)',
+                  background: 'rgba(36,119,198,0.12)',
+                  border: '1px solid rgba(36,119,198,0.25)',
                   borderRadius: '20px',
-                  color: '#00bfff',
+                  color: 'var(--accent)',
                   fontSize: '12px',
                   fontFamily: 'Poppins, sans-serif',
                   padding: '2px 8px',
@@ -269,7 +269,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                   #{tag}
                   <button
                     onClick={() => removeTag(tag)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#00bfff', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}
                   >
                     <X size={10} />
                   </button>
@@ -283,7 +283,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#D5D8DE',
+                  color: 'var(--text-secondary)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '12.5px',
                   outline: 'none',
@@ -296,7 +296,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
 
           {/* Notes — rich text */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: '#8A8F98' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: 'var(--text-muted)' }}>
               <FileText size={14} />
               <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 500, letterSpacing: '0.3px', textTransform: 'uppercase' }}>Notes</span>
             </div>
@@ -317,8 +317,8 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '14px 24px',
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          background: 'rgba(0,0,0,0.15)',
+          borderTop: '1px solid var(--divider)',
+          background: 'var(--bg-input)',
           flexShrink: 0,
         }}>
           <button
@@ -327,18 +327,18 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(0, 191, 255, 0.08)',
-              border: '1px solid rgba(0, 191, 255, 0.2)',
+              background: 'rgba(36,119,198,0.08)',
+              border: '1px solid rgba(36,119,198,0.2)',
               borderRadius: '8px',
-              color: '#00bfff',
+              color: 'var(--accent)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '13px',
               padding: '8px 14px',
               cursor: 'pointer',
               transition: 'background 0.15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0, 191, 255, 0.14)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0, 191, 255, 0.08)')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(36,119,198,0.14)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(36,119,198,0.08)')}
           >
             <Plus size={14} />
             Add Sub-task
@@ -348,15 +348,15 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
             onClick={() => isInDaily ? removeFromDaily.mutate(node.id) : addToDaily.mutate(node.id)}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: isInDaily ? 'rgba(0,200,150,0.08)' : 'rgba(0,191,255,0.08)',
-              border: isInDaily ? '1px solid rgba(0,200,150,0.25)' : '1px solid rgba(0,191,255,0.2)',
+              background: isInDaily ? 'rgba(48,209,88,0.08)' : 'rgba(36,119,198,0.08)',
+              border: isInDaily ? '1px solid rgba(48,209,88,0.25)' : '1px solid rgba(36,119,198,0.2)',
               borderRadius: '8px',
-              color: isInDaily ? '#00c896' : '#00bfff',
+              color: isInDaily ? 'var(--accent-teal)' : 'var(--accent)',
               fontFamily: 'Poppins, sans-serif', fontSize: '13px',
               padding: '8px 14px', cursor: 'pointer', transition: 'background 0.15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = isInDaily ? 'rgba(0,200,150,0.14)' : 'rgba(0,191,255,0.14)')}
-            onMouseLeave={e => (e.currentTarget.style.background = isInDaily ? 'rgba(0,200,150,0.08)' : 'rgba(0,191,255,0.08)')}
+            onMouseEnter={e => (e.currentTarget.style.background = isInDaily ? 'rgba(48,209,88,0.14)' : 'rgba(36,119,198,0.14)')}
+            onMouseLeave={e => (e.currentTarget.style.background = isInDaily ? 'rgba(48,209,88,0.08)' : 'rgba(36,119,198,0.08)')}
           >
             <CalendarDays size={14} />
             {isInDaily ? 'Remove from Daily' : 'Add to Daily'}

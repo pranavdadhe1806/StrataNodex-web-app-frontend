@@ -100,11 +100,7 @@ export default function NodeTree({
         width={contentWidth}
         height={contentHeight}
       >
-        <defs>
-          <filter id="connectorShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(0, 0, 0, 0.6)" />
-          </filter>
-        </defs>
+
         {connectors.map((conn) => {
           // L-shaped path: down from parent bottom, then right to child middle
           const startX = conn.fromX;
@@ -122,11 +118,10 @@ export default function NodeTree({
               <path
                 d={pathD}
                 fill="none"
-                stroke="#8B92A1"
+                stroke="var(--connector-color)"
                 strokeWidth={1.5}
-                filter="url(#connectorShadow)"
               />
-              <path d={arrowPath} fill="#8B92A1" stroke="none" filter="url(#connectorShadow)" />
+              <path d={arrowPath} fill="var(--connector-color)" stroke="none" />
             </g>
           );
         })}
