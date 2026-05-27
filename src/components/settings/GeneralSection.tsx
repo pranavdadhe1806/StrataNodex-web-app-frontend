@@ -55,7 +55,7 @@ const FONTS: { id: Font; label: string; preview: string; style: string; size: nu
   { id: 'Poppins', label: 'Poppins', preview: 'Aa', style: "'Poppins', sans-serif", size: 16, weight: 400 },
   { id: 'Inter', label: 'Inter', preview: 'Aa', style: "'Inter', sans-serif", size: 16, weight: 400 },
   { id: 'JetBrains Mono', label: 'JetBrains Mono', preview: 'Aa', style: "'JetBrains Mono', monospace", size: 15, weight: 400 },
-  { id: 'Caveat', label: 'Caveat', preview: 'Aa', style: "'Caveat', cursive", size: 22, weight: 600 },
+  { id: 'Indie Flower', label: 'Indie Flower', preview: 'Aa', style: "'Indie Flower', cursive", size: 24, weight: 600 },
 ];
 
 /* ─── Date format options ───────────────────────────────────── */

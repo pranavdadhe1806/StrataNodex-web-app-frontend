@@ -304,3 +304,22 @@ input, textarea, button, select {
 .ProseMirror strong { font-weight: 700; color: var(--prose-strong); }
 .ProseMirror em { font-style: italic; }
 .ProseMirror a { color: var(--prose-link); text-decoration: underline; cursor: pointer; }
+
+/* ══════════════════════════════════════════════════════════════
+   FONT SPECIFIC ADJUSTMENTS
+   ══════════════════════════════════════════════════════════════ */
+[data-font="Indie Flower"] {
+  /* Make the handwriting font slightly thicker (browser faux-bold) and bigger globally */
+  font-weight: 600;
+  font-size: 110%;
+  letter-spacing: 0.02em;
+}
+
+[data-font="Indie Flower"] input,
+[data-font="Indie Flower"] textarea,
+[data-font="Indie Flower"] button,
+[data-font="Indie Flower"] select {
+  font-weight: 600;
+  font-size: 110%;
+}
+

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type Theme = 'dark' | 'white' | 'grey';
-export type Font = 'Poppins' | 'Inter' | 'JetBrains Mono' | 'Caveat';
+export type Font = 'Poppins' | 'Inter' | 'JetBrains Mono' | 'Indie Flower';
 
 interface ThemeStore {
   theme: Theme;
@@ -20,8 +20,9 @@ function applyFont(f: Font) {
     'Poppins': "'Poppins', sans-serif",
     'Inter': "'Inter', sans-serif",
     'JetBrains Mono': "'JetBrains Mono', monospace",
-    'Caveat': "'Caveat', cursive",
+    'Indie Flower': "'Indie Flower', cursive",
   };
+  document.documentElement.setAttribute('data-font', f);
   document.documentElement.style.setProperty('--font-main', fontMap[f]);
   localStorage.setItem('stratanodex-font', f);
 }
