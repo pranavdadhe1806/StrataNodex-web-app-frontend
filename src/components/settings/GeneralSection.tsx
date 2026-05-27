@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
+import { useThemeStore, Theme } from '../../store/theme.store';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
@@ -43,9 +44,9 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
 }
 
 /* ─── Theme cards ───────────────────────────────────────────── */
-const THEMES = [
+const THEMES: { id: Theme; label: string; swatch: string[] }[] = [
   { id: 'dark', label: 'Dark', swatch: ['var(--bg-base)', 'var(--bg-card)', 'var(--accent)'] },
-  { id: 'light', label: 'Light', swatch: ['#F5F5F5', '#FFFFFF', '#0070cc'] },
+  { id: 'white', label: 'White', swatch: ['#F5F5F5', '#FFFFFF', '#0070cc'] },
   { id: 'grey', label: 'Grey', swatch: ['#2C2C2E', '#3A3A3C', '#636366'] },
 ];
 
@@ -60,7 +61,7 @@ const FONTS = [
 const DATE_FORMATS = ['DD/MM/YYYY', 'MM/DD/YYYY', 'Relative'];
 
 export default function GeneralSection() {
-  const [theme, setTheme] = useState('dark');
+  const { theme, setTheme } = useThemeStore();
   const [font, setFont] = useState('Poppins');
   const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
   const [timeFormat24, setTimeFormat24] = useState(true);
