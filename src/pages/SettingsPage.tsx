@@ -52,7 +52,6 @@ export default function SettingsPage() {
       <div style={{
         display: 'flex',
         height: 'calc(100vh - 56px)',
-        marginTop: 56,
         overflow: 'hidden',
       }}>
 
@@ -142,7 +141,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Section content */}
-          <div style={{ maxWidth: 680 }}>
+          <div>
             {active === 'profile'       && <ProfileSection />}
             {active === 'general'       && <GeneralSection />}
             {active === 'productivity'  && <ProductivitySection />}
