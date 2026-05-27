@@ -72,10 +72,10 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: `1px solid ${open ? 'rgba(0, 191, 255, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+          background: 'var(--divider)',
+          border: `1px solid ${open ? 'rgba(36, 119, 198, 0.4)' : 'var(--border)'}`,
           borderRadius: '8px',
-          color: value ? '#EDEFF3' : '#7D828B',
+          color: value ? 'var(--text-primary)' : 'var(--text-placeholder)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '13px',
           padding: '8px 12px',
@@ -89,7 +89,7 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
         }}
       >
         <span>{value ? formatDisplay(value) : placeholder}</span>
-        <Clock size={14} color="#8A8F98" />
+        <Clock size={14} color="var(--text-muted)" />
       </button>
 
       {open && (
@@ -134,10 +134,10 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
                   type="button"
                   onClick={() => selectPeriod(p)}
                   style={{
-                    background: isActive ? '#00bfff' : 'rgba(255,255,255,0.04)',
+                    background: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
                     border: 'none',
                     borderRadius: '6px',
-                    color: isActive ? '#1B1D21' : '#D5D8DE',
+                    color: isActive ? 'var(--bg-base)' : 'var(--text-secondary)',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '12.5px',
                     fontWeight: 600,
@@ -164,7 +164,7 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#00bfff',
+                color: 'var(--accent)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '12px',
                 fontWeight: 600,
@@ -220,10 +220,10 @@ function ScrollColumn({
             onClick={() => onSelect(it.value)}
             style={{
               width: '100%',
-              background: isActive ? '#00bfff' : 'transparent',
+              background: isActive ? 'var(--accent)' : 'transparent',
               border: 'none',
               borderRadius: '6px',
-              color: isActive ? '#1B1D21' : '#D5D8DE',
+              color: isActive ? 'var(--bg-base)' : 'var(--text-secondary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '13px',
               fontWeight: isActive ? 600 : 500,
@@ -233,7 +233,7 @@ function ScrollColumn({
               marginBottom: '2px',
             }}
             onMouseEnter={e => {
-              if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              if (!isActive) e.currentTarget.style.background = 'var(--divider)';
             }}
             onMouseLeave={e => {
               if (!isActive) e.currentTarget.style.background = 'transparent';

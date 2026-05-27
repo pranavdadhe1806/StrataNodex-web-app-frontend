@@ -35,10 +35,10 @@ export default function CustomSelect({ value, options, onChange, placeholder = '
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: `1px solid ${open ? 'rgba(0, 191, 255, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+          background: 'var(--divider)',
+          border: `1px solid ${open ? 'rgba(36, 119, 198, 0.4)' : 'var(--border)'}`,
           borderRadius: '8px',
-          color: selected ? '#EDEFF3' : '#7D828B',
+          color: selected ? 'var(--text-primary)' : 'var(--text-placeholder)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '13px',
           padding: '8px 12px',
@@ -61,7 +61,7 @@ export default function CustomSelect({ value, options, onChange, placeholder = '
           )}
           {selected?.label ?? placeholder}
         </span>
-        <ChevronDown size={14} color="#8A8F98" style={{
+        <ChevronDown size={14} color="var(--text-muted)" style={{
           transform: open ? 'rotate(180deg)' : 'rotate(0)',
           transition: 'transform 0.15s',
         }} />
@@ -91,10 +91,10 @@ export default function CustomSelect({ value, options, onChange, placeholder = '
                 onClick={() => { onChange(opt.value); setOpen(false); }}
                 style={{
                   width: '100%',
-                  background: isSelected ? 'rgba(0, 191, 255, 0.12)' : 'transparent',
+                  background: isSelected ? 'rgba(36, 119, 198, 0.12)' : 'transparent',
                   border: 'none',
                   borderRadius: '6px',
-                  color: isSelected ? '#00bfff' : '#D5D8DE',
+                  color: isSelected ? 'var(--accent)' : 'var(--text-secondary)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '13px',
                   padding: '8px 10px',
@@ -107,7 +107,7 @@ export default function CustomSelect({ value, options, onChange, placeholder = '
                   transition: 'background 0.1s',
                 }}
                 onMouseEnter={e => {
-                  if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  if (!isSelected) e.currentTarget.style.background = 'var(--divider)';
                 }}
                 onMouseLeave={e => {
                   if (!isSelected) e.currentTarget.style.background = 'transparent';

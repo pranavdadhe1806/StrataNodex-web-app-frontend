@@ -10,15 +10,15 @@ import {
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
-  bg: '#1B1D21',
-  textPrimary: '#EDEFF3',
-  textMuted: '#8A8F98',
-  textSecondary: '#D5D8DE',
-  accent: '#00bfff',
-  teal: '#00c896',
+  bg: 'var(--bg-base)',
+  textPrimary: 'var(--text-primary)',
+  textMuted: 'var(--text-muted)',
+  textSecondary: 'var(--text-secondary)',
+  accent: 'var(--accent)',
+  teal: 'var(--accent-teal)',
   danger: '#ff4d4d',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const TIMEZONES = [
@@ -57,7 +57,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
       aria-checked={enabled}
       style={{
         width: 36, height: 20, borderRadius: 10,
-        background: enabled ? DS.accent : 'rgba(255,255,255,0.12)',
+        background: enabled ? DS.accent : 'var(--border-bright)',
         cursor: 'pointer', transition: 'background 0.2s',
         position: 'relative', flexShrink: 0,
       }}
@@ -173,8 +173,8 @@ export default function NotificationsSection() {
         <div style={{
           position: 'fixed', top: 24, right: 24, zIndex: 1000,
           padding: '10px 18px', borderRadius: 8,
-          background: toast.type === 'success' ? 'rgba(0,200,150,0.15)' : 'rgba(255,77,77,0.15)',
-          border: `1px solid ${toast.type === 'success' ? 'rgba(0,200,150,0.3)' : 'rgba(255,77,77,0.3)'}`,
+          background: toast.type === 'success' ? 'rgba(48,209,88,0.15)' : 'rgba(255,77,77,0.15)',
+          border: `1px solid ${toast.type === 'success' ? 'rgba(48,209,88,0.3)' : 'rgba(255,77,77,0.3)'}`,
           color: toast.type === 'success' ? DS.teal : DS.danger,
           fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500,
         }}>
@@ -233,7 +233,7 @@ export default function NotificationsSection() {
               onChange={e => setEmailAddress(e.target.value)}
               placeholder="your@email.com"
               style={{ ...inputStyle, maxWidth: 320 }}
-              onFocus={e => (e.target.style.borderColor = 'rgba(0,191,255,0.4)')}
+              onFocus={e => (e.target.style.borderColor = 'rgba(36,119,198,0.4)')}
               onBlur={e => (e.target.style.borderColor = DS.border)}
             />
           </div>
@@ -293,13 +293,13 @@ export default function NotificationsSection() {
                 </div>
                 <div style={{ marginBottom: 6 }}>
                   <strong style={{ color: DS.textSecondary }}>Step 2:</strong> Send{' '}
-                  <code style={{ background: 'rgba(0,191,255,0.1)', padding: '1px 6px', borderRadius: 4, color: DS.accent, fontSize: 11 }}>
+                  <code style={{ background: 'rgba(36,119,198,0.1)', padding: '1px 6px', borderRadius: 4, color: DS.accent, fontSize: 11 }}>
                     /start
                   </code>{' '}to the bot
                 </div>
                 <div>
                   <strong style={{ color: DS.textSecondary }}>Step 3:</strong> Send{' '}
-                  <code style={{ background: 'rgba(0,191,255,0.1)', padding: '1px 6px', borderRadius: 4, color: DS.accent, fontSize: 11 }}>
+                  <code style={{ background: 'rgba(36,119,198,0.1)', padding: '1px 6px', borderRadius: 4, color: DS.accent, fontSize: 11 }}>
                     /link
                   </code>{' '}followed by this code:
                 </div>
@@ -310,7 +310,7 @@ export default function NotificationsSection() {
                   {/* Code box — styled per spec */}
                   <div style={{
                     background: DS.bg,
-                    border: '1px solid rgba(0,191,255,0.2)',
+                    border: '1px solid rgba(36,119,198,0.2)',
                     borderRadius: 8, padding: '12px 16px',
                     fontFamily: 'monospace', fontSize: 18, fontWeight: 700,
                     color: DS.accent, letterSpacing: '0.2em',
@@ -323,7 +323,7 @@ export default function NotificationsSection() {
                       showToast('Copied!', 'success');
                     }}
                     style={{
-                      background: 'rgba(0,191,255,0.08)', border: '1px solid rgba(0,191,255,0.25)',
+                      background: 'rgba(36,119,198,0.08)', border: '1px solid rgba(36,119,198,0.25)',
                       borderRadius: 8, color: DS.accent, fontFamily: 'Poppins, sans-serif',
                       fontSize: 12, padding: '8px 12px', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', gap: 5,
@@ -339,7 +339,7 @@ export default function NotificationsSection() {
                   onClick={handleGenerateCode}
                   disabled={generateCodeMutation.isPending}
                   style={{
-                    background: 'rgba(0,191,255,0.08)', border: '1px solid rgba(0,191,255,0.25)',
+                    background: 'rgba(36,119,198,0.08)', border: '1px solid rgba(36,119,198,0.25)',
                     borderRadius: 8, color: DS.accent, fontFamily: 'Poppins, sans-serif',
                     fontSize: 12, padding: '7px 14px',
                     cursor: generateCodeMutation.isPending ? 'not-allowed' : 'pointer',
@@ -367,7 +367,7 @@ export default function NotificationsSection() {
         disabled={updateMutation.isPending}
         style={{
           background: DS.accent, border: 'none', borderRadius: 8,
-          color: '#1B1D21', fontFamily: 'Poppins, sans-serif',
+          color: 'var(--bg-base)', fontFamily: 'Poppins, sans-serif',
           fontSize: 13, fontWeight: 600,
           padding: '9px 24px',
           cursor: updateMutation.isPending ? 'not-allowed' : 'pointer',

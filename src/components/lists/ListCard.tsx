@@ -15,10 +15,10 @@ export default function ListCard({ name, nodeCount = 0, onClick, onRename, onDel
       onClick={onClick}
       style={{
         padding: '24px',
-        background: '#32363C',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '16px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--divider), inset 0 1px 0 var(--divider)',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         position: 'relative',
@@ -28,7 +28,7 @@ export default function ListCard({ name, nodeCount = 0, onClick, onRename, onDel
         e.currentTarget.style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+        e.currentTarget.style.borderColor = 'var(--border)';
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
@@ -44,7 +44,7 @@ export default function ListCard({ name, nodeCount = 0, onClick, onRename, onDel
               onClick={onRename}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
             >
-              <Pencil size={14} color="#8A8F98" />
+              <Pencil size={14} color="var(--text-muted)" />
             </button>
           )}
           {onDelete && (
@@ -61,13 +61,13 @@ export default function ListCard({ name, nodeCount = 0, onClick, onRename, onDel
 
       {/* List icon */}
       <div style={{ marginBottom: '12px' }}>
-        <ListDuotone size={32} weight="duotone" color="#00c896" />
+        <ListDuotone size={32} weight="duotone" color="var(--accent-teal)" />
       </div>
 
       {/* Name */}
       <div
         style={{
-          color: '#EDEFF3',
+          color: 'var(--text-primary)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '15px',
           fontWeight: 500,
@@ -81,7 +81,7 @@ export default function ListCard({ name, nodeCount = 0, onClick, onRename, onDel
       </div>
 
       {/* Subtext */}
-      <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+      <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
         {nodeCount} {nodeCount === 1 ? 'task' : 'tasks'}
       </div>
     </div>

@@ -11,11 +11,11 @@ import DataSection from '../components/settings/DataSection';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
-  bg: '#1B1D21',
-  textPrimary: '#EDEFF3',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  border: 'rgba(255,255,255,0.06)',
+  bg: 'var(--bg-base)',
+  textPrimary: 'var(--text-primary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  border: 'var(--divider)',
 };
 
 /* ─── Sidebar items ─────────────────────────────────────────── */
@@ -90,7 +90,7 @@ export default function SettingsPage() {
                   padding: '9px 20px',
                   border: 'none',
                   borderLeft: isActive ? `2px solid ${DS.accent}` : '2px solid transparent',
-                  background: isActive ? 'rgba(0,191,255,0.06)' : 'transparent',
+                  background: isActive ? 'rgba(36,119,198,0.06)' : 'transparent',
                   color: isActive ? DS.accent : DS.textMuted,
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: 13,
@@ -103,7 +103,7 @@ export default function SettingsPage() {
                 onMouseEnter={e => {
                   if (!isActive) {
                     e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                    e.currentTarget.style.color = '#D5D8DE';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
                   }
                 }}
                 onMouseLeave={e => {

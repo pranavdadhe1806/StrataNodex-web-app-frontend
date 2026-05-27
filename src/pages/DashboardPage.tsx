@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const streak = streakData?.streak ?? 0;
 
   return (
-    <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
       <Topbar title="Dashboard" />
       <SidePanel />
 

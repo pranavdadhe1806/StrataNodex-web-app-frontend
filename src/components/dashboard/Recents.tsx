@@ -49,7 +49,7 @@ export default function Recents() {
     <div style={{ width: '100%', position: 'relative' }}>
       <h2
         style={{
-          color: '#EDEFF3',
+          color: 'var(--text-primary)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '18px',
           fontWeight: 600,
@@ -62,7 +62,7 @@ export default function Recents() {
       {items.length === 0 ? (
         <p
           style={{
-            color: '#8A8F98',
+            color: 'var(--text-muted)',
             fontFamily: 'Poppins, sans-serif',
             fontSize: '14px',
             margin: 0,
@@ -102,8 +102,8 @@ export default function Recents() {
             top: ctxMenu.y,
             left: ctxMenu.x,
             zIndex: 1000,
-            background: '#2A2D33',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
             minWidth: 168,

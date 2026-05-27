@@ -3,12 +3,12 @@ import { Check } from 'lucide-react';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
-  bg: '#1B1D21',
-  textPrimary: '#EDEFF3',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  bg: 'var(--bg-base)',
+  textPrimary: 'var(--text-primary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -28,7 +28,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
       aria-checked={enabled}
       style={{
         width: 36, height: 20, borderRadius: 10,
-        background: enabled ? DS.accent : 'rgba(255,255,255,0.12)',
+        background: enabled ? DS.accent : 'var(--border-bright)',
         cursor: 'pointer', transition: 'background 0.2s',
         position: 'relative', flexShrink: 0,
       }}
@@ -44,7 +44,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
 
 /* ─── Theme cards ───────────────────────────────────────────── */
 const THEMES = [
-  { id: 'dark', label: 'Dark', swatch: ['#1B1D21', '#32363C', '#00bfff'] },
+  { id: 'dark', label: 'Dark', swatch: ['var(--bg-base)', 'var(--bg-card)', 'var(--accent)'] },
   { id: 'light', label: 'Light', swatch: ['#F5F5F5', '#FFFFFF', '#0070cc'] },
   { id: 'grey', label: 'Grey', swatch: ['#2C2C2E', '#3A3A3C', '#636366'] },
 ];
@@ -116,7 +116,7 @@ export default function GeneralSection() {
                   width: 16, height: 16, borderRadius: '50%',
                   background: DS.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Check size={10} color="#1B1D21" strokeWidth={3} />
+                  <Check size={10} color="var(--bg-base)" strokeWidth={3} />
                 </div>
               )}
             </button>
@@ -136,7 +136,7 @@ export default function GeneralSection() {
               key={f.id}
               onClick={() => setFont(f.id)}
               style={{
-                background: active ? 'rgba(0,191,255,0.06)' : 'none',
+                background: active ? 'rgba(36,119,198,0.06)' : 'none',
                 border: `1px solid ${active ? DS.accent : DS.border}`,
                 borderRadius: 8, padding: '8px 16px',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,

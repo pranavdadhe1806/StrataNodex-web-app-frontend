@@ -54,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return (
     <div
       style={{
-        background: '#32363C',
+        background: 'var(--bg-card)',
         border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: '8px',
         padding: '8px 12px',
@@ -63,7 +63,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     >
       <p
         style={{
-          color: '#8A8F98',
+          color: 'var(--text-muted)',
           fontSize: 11,
           margin: '0 0 4px',
           fontFamily: 'Poppins, sans-serif',
@@ -73,7 +73,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       </p>
       <p
         style={{
-          color: '#00bfff',
+          color: 'var(--accent)',
           fontSize: 14,
           fontWeight: 600,
           margin: 0,
@@ -105,20 +105,20 @@ export default function MainGraph() {
     fontFamily: 'Poppins, sans-serif',
     fontWeight: 500,
     cursor: 'pointer',
-    border: isActive ? '1px solid rgba(0,191,255,0.3)' : '1px solid transparent',
-    background: isActive ? 'rgba(0,191,255,0.12)' : 'rgba(255,255,255,0.05)',
-    color: isActive ? '#00bfff' : '#8A8F98',
+    border: isActive ? '1px solid rgba(36,119,198,0.3)' : '1px solid transparent',
+    background: isActive ? 'rgba(36,119,198,0.12)' : 'var(--divider)',
+    color: isActive ? 'var(--accent)' : 'var(--text-muted)',
     transition: 'all 0.2s ease',
   });
 
   return (
     <div
       style={{
-        background: '#32363C',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '16px',
         boxShadow:
-          '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+          '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--divider), inset 0 1px 0 var(--divider)',
         padding: '24px 28px',
         marginBottom: '36px',
       }}
@@ -134,7 +134,7 @@ export default function MainGraph() {
       >
         <span
           style={{
-            color: '#8A8F98',
+            color: 'var(--text-muted)',
             fontFamily: 'Poppins, sans-serif',
             fontSize: '13px',
             fontWeight: 500,
@@ -150,12 +150,12 @@ export default function MainGraph() {
               style={toggleStyle(range === r)}
               onMouseEnter={(e) => {
                 if (range !== r) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.background = 'var(--border)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (range !== r) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.background = 'var(--divider)';
                 }
               }}
             >
@@ -168,15 +168,15 @@ export default function MainGraph() {
       {/* Graph */}
       <ResponsiveContainer width="100%" height={220}>
         {isLoading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#7D828B', fontFamily: 'Poppins', fontSize: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-placeholder)', fontFamily: 'Poppins', fontSize: '12px' }}>
             Loading…
           </div>
         ) : (
           <AreaChart data={data} margin={{ top: 5, right: 28, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#00bfff" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#00bfff" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid
@@ -186,7 +186,7 @@ export default function MainGraph() {
             />
             <XAxis
               dataKey="date"
-              tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
+              tick={{ fill: 'var(--text-placeholder)', fontSize: 11, fontFamily: 'Poppins' }}
               axisLine={false}
               tickLine={false}
               interval={tickInterval}
@@ -195,7 +195,7 @@ export default function MainGraph() {
             <YAxis
               domain={[-1, 3]}
               ticks={[-1, 0, 1, 2, 3]}
-              tick={{ fill: '#7D828B', fontSize: 11, fontFamily: 'Poppins' }}
+              tick={{ fill: 'var(--text-placeholder)', fontSize: 11, fontFamily: 'Poppins' }}
               axisLine={false}
               tickLine={false}
               width={24}
@@ -207,11 +207,11 @@ export default function MainGraph() {
                 <Area
                   type="monotone"
                   dataKey="points"
-                  stroke="#00bfff"
+                  stroke="var(--accent)"
                   strokeWidth={2}
                   fill="url(#cyanGradient)"
                   dot={false}
-                  activeDot={{ r: 5, fill: '#00bfff', stroke: '#1B1D21', strokeWidth: 2 }}
+                  activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'var(--bg-base)', strokeWidth: 2 }}
                   connectNulls={false}
                 />
               </>

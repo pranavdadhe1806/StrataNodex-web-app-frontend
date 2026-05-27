@@ -25,8 +25,8 @@ export default function DailyTaskItem({
         alignItems: 'center',
         gap: '12px',
         padding: '12px 16px',
-        background: '#32363C',
-        border: `1px solid ${isOverdue ? 'rgba(248, 81, 73, 0.25)' : 'rgba(255, 255, 255, 0.08)'}`,
+        background: 'var(--bg-card)',
+        border: `1px solid ${isOverdue ? 'rgba(248, 81, 73, 0.25)' : 'var(--border)'}`,
         borderRadius: '10px',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'border-color 0.2s ease',
@@ -39,8 +39,8 @@ export default function DailyTaskItem({
           width: 18,
           height: 18,
           borderRadius: '50%',
-          border: isDone ? 'none' : '1.5px solid #8A8F98',
-          background: isDone ? '#00c896' : 'transparent',
+          border: isDone ? 'none' : '1.5px solid var(--text-muted)',
+          background: isDone ? 'var(--accent-teal)' : 'transparent',
           flexShrink: 0,
           cursor: onToggle ? 'pointer' : 'default',
         }}
@@ -50,7 +50,7 @@ export default function DailyTaskItem({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            color: isDone ? '#8A8F98' : '#D5D8DE',
+            color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
             fontFamily: 'Poppins, sans-serif',
             fontSize: '14px',
             textDecoration: isDone ? 'line-through' : 'none',
@@ -61,7 +61,7 @@ export default function DailyTaskItem({
         >
           {title}
         </div>
-        <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '12px', marginTop: '2px' }}>
+        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', marginTop: '2px' }}>
           {listName}
         </div>
       </div>

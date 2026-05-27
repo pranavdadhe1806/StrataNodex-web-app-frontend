@@ -18,16 +18,16 @@ export default function Input({ value, onChange, placeholder, type = 'text', cla
       className={className}
       style={{
         width: '100%',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'var(--divider)',
+        border: '1px solid var(--border)',
         borderRadius: '8px',
         padding: '10px 14px',
-        color: '#EDEFF3',
+        color: 'var(--text-primary)',
         fontSize: '14px',
         transition: 'border-color 0.2s ease',
       }}
-      onFocus={e => e.target.style.borderColor = 'rgba(0,191,255,0.5)'}
-      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+      onFocus={e => e.target.style.borderColor = 'rgba(36,119,198,0.5)'}
+      onBlur={e => e.target.style.borderColor = 'var(--border)'}
     />
   );
 }

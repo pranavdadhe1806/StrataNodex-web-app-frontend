@@ -59,7 +59,7 @@ export default function RecentCard({ id, name, type, onClick, onContextMenu }: R
       )}
       <span
         style={{
-          color: '#D5D8DE',
+          color: 'var(--text-secondary)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '12px',
           fontWeight: 500,

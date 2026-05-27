@@ -19,8 +19,8 @@ const TIMEZONES = [
 ];
 
 const cardStyle: React.CSSProperties = {
-  background: '#2A2D33',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
+  background: 'var(--bg-elevated)',
+  border: '1px solid var(--divider)',
   borderRadius: '14px',
   padding: '28px',
   boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)',
@@ -36,10 +36,10 @@ const labelStyle: React.CSSProperties = {
 };
 
 const inputStyle: React.CSSProperties = {
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '10px',
-  color: '#EDEFF3',
+  color: 'var(--text-primary)',
   padding: '12px 14px',
   fontSize: '14px',
   fontFamily: 'Poppins, sans-serif',
@@ -49,7 +49,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const sectionTitleStyle: React.CSSProperties = {
-  color: '#EDEFF3',
+  color: 'var(--text-primary)',
   fontSize: '16px',
   fontWeight: 600,
   fontFamily: 'Poppins, sans-serif',
@@ -64,7 +64,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
         width: '44px',
         height: '24px',
         borderRadius: '12px',
-        background: enabled ? '#00bfff' : '#4A4F57',
+        background: enabled ? 'var(--accent)' : '#4A4F57',
         cursor: 'pointer',
         transition: 'background 0.2s',
         position: 'relative',
@@ -179,7 +179,7 @@ export default function NotificationSettings() {
             height: '24px',
             borderRadius: '50%',
             border: '2px solid rgba(255,255,255,0.1)',
-            borderTop: '2px solid #00bfff',
+            borderTop: '2px solid var(--accent)',
             animation: 'spin 0.8s linear infinite',
           }}
         />
@@ -202,14 +202,14 @@ export default function NotificationSettings() {
             borderRadius: '10px',
             background:
               toast.type === 'success'
-                ? 'rgba(0, 200, 150, 0.15)'
+                ? 'rgba(48, 209, 88, 0.15)'
                 : 'rgba(248, 81, 73, 0.15)',
             border: `1px solid ${
               toast.type === 'success'
-                ? 'rgba(0, 200, 150, 0.3)'
+                ? 'rgba(48, 209, 88, 0.3)'
                 : 'rgba(248, 81, 73, 0.3)'
             }`,
-            color: toast.type === 'success' ? '#00c896' : '#f85149',
+            color: toast.type === 'success' ? 'var(--accent-teal)' : '#f85149',
             fontFamily: 'Poppins, sans-serif',
             fontSize: '14px',
             fontWeight: 500,
@@ -271,8 +271,8 @@ export default function NotificationSettings() {
               onChange={(e) => setEmailAddress(e.target.value)}
               placeholder="your@email.com"
               style={inputStyle}
-              onFocus={(e) => (e.target.style.borderColor = 'rgba(0, 191, 255, 0.4)')}
-              onBlur={(e) => (e.target.style.borderColor = 'rgba(255, 255, 255, 0.08)')}
+              onFocus={(e) => (e.target.style.borderColor = 'rgba(36, 119, 198, 0.4)')}
+              onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
             />
           </div>
         )}
@@ -306,7 +306,7 @@ export default function NotificationSettings() {
           >
             <span
               style={{
-                color: '#00c896',
+                color: 'var(--accent-teal)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 fontWeight: 500,
@@ -343,10 +343,10 @@ export default function NotificationSettings() {
         {telegramEnabled && !activePrefs?.telegramLinked && (
           <div
             style={{
-              background: '#32363C',
+              background: 'var(--bg-card)',
               borderRadius: '10px',
               padding: '20px',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              border: '1px solid var(--divider)',
             }}
           >
             <div
@@ -358,25 +358,25 @@ export default function NotificationSettings() {
               }}
             >
               <div style={{ marginBottom: '8px' }}>
-                <strong style={{ color: '#EDEFF3' }}>Step 1:</strong> Open{' '}
+                <strong style={{ color: 'var(--text-primary)' }}>Step 1:</strong> Open{' '}
                 <a
                   href="https://t.me/StrataNodexBot"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#00bfff', textDecoration: 'none' }}
+                  style={{ color: 'var(--accent)', textDecoration: 'none' }}
                 >
                   @StrataNodexBot
                 </a>{' '}
                 on Telegram
               </div>
               <div style={{ marginBottom: '8px' }}>
-                <strong style={{ color: '#EDEFF3' }}>Step 2:</strong> Send{' '}
+                <strong style={{ color: 'var(--text-primary)' }}>Step 2:</strong> Send{' '}
                 <code
                   style={{
-                    background: 'rgba(0,191,255,0.1)',
+                    background: 'rgba(36,119,198,0.1)',
                     padding: '2px 6px',
                     borderRadius: '4px',
-                    color: '#00bfff',
+                    color: 'var(--accent)',
                   }}
                 >
                   /start
@@ -384,13 +384,13 @@ export default function NotificationSettings() {
                 to the bot
               </div>
               <div>
-                <strong style={{ color: '#EDEFF3' }}>Step 3:</strong> Send{' '}
+                <strong style={{ color: 'var(--text-primary)' }}>Step 3:</strong> Send{' '}
                 <code
                   style={{
-                    background: 'rgba(0,191,255,0.1)',
+                    background: 'rgba(36,119,198,0.1)',
                     padding: '2px 6px',
                     borderRadius: '4px',
-                    color: '#00bfff',
+                    color: 'var(--accent)',
                   }}
                 >
                   /link
@@ -410,14 +410,14 @@ export default function NotificationSettings() {
               >
                 <div
                   style={{
-                    background: '#1B1D21',
-                    border: '1px solid rgba(0, 191, 255, 0.3)',
+                    background: 'var(--bg-base)',
+                    border: '1px solid rgba(36, 119, 198, 0.3)',
                     borderRadius: '8px',
                     padding: '12px 20px',
                     fontFamily: 'monospace',
                     fontSize: '20px',
                     fontWeight: 700,
-                    color: '#00bfff',
+                    color: 'var(--accent)',
                     letterSpacing: '4px',
                   }}
                 >
@@ -429,10 +429,10 @@ export default function NotificationSettings() {
                     showToast('📋 Copied!', 'success');
                   }}
                   style={{
-                    background: 'rgba(0, 191, 255, 0.1)',
-                    border: '1px solid rgba(0, 191, 255, 0.25)',
+                    background: 'rgba(36, 119, 198, 0.1)',
+                    border: '1px solid rgba(36, 119, 198, 0.25)',
                     borderRadius: '8px',
-                    color: '#00bfff',
+                    color: 'var(--accent)',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     padding: '8px 12px',
@@ -456,10 +456,10 @@ export default function NotificationSettings() {
                 onClick={handleGenerateCode}
                 disabled={generateCodeMutation.isPending}
                 style={{
-                  background: 'rgba(0, 191, 255, 0.1)',
-                  border: '1px solid rgba(0, 191, 255, 0.25)',
+                  background: 'rgba(36, 119, 198, 0.1)',
+                  border: '1px solid rgba(36, 119, 198, 0.25)',
                   borderRadius: '8px',
-                  color: '#00bfff',
+                  color: 'var(--accent)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '13px',
                   padding: '8px 14px',
@@ -472,7 +472,7 @@ export default function NotificationSettings() {
               {telegramCode && (
                 <span
                   style={{
-                    color: '#7D828B',
+                    color: 'var(--text-placeholder)',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '12px',
                   }}
@@ -490,7 +490,7 @@ export default function NotificationSettings() {
         onClick={handleSave}
         disabled={updateMutation.isPending}
         style={{
-          background: '#00bfff',
+          background: 'var(--accent)',
           border: 'none',
           borderRadius: '10px',
           color: '#fff',

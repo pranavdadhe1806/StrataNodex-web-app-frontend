@@ -5,16 +5,16 @@ import { authApi } from '../../api/auth.api';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
-  bg: '#1B1D21',
-  surface: '#32363C',
-  textPrimary: '#EDEFF3',
-  textSecondary: '#D5D8DE',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  teal: '#00c896',
+  bg: 'var(--bg-base)',
+  surface: 'var(--bg-card)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  teal: 'var(--accent-teal)',
   danger: '#ff4d4d',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const inputStyle: React.CSSProperties = {
@@ -110,7 +110,7 @@ export default function ProfileSection() {
     dayEnd !== (user?.dayEndTime ?? '23:59');
 
   const focusBorder = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.target.style.borderColor = 'rgba(0,191,255,0.35)');
+    (e.target.style.borderColor = 'rgba(36,119,198,0.35)');
   const blurBorder = (e: React.FocusEvent<HTMLInputElement>) =>
     (e.target.style.borderColor = DS.border);
 
@@ -128,8 +128,8 @@ export default function ProfileSection() {
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 999,
           padding: '10px 18px', borderRadius: 8,
-          background: toast.ok ? 'rgba(0,200,150,0.12)' : 'rgba(255,77,77,0.12)',
-          border: `1px solid ${toast.ok ? 'rgba(0,200,150,0.25)' : 'rgba(255,77,77,0.25)'}`,
+          background: toast.ok ? 'rgba(48,209,88,0.12)' : 'rgba(255,77,77,0.12)',
+          border: `1px solid ${toast.ok ? 'rgba(48,209,88,0.25)' : 'rgba(255,77,77,0.25)'}`,
           color: toast.ok ? DS.teal : DS.danger, fontSize: 13, fontWeight: 500,
         }}>{toast.msg}</div>
       )}
@@ -139,8 +139,8 @@ export default function ProfileSection() {
         {/* Avatar circle */}
         <div style={{
           width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
-          background: 'rgba(0,191,255,0.1)',
-          border: '2px solid rgba(0,191,255,0.3)',
+          background: 'rgba(36,119,198,0.1)',
+          border: '2px solid rgba(36,119,198,0.3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: DS.accent, fontSize: 18, fontWeight: 600,
         }}>
@@ -155,7 +155,7 @@ export default function ProfileSection() {
             </span>
             {user?.isEmailVerified && (
               <span style={{
-                background: 'rgba(0,200,150,0.12)', color: DS.teal,
+                background: 'rgba(48,209,88,0.12)', color: DS.teal,
                 fontSize: 11, borderRadius: 4, padding: '2px 8px', fontWeight: 500,
                 display: 'inline-flex', alignItems: 'center', gap: 3,
               }}>
@@ -171,7 +171,7 @@ export default function ProfileSection() {
         {/* Change avatar stub */}
         <button style={{
           background: 'none',
-          border: '1px solid rgba(0,191,255,0.25)',
+          border: '1px solid rgba(36,119,198,0.25)',
           borderRadius: 7,
           color: DS.accent,
           fontSize: 12,
@@ -274,9 +274,9 @@ export default function ProfileSection() {
           onClick={handleSave}
           disabled={saving || !dirty}
           style={{
-            background: dirty ? DS.accent : 'rgba(255,255,255,0.06)',
+            background: dirty ? DS.accent : 'var(--divider)',
             border: 'none', borderRadius: 8,
-            color: dirty ? '#1B1D21' : DS.textMuted,
+            color: dirty ? 'var(--bg-base)' : DS.textMuted,
             fontSize: 13, fontWeight: 600,
             padding: '9px 24px',
             cursor: dirty && !saving ? 'pointer' : 'default',

@@ -9,7 +9,7 @@ const fireIcon = (
   <Fire
     size={16}
     weight="duotone"
-    color="#00c896"
+    color="var(--accent-teal)"
     style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '4px' }}
   />
 );
@@ -29,7 +29,7 @@ export default function WelcomeHeader({ userName, streak }: WelcomeHeaderProps) 
     <div style={{ marginBottom: '28px' }}>
       <h1
         style={{
-          color: '#EDEFF3',
+          color: 'var(--text-primary)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '26px',
           fontWeight: 600,
@@ -40,7 +40,7 @@ export default function WelcomeHeader({ userName, streak }: WelcomeHeaderProps) 
       </h1>
       <p
         style={{
-          color: '#8A8F98',
+          color: 'var(--text-muted)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '14px',
           fontWeight: 400,

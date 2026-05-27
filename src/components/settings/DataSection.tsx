@@ -3,15 +3,15 @@ import { Download, Upload } from 'lucide-react';
 import client from '../../api/client';
 
 const DS = {
-  bg: '#1B1D21',
-  textPrimary: '#EDEFF3',
-  textSecondary: '#D5D8DE',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  teal: '#00c896',
+  bg: 'var(--bg-base)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  teal: 'var(--accent-teal)',
   danger: '#ff4d4d',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -49,8 +49,8 @@ export default function DataSection() {
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 999,
           padding: '10px 18px', borderRadius: 8,
-          background: toast.ok ? 'rgba(0,200,150,0.12)' : 'rgba(255,77,77,0.12)',
-          border: `1px solid ${toast.ok ? 'rgba(0,200,150,0.25)' : 'rgba(255,77,77,0.25)'}`,
+          background: toast.ok ? 'rgba(48,209,88,0.12)' : 'rgba(255,77,77,0.12)',
+          border: `1px solid ${toast.ok ? 'rgba(48,209,88,0.25)' : 'rgba(255,77,77,0.25)'}`,
           color: toast.ok ? DS.teal : DS.danger, fontSize: 13, fontWeight: 500,
         }}>{toast.msg}</div>
       )}
@@ -94,7 +94,7 @@ export default function DataSection() {
             <span style={{ fontSize: 13, color: DS.textPrimary, fontWeight: 500 }}>Import data</span>
             <span style={{
               fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
-              background: 'rgba(255,255,255,0.08)', color: DS.textMuted,
+              background: 'var(--border)', color: DS.textMuted,
               padding: '2px 7px', borderRadius: 4,
             }}>Coming soon</span>
           </div>

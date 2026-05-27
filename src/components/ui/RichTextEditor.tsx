@@ -22,7 +22,7 @@ interface RichTextEditorProps {
 }
 
 const COLORS = [
-  '#EDEFF3', '#8A8F98', '#00bfff', '#00c896',
+  'var(--text-primary)', 'var(--text-muted)', 'var(--accent)', 'var(--accent-teal)',
   '#f85149', '#f7b955', '#a371f7', '#ff79c6',
 ];
 
@@ -43,10 +43,10 @@ function ToolbarButton({
       onMouseDown={(e) => { e.preventDefault(); onClick(); }}
       title={title}
       style={{
-        background: active ? 'rgba(0, 191, 255, 0.16)' : 'transparent',
+        background: active ? 'rgba(36, 119, 198, 0.16)' : 'transparent',
         border: 'none',
         borderRadius: '6px',
-        color: active ? '#00bfff' : '#A8ADB5',
+        color: active ? 'var(--accent)' : '#A8ADB5',
         cursor: 'pointer',
         padding: '6px',
         display: 'flex',
@@ -55,7 +55,7 @@ function ToolbarButton({
         transition: 'background 0.12s, color 0.12s',
       }}
       onMouseEnter={(e) => {
-        if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+        if (!active) e.currentTarget.style.background = 'var(--divider)';
       }}
       onMouseLeave={(e) => {
         if (!active) e.currentTarget.style.background = 'transparent';
@@ -67,7 +67,7 @@ function ToolbarButton({
 }
 
 function Divider() {
-  return <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.08)', margin: '0 4px' }} />;
+  return <div style={{ width: 1, height: 18, background: 'var(--border)', margin: '0 4px' }} />;
 }
 
 function ColorPicker({ editor }: { editor: Editor }) {
@@ -92,7 +92,7 @@ function ColorPicker({ editor }: { editor: Editor }) {
           position: 'absolute',
           top: 'calc(100% + 6px)',
           left: 0,
-          background: '#2A2D33',
+          background: 'var(--bg-elevated)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -141,7 +141,7 @@ export default function RichTextEditor({
       Underline,
       TextStyle,
       Color,
-      Link.configure({ openOnClick: false, HTMLAttributes: { style: 'color: #00bfff; text-decoration: underline;' } }),
+      Link.configure({ openOnClick: false, HTMLAttributes: { style: 'color: var(--accent); text-decoration: underline;' } }),
       Placeholder.configure({ placeholder }),
     ],
     content: value || '',
@@ -169,7 +169,7 @@ export default function RichTextEditor({
 
   return (
     <div style={{
-      border: '1px solid rgba(255,255,255,0.08)',
+      border: '1px solid var(--border)',
       borderRadius: '10px',
       background: 'rgba(255,255,255,0.02)',
       display: 'flex',
@@ -182,7 +182,7 @@ export default function RichTextEditor({
         alignItems: 'center',
         gap: '2px',
         padding: '6px 8px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--divider)',
         background: 'rgba(255,255,255,0.02)',
         flexWrap: 'wrap',
       }}>
@@ -292,7 +292,7 @@ export default function RichTextEditor({
           fontFamily: 'Poppins, sans-serif',
           fontSize: '13.5px',
           lineHeight: 1.6,
-          color: '#D5D8DE',
+          color: 'var(--text-secondary)',
         }}
         onClick={() => editor.commands.focus()}
       >

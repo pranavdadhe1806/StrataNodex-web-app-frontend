@@ -8,9 +8,9 @@ const field: React.CSSProperties = {
   boxSizing: 'border-box',
   padding: '10px 12px',
   background: '#25282E',
-  border: '1px solid rgba(255,255,255,0.08)',
+  border: '1px solid var(--border)',
   borderRadius: 8,
-  color: '#EDEFF3',
+  color: 'var(--text-primary)',
   fontSize: 13,
   fontFamily: 'Poppins, sans-serif',
   outline: 'none',
@@ -87,9 +87,9 @@ export default function ProfileSettings() {
     dayEnd !== (user?.dayEndTime ?? '23:59');
 
   const focusBorder = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.target.style.borderColor = 'rgba(0,191,255,0.35)');
+    (e.target.style.borderColor = 'rgba(36,119,198,0.35)');
   const blurBorder = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.target.style.borderColor = 'rgba(255,255,255,0.08)');
+    (e.target.style.borderColor = 'var(--border)');
 
   return (
     <div style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -97,9 +97,9 @@ export default function ProfileSettings() {
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 999,
           padding: '10px 18px', borderRadius: 8,
-          background: toast.ok ? 'rgba(0,200,150,0.12)' : 'rgba(248,81,73,0.12)',
-          border: `1px solid ${toast.ok ? 'rgba(0,200,150,0.25)' : 'rgba(248,81,73,0.25)'}`,
-          color: toast.ok ? '#00c896' : '#f85149', fontSize: 13, fontWeight: 500,
+          background: toast.ok ? 'rgba(48,209,88,0.12)' : 'rgba(248,81,73,0.12)',
+          border: `1px solid ${toast.ok ? 'rgba(48,209,88,0.25)' : 'rgba(248,81,73,0.25)'}`,
+          color: toast.ok ? 'var(--accent-teal)' : '#f85149', fontSize: 13, fontWeight: 500,
         }}>{toast.msg}</div>
       )}
 
@@ -107,14 +107,14 @@ export default function ProfileSettings() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
         <div style={{
           width: 48, height: 48, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #00bfff 0%, #0070cc 100%)',
+          background: 'linear-gradient(135deg, var(--accent) 0%, #0070cc 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 600, fontSize: 18, flexShrink: 0,
         }}>
           {(user?.name?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()}
         </div>
         <div>
-          <div style={{ color: '#EDEFF3', fontSize: 15, fontWeight: 500, lineHeight: 1.3 }}>
+          <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 500, lineHeight: 1.3 }}>
             {user?.name || user?.email}
           </div>
           <div style={{ color: '#6B7280', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -122,7 +122,7 @@ export default function ProfileSettings() {
             {user?.isEmailVerified && (
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 2, marginLeft: 6,
-                fontSize: 11, color: '#00c896',
+                fontSize: 11, color: 'var(--accent-teal)',
               }}>
                 <Check size={10} /> verified
               </span>
@@ -165,10 +165,10 @@ export default function ProfileSettings() {
         </div>
       </div>
 
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '28px 0' }} />
+      <div style={{ height: 1, background: 'var(--divider)', margin: '28px 0' }} />
 
       {/* Day bounds */}
-      <span style={{ color: '#EDEFF3', fontSize: 15, fontWeight: 500, display: 'block', marginBottom: 4 }}>
+      <span style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 500, display: 'block', marginBottom: 4 }}>
         Day boundaries
       </span>
       <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 14px' }}>
@@ -192,7 +192,7 @@ export default function ProfileSettings() {
       <div style={{ marginTop: 28 }}>
         <button onClick={handleSave} disabled={saving || !dirty}
           style={{
-            background: dirty ? '#00bfff' : '#3A3F47',
+            background: dirty ? 'var(--accent)' : '#3A3F47',
             border: 'none', borderRadius: 8,
             color: dirty ? '#fff' : '#6B7280',
             fontSize: 13, fontWeight: 500,

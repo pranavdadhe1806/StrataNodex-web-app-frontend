@@ -14,15 +14,15 @@ export default function Button({
 }: ButtonProps) {
   const styles: Record<string, React.CSSProperties> = {
     primary: {
-      background: '#00bfff',
+      background: 'var(--accent)',
       color: '#0d1117',
       border: 'none',
       fontWeight: 600,
     },
     ghost: {
-      background: 'rgba(255,255,255,0.06)',
-      color: '#D5D8DE',
-      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'var(--divider)',
+      color: 'var(--text-secondary)',
+      border: '1px solid var(--border)',
     },
     danger: {
       background: 'rgba(248,81,73,0.15)',

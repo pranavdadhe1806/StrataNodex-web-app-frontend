@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 const DS = {
-  bg: '#1B1D21',
-  textPrimary: '#EDEFF3',
-  textSecondary: '#D5D8DE',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  bg: 'var(--bg-base)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -34,7 +34,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
       aria-checked={enabled}
       style={{
         width: 36, height: 20, borderRadius: 10,
-        background: enabled ? DS.accent : 'rgba(255,255,255,0.12)',
+        background: enabled ? DS.accent : 'var(--border-bright)',
         cursor: 'pointer', transition: 'background 0.2s',
         position: 'relative', flexShrink: 0,
       }}

@@ -476,7 +476,7 @@ export default function ListPage() {
   });
 
   return (
-    <div style={{ background: '#1B1D21', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-base)', height: '100vh', overflow: 'hidden' }}>
       <AnimatePresence>
         {detailNode && (
           <NodeDetailPanel
@@ -503,8 +503,8 @@ export default function ListPage() {
               style={{
                 background: 'transparent',
                 border: 'none',
-                borderBottom: '1px solid rgba(0,191,255,0.5)',
-                color: '#EDEFF3',
+                borderBottom: '1px solid rgba(36,119,198,0.5)',
+                color: 'var(--text-primary)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '16px',
                 fontWeight: 500,
@@ -532,7 +532,7 @@ export default function ListPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: '#1B1D21',
+          background: 'var(--bg-base)',
           overflow: 'hidden',
           cursor: isDragging ? 'grabbing' : isTyping ? 'text' : 'grab',
         }}
@@ -557,7 +557,7 @@ export default function ListPage() {
                 position: 'absolute',
                 top: '28px',
                 left: '60px',
-                color: '#7D828B',
+                color: 'var(--text-placeholder)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '15px',
                 fontWeight: 400,
@@ -586,12 +586,12 @@ export default function ListPage() {
               background: 'transparent',
               border: 'none',
               outline: 'none',
-              color: '#EDEFF3',
+              color: 'var(--text-primary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '20px',
               lineHeight: '30px',
               resize: 'none',
-              caretColor: '#00bfff',
+              caretColor: 'var(--accent)',
               width: '200px',
               minHeight: '24px',
               padding: 0,

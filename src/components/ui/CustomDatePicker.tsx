@@ -90,10 +90,10 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: `1px solid ${open ? 'rgba(0, 191, 255, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+          background: 'var(--divider)',
+          border: `1px solid ${open ? 'rgba(36, 119, 198, 0.4)' : 'var(--border)'}`,
           borderRadius: '8px',
-          color: value ? '#EDEFF3' : '#7D828B',
+          color: value ? 'var(--text-primary)' : 'var(--text-placeholder)',
           fontFamily: 'Poppins, sans-serif',
           fontSize: '13px',
           padding: '8px 12px',
@@ -107,7 +107,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
         }}
       >
         <span>{value ? formatDisplay(value) : placeholder}</span>
-        <Calendar size={14} color="#8A8F98" />
+        <Calendar size={14} color="var(--text-muted)" />
       </button>
 
       {open && (
@@ -125,7 +125,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
         }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <div style={{ color: '#EDEFF3', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 600 }}>
+            <div style={{ color: 'var(--text-primary)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 600 }}>
               {MONTHS[viewMonth]} {viewYear}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
@@ -140,7 +140,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
               <div key={w} style={{
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '10px',
-                color: '#7D828B',
+                color: 'var(--text-placeholder)',
                 textAlign: 'center',
                 padding: '4px 0',
                 fontWeight: 500,
@@ -163,13 +163,13 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
                   type="button"
                   onClick={() => pickDay(c.iso)}
                   style={{
-                    background: isSelected ? '#00bfff' : isToday ? 'rgba(0, 191, 255, 0.12)' : 'transparent',
+                    background: isSelected ? 'var(--accent)' : isToday ? 'rgba(36, 119, 198, 0.12)' : 'transparent',
                     border: 'none',
                     borderRadius: '6px',
-                    color: isSelected ? '#1B1D21'
+                    color: isSelected ? 'var(--bg-base)'
                       : c.outOfMonth ? '#4A4F57'
-                      : isToday ? '#00bfff'
-                      : '#D5D8DE',
+                      : isToday ? 'var(--accent)'
+                      : 'var(--text-secondary)',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '12.5px',
                     fontWeight: isSelected || isToday ? 600 : 400,
@@ -178,10 +178,10 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
                     transition: 'background 0.1s',
                   }}
                   onMouseEnter={e => {
-                    if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                    if (!isSelected) e.currentTarget.style.background = 'var(--divider)';
                   }}
                   onMouseLeave={e => {
-                    if (!isSelected) e.currentTarget.style.background = isToday ? 'rgba(0, 191, 255, 0.12)' : 'transparent';
+                    if (!isSelected) e.currentTarget.style.background = isToday ? 'rgba(36, 119, 198, 0.12)' : 'transparent';
                   }}
                 >
                   {c.day}
@@ -191,7 +191,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
           </div>
 
           {/* Footer actions */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--divider)' }}>
             <button
               type="button"
               onClick={() => { onChange(''); setOpen(false); }}
@@ -202,7 +202,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
             <button
               type="button"
               onClick={() => pickDay(todayIso)}
-              style={{ ...textBtn, color: '#00bfff' }}
+              style={{ ...textBtn, color: 'var(--accent)' }}
             >
               Today
             </button>
@@ -215,7 +215,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
 
 const iconBtn: React.CSSProperties = {
   background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.06)',
+  border: '1px solid var(--divider)',
   borderRadius: '6px',
   padding: '4px',
   cursor: 'pointer',
@@ -226,7 +226,7 @@ const iconBtn: React.CSSProperties = {
 const textBtn: React.CSSProperties = {
   background: 'none',
   border: 'none',
-  color: '#8A8F98',
+  color: 'var(--text-muted)',
   fontFamily: 'Poppins, sans-serif',
   fontSize: '12px',
   fontWeight: 500,

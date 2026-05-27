@@ -13,10 +13,10 @@ import { Plus, Loader2, X, Trash2, Edit2, Square, CheckSquare } from 'lucide-rea
 import ListPreviewCard from '../components/ui/ListPreviewCard';
 
 const glassCardStyle: React.CSSProperties = {
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '16px',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--divider), inset 0 1px 0 var(--divider)',
 };
 
 const popupOverlayStyle: React.CSSProperties = {
@@ -38,8 +38,8 @@ const popupStyle: React.CSSProperties = {
 
 const contextMenuStyle: React.CSSProperties = {
   position: 'fixed',
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-bright)',
   borderRadius: '12px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
   padding: '6px',
@@ -54,16 +54,16 @@ const newListButtonStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: '8px',
   padding: '10px 16px',
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '10px',
-  color: '#EDEFF3',
+  color: 'var(--text-primary)',
   fontFamily: 'Poppins, sans-serif',
   fontSize: '14px',
   fontWeight: 500,
   cursor: 'pointer',
   transition: 'all 0.2s ease',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--divider), inset 0 1px 0 var(--divider)',
 };
 
 export default function FolderPage() {
@@ -250,7 +250,7 @@ export default function FolderPage() {
   }
 
   return (
-    <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -282,7 +282,7 @@ export default function FolderPage() {
         >
           <h1
             style={{
-              color: '#EDEFF3',
+              color: 'var(--text-primary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '26px',
               fontWeight: 600,
@@ -291,7 +291,7 @@ export default function FolderPage() {
           >
             {folder ? folder.name : 'Loading folder…'}
             {selectionMode && (
-              <span style={{ color: '#8A8F98', fontSize: '14px', fontWeight: 400, marginLeft: '12px' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 400, marginLeft: '12px' }}>
                 ({selectedLists.size} selected)
               </span>
             )}
@@ -331,17 +331,17 @@ export default function FolderPage() {
                 style={{
                   padding: '10px 16px',
                   background: 'transparent',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  border: '1px solid var(--border-bright)',
                   borderRadius: '10px',
-                  color: '#8A8F98',
+                  color: 'var(--text-muted)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '14px',
                   fontWeight: 500,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#D5D8DE'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = '#8A8F98'; e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--divider)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
               >
                 Cancel
               </button>
@@ -360,7 +360,7 @@ export default function FolderPage() {
                   if (folderId) e.currentTarget.style.background = '#3A3F45';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#32363C';
+                  e.currentTarget.style.background = 'var(--bg-card)';
                 }}
               >
                 <Plus size={18} />
@@ -372,7 +372,7 @@ export default function FolderPage() {
 
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
-            <Loader2 size={32} style={{ color: '#00bfff', animation: 'spin 1s linear infinite' }} />
+            <Loader2 size={32} style={{ color: 'var(--accent)', animation: 'spin 1s linear infinite' }} />
           </div>
         ) : error ? (
           <div
@@ -397,8 +397,8 @@ export default function FolderPage() {
                 onClick={openNewListPopup}
                 style={{
                   ...newListButtonStyle,
-                  background: '#00bfff',
-                  color: '#1B1D21',
+                  background: 'var(--accent)',
+                  color: 'var(--bg-base)',
                   border: 'none',
                 }}
               >
@@ -420,10 +420,10 @@ export default function FolderPage() {
               borderStyle: 'dashed',
             }}
           >
-            <Plus size={48} style={{ color: '#8A8F98', marginBottom: '16px' }} />
+            <Plus size={48} style={{ color: 'var(--text-muted)', marginBottom: '16px' }} />
             <h3
               style={{
-                color: '#EDEFF3',
+                color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: 500,
                 marginBottom: '8px',
@@ -434,7 +434,7 @@ export default function FolderPage() {
             </h3>
             <p
               style={{
-                color: '#8A8F98',
+                color: 'var(--text-muted)',
                 fontSize: '14px',
                 marginBottom: '24px',
                 fontFamily: 'Poppins, sans-serif',
@@ -451,10 +451,10 @@ export default function FolderPage() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '12px 24px',
-                background: '#00bfff',
+                background: 'var(--accent)',
                 border: 'none',
                 borderRadius: '10px',
-                color: '#1B1D21',
+                color: 'var(--bg-base)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 fontWeight: 600,
@@ -499,7 +499,7 @@ export default function FolderPage() {
                     position: 'relative',
                     borderRadius: '16px',
                     padding: '4px',
-                    background: isSelected ? 'rgba(0, 191, 255, 0.06)' : 'transparent',
+                    background: isSelected ? 'rgba(36, 119, 198, 0.06)' : 'transparent',
                     transition: 'background 0.15s ease, transform 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
@@ -520,7 +520,7 @@ export default function FolderPage() {
                         position: 'absolute',
                         top: '8px',
                         right: '8px',
-                        color: isSelected ? '#00bfff' : '#8A8F98',
+                        color: isSelected ? 'var(--accent)' : 'var(--text-muted)',
                         cursor: 'pointer',
                         zIndex: 2,
                       }}
@@ -556,7 +556,7 @@ export default function FolderPage() {
                   padding: '24px',
                   minHeight: '120px',
                   background: 'transparent',
-                  border: '2px dashed rgba(255, 255, 255, 0.12)',
+                  border: '2px dashed var(--border-bright)',
                   borderRadius: '16px',
                   cursor: 'pointer',
                   display: 'flex',
@@ -564,19 +564,19 @@ export default function FolderPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
-                  color: '#8A8F98',
+                  color: 'var(--text-muted)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '14px',
                   fontWeight: 500,
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0, 191, 255, 0.4)';
-                  e.currentTarget.style.color = '#00bfff';
+                  e.currentTarget.style.borderColor = 'rgba(36, 119, 198, 0.4)';
+                  e.currentTarget.style.color = 'var(--accent)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-                  e.currentTarget.style.color = '#8A8F98';
+                  e.currentTarget.style.borderColor = 'var(--border-bright)';
+                  e.currentTarget.style.color = 'var(--text-muted)';
                 }}
               >
                 <Plus size={28} />
@@ -591,7 +591,7 @@ export default function FolderPage() {
       {contextMenu && contextMenuList && (
         <div style={{ ...contextMenuStyle, left: contextMenu.x, top: contextMenu.y }}>
           {isSystemList(contextMenuList) ? (
-            <div style={{ padding: '10px 12px', color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+            <div style={{ padding: '10px 12px', color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
               System list — cannot rename or delete
             </div>
           ) : (
@@ -601,13 +601,13 @@ export default function FolderPage() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '10px 12px', borderRadius: '8px', cursor: 'pointer',
-                  color: '#D5D8DE', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+                  color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
                   transition: 'all 0.15s ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--divider)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
-                <Edit2 size={16} style={{ color: '#00bfff' }} />
+                <Edit2 size={16} style={{ color: 'var(--accent)' }} />
                 Rename
               </div>
               <div
@@ -615,11 +615,11 @@ export default function FolderPage() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '10px 12px', borderRadius: '8px', cursor: 'pointer',
-                  color: '#D5D8DE', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+                  color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 107, 53, 0.15)'; e.currentTarget.style.color = '#FF6B35'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D5D8DE'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
               >
                 <Trash2 size={16} style={{ color: '#FF6B35' }} />
                 Delete
@@ -642,7 +642,7 @@ export default function FolderPage() {
             >
               <h2
                 style={{
-                  color: '#EDEFF3',
+                  color: 'var(--text-primary)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '18px',
                   fontWeight: 600,
@@ -658,7 +658,7 @@ export default function FolderPage() {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#8A8F98',
+                  color: 'var(--text-muted)',
                   padding: '4px',
                   display: 'flex',
                 }}
@@ -670,7 +670,7 @@ export default function FolderPage() {
             <label
               style={{
                 display: 'block',
-                color: '#8A8F98',
+                color: 'var(--text-muted)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '13px',
                 marginBottom: '8px',
@@ -688,10 +688,10 @@ export default function FolderPage() {
               style={{
                 width: '100%',
                 padding: '12px 16px',
-                background: '#1B1D21',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                background: 'var(--bg-base)',
+                border: '1px solid var(--border-bright)',
                 borderRadius: '10px',
-                color: '#EDEFF3',
+                color: 'var(--text-primary)',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 outline: 'none',
@@ -715,10 +715,10 @@ export default function FolderPage() {
                 disabled={!newListName.trim() || createList.isPending}
                 style={{
                   padding: '10px 20px',
-                  background: newListName.trim() ? '#00bfff' : 'rgba(0, 191, 255, 0.3)',
+                  background: newListName.trim() ? 'var(--accent)' : 'rgba(36, 119, 198, 0.3)',
                   border: 'none',
                   borderRadius: '10px',
-                  color: '#1B1D21',
+                  color: 'var(--bg-base)',
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '14px',
                   fontWeight: 600,

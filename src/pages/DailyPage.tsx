@@ -11,12 +11,12 @@ const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: '
 function StatusCircle({ status, onClick }: { status: Node['status']; onClick: () => void }) {
   const colors: Record<Node['status'], string> = {
     TODO: 'transparent',
-    IN_PROGRESS: 'rgba(0,191,255,0.5)',
-    DONE: '#00c896',
+    IN_PROGRESS: 'rgba(36,119,198,0.5)',
+    DONE: 'var(--accent-teal)',
   };
   const borders: Record<Node['status'], string> = {
-    TODO: '1.5px solid #8A8F98',
-    IN_PROGRESS: '1.5px solid rgba(0,191,255,0.75)',
+    TODO: '1.5px solid var(--text-muted)',
+    IN_PROGRESS: '1.5px solid rgba(36,119,198,0.75)',
     DONE: 'none',
   };
   return (
@@ -46,15 +46,15 @@ function DailyNode({ node }: { node: Node }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '12px',
-      padding: '12px 16px', background: '#2A2D33',
-      border: '1px solid rgba(255,255,255,0.07)',
+      padding: '12px 16px', background: 'var(--bg-elevated)',
+      border: '1px solid var(--divider)',
       borderRadius: '10px', transition: 'border-color 0.15s ease',
     }}>
       <StatusCircle status={node.status} onClick={cycleStatus} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          color: isDone ? '#8A8F98' : '#D5D8DE',
+          color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
           fontFamily: 'Poppins, sans-serif', fontSize: '14px',
           textDecoration: isDone ? 'line-through' : 'none',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -62,7 +62,7 @@ function DailyNode({ node }: { node: Node }) {
           {node.title}
         </div>
         {isRef && node.source && (
-          <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <ExternalLink size={10} />
             {node.source.list.name}
           </div>
@@ -71,7 +71,7 @@ function DailyNode({ node }: { node: Node }) {
 
       <button
         onClick={() => removeFromDaily.mutate(node.id)}
-        style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: '#7D828B', display: 'flex', alignItems: 'center', opacity: 0.6, transition: 'opacity 0.15s' }}
+        style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: 'var(--text-placeholder)', display: 'flex', alignItems: 'center', opacity: 0.6, transition: 'opacity 0.15s' }}
         onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
         onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
         title="Remove from daily"
@@ -102,17 +102,17 @@ export default function DailyPage() {
   };
 
   return (
-    <div style={{ background: '#1B1D21', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
       <Topbar title="Today" />
       <SidePanel />
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '80px 24px 48px' }}>
         {/* Header */}
         <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ color: '#D5D8DE', fontFamily: 'Poppins, sans-serif', fontSize: '24px', fontWeight: 600, margin: 0 }}>
+          <h1 style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '24px', fontWeight: 600, margin: 0 }}>
             Daily Task List
           </h1>
-          <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginTop: '4px' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginTop: '4px' }}>
             {today}
           </div>
         </div>
@@ -121,17 +121,17 @@ export default function DailyPage() {
         {total > 0 && (
           <div style={{ marginBottom: '28px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: '#8A8F98', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+              <span style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
                 {done} / {total} tasks complete
               </span>
-              <span style={{ color: pct >= 90 ? '#00c896' : pct >= 60 ? 'rgba(0,191,255,0.9)' : '#8A8F98', fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 600 }}>
+              <span style={{ color: pct >= 90 ? 'var(--accent-teal)' : pct >= 60 ? 'rgba(36,119,198,0.9)' : 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 600 }}>
                 {pct}%
               </span>
             </div>
-            <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ height: '6px', background: 'var(--divider)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{
                 height: '100%', borderRadius: '3px',
-                background: pct >= 90 ? '#00c896' : pct >= 60 ? 'rgba(0,191,255,0.8)' : 'rgba(0,191,255,0.4)',
+                background: pct >= 90 ? 'var(--accent-teal)' : pct >= 60 ? 'rgba(36,119,198,0.8)' : 'rgba(36,119,198,0.4)',
                 width: `${pct}%`, transition: 'width 0.4s ease',
               }} />
             </div>
@@ -139,13 +139,13 @@ export default function DailyPage() {
         )}
 
         {/* Task list */}
-        <div style={{ background: '#22252A', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px', marginBottom: '24px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '16px', marginBottom: '24px' }}>
           {isLoading ? (
-            <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               Loading…
             </div>
           ) : nodes.length === 0 && !adding ? (
-            <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               No tasks yet — add one below or pin tasks from any list
             </div>
           ) : (
@@ -166,32 +166,32 @@ export default function DailyPage() {
                 onKeyDown={e => { if (e.key === 'Enter') handleAddTask(); if (e.key === 'Escape') setAdding(false); }}
                 placeholder="Task title…"
                 style={{
-                  flex: 1, background: '#32363C', border: '1px solid rgba(0,191,255,0.3)',
-                  borderRadius: '8px', padding: '8px 12px', color: '#D5D8DE',
+                  flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(36,119,198,0.3)',
+                  borderRadius: '8px', padding: '8px 12px', color: 'var(--text-secondary)',
                   fontFamily: 'Poppins, sans-serif', fontSize: '13px', outline: 'none',
                 }}
               />
-              <button onClick={handleAddTask} style={{ background: 'rgba(0,191,255,0.15)', border: '1px solid rgba(0,191,255,0.3)', borderRadius: '8px', padding: '8px 14px', color: '#00bfff', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={handleAddTask} style={{ background: 'rgba(36,119,198,0.15)', border: '1px solid rgba(36,119,198,0.3)', borderRadius: '8px', padding: '8px 14px', color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
                 Add
               </button>
-              <button onClick={() => setAdding(false)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 14px', color: '#8A8F98', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={() => setAdding(false)} style={{ background: 'var(--divider)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 14px', color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
                 Cancel
               </button>
             </div>
           ) : (
             <button
               onClick={() => setAdding(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: nodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#D5D8DE')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#7D828B')}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: nodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-placeholder)')}
             >
               <Plus size={14} /> Add task
             </button>
           )}
         </div>
 
-        <div style={{ color: '#7D828B', fontFamily: 'Poppins, sans-serif', fontSize: '12px', textAlign: 'center' }}>
-          Pin tasks from any list using the <strong style={{ color: '#8A8F98' }}>Add to Daily</strong> button in the task detail panel
+        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', textAlign: 'center' }}>
+          Pin tasks from any list using the <strong style={{ color: 'var(--text-muted)' }}>Add to Daily</strong> button in the task detail panel
         </div>
       </div>
     </div>

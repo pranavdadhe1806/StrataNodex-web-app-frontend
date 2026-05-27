@@ -4,16 +4,16 @@ import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
 
 const DS = {
-  bg: '#1B1D21',
-  surface: '#32363C',
-  textPrimary: '#EDEFF3',
-  textSecondary: '#D5D8DE',
-  textMuted: '#8A8F98',
-  accent: '#00bfff',
-  teal: '#00c896',
+  bg: 'var(--bg-base)',
+  surface: 'var(--bg-card)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
+  accent: 'var(--accent)',
+  teal: 'var(--accent-teal)',
   danger: '#ff4d4d',
-  border: 'rgba(255,255,255,0.08)',
-  divider: 'rgba(255,255,255,0.06)',
+  border: 'var(--border)',
+  divider: 'var(--divider)',
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -43,7 +43,7 @@ function Toggle({ enabled, onToggle, disabled }: { enabled: boolean; onToggle: (
       aria-checked={enabled}
       style={{
         width: 36, height: 20, borderRadius: 10,
-        background: enabled ? DS.accent : 'rgba(255,255,255,0.12)',
+        background: enabled ? DS.accent : 'var(--border-bright)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         transition: 'background 0.2s',
         position: 'relative', flexShrink: 0,
@@ -154,7 +154,7 @@ export default function SecuritySection() {
   };
 
   const focusBorder = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.target.style.borderColor = 'rgba(0,191,255,0.35)');
+    (e.target.style.borderColor = 'rgba(36,119,198,0.35)');
   const blurBorder = (e: React.FocusEvent<HTMLInputElement>) =>
     (e.target.style.borderColor = DS.border);
 
@@ -165,8 +165,8 @@ export default function SecuritySection() {
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 999,
           padding: '10px 18px', borderRadius: 8,
-          background: toast.ok ? 'rgba(0,200,150,0.12)' : 'rgba(255,77,77,0.12)',
-          border: `1px solid ${toast.ok ? 'rgba(0,200,150,0.25)' : 'rgba(255,77,77,0.25)'}`,
+          background: toast.ok ? 'rgba(48,209,88,0.12)' : 'rgba(255,77,77,0.12)',
+          border: `1px solid ${toast.ok ? 'rgba(48,209,88,0.25)' : 'rgba(255,77,77,0.25)'}`,
           color: toast.ok ? DS.teal : DS.danger, fontSize: 13, fontWeight: 500,
         }}>{toast.msg}</div>
       )}
@@ -187,7 +187,7 @@ export default function SecuritySection() {
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 8,
                 padding: '4px 10px', borderRadius: 6,
-                background: 'rgba(0,191,255,0.06)', color: DS.accent, fontSize: 11, fontWeight: 500,
+                background: 'rgba(36,119,198,0.06)', color: DS.accent, fontSize: 11, fontWeight: 500,
               }}>
                 <Shield size={11} /> Email OTP active
               </div>
@@ -280,7 +280,7 @@ export default function SecuritySection() {
               <button onClick={submitReset} disabled={pwBusy}
                 style={{
                   background: DS.accent, border: 'none', borderRadius: 8,
-                  color: '#1B1D21', fontSize: 13, fontWeight: 600,
+                  color: 'var(--bg-base)', fontSize: 13, fontWeight: 600,
                   padding: '8px 18px', cursor: 'pointer', opacity: pwBusy ? 0.5 : 1,
                   fontFamily: 'Poppins, sans-serif',
                 }}>
@@ -335,7 +335,7 @@ export default function SecuritySection() {
                   <div>
                     <div style={{ fontSize: 12, color: DS.textPrimary, fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
                       {session.device}
-                      {session.current && <span style={{ marginLeft: 8, fontSize: 10, color: DS.teal, background: 'rgba(0,200,150,0.12)', padding: '1px 6px', borderRadius: 3 }}>Current</span>}
+                      {session.current && <span style={{ marginLeft: 8, fontSize: 10, color: DS.teal, background: 'rgba(48,209,88,0.12)', padding: '1px 6px', borderRadius: 3 }}>Current</span>}
                     </div>
                     <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: 'Poppins, sans-serif', marginTop: 1 }}>
                       {session.location} · {session.lastSeen}

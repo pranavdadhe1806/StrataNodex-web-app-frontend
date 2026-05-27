@@ -39,11 +39,11 @@ export default function ListPreviewCard({
           width: '100%',
           aspectRatio: '1 / 1',
           borderRadius: '20px',
-          background: isSelected ? '#2A3040' : '#22252A',
+          background: isSelected ? '#2A3040' : 'var(--bg-surface)',
           border: isSelected
-            ? '1.5px solid rgba(0, 191, 255, 0.5)'
-            : '1px solid rgba(255, 255, 255, 0.07)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+            ? '1.5px solid rgba(36, 119, 198, 0.5)'
+            : '1px solid var(--divider)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 var(--divider)',
           padding: '14px 12px 10px',
           display: 'flex',
           flexDirection: 'column',
@@ -73,8 +73,8 @@ export default function ListPreviewCard({
                 width: '14px',
                 height: '14px',
                 borderRadius: '50%',
-                border: `2px solid ${node ? (isDone ? '#00c896' : 'rgba(0, 191, 255, 0.75)') : 'rgba(255,255,255,0.08)'}`,
-                background: isDone ? '#00c896' : 'transparent',
+                border: `2px solid ${node ? (isDone ? 'var(--accent-teal)' : 'rgba(36, 119, 198, 0.75)') : 'var(--border)'}`,
+                background: isDone ? 'var(--accent-teal)' : 'transparent',
                 flexShrink: 0,
               }} />
               {/* Title or placeholder bar */}
@@ -83,7 +83,7 @@ export default function ListPreviewCard({
                   fontFamily: 'Poppins, sans-serif',
                   fontSize: '10px',
                   fontWeight: 500,
-                  color: isDone ? '#8A8F98' : '#D5D8DE',
+                  color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
                   textDecoration: isDone ? 'line-through' : 'none',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -109,7 +109,7 @@ export default function ListPreviewCard({
         <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '4px', flexShrink: 0 }}>
           <span style={{
             fontSize: '10px',
-            color: nodeCount > 0 ? '#8A8F98' : 'rgba(255,255,255,0.1)',
+            color: nodeCount > 0 ? 'var(--text-muted)' : 'rgba(255,255,255,0.1)',
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 500,
           }}>
@@ -132,10 +132,10 @@ export default function ListPreviewCard({
             style={{
               width: '100%',
               padding: '4px 8px',
-              background: '#1B1D21',
-              border: '1px solid rgba(0, 191, 255, 0.5)',
+              background: 'var(--bg-base)',
+              border: '1px solid rgba(36, 119, 198, 0.5)',
               borderRadius: '6px',
-              color: '#EDEFF3',
+              color: 'var(--text-primary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '13px',
               outline: 'none',
@@ -145,7 +145,7 @@ export default function ListPreviewCard({
           />
         ) : (
           <p style={{
-            color: '#D5D8DE',
+            color: 'var(--text-secondary)',
             fontFamily: 'Poppins, sans-serif',
             fontSize: '13px',
             fontWeight: 500,
