@@ -17,7 +17,7 @@ interface NodeDetailPanelProps {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   fontSize: '11px',
   color: 'var(--text-placeholder)',
   fontWeight: 500,
@@ -177,7 +177,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               background: 'transparent',
               border: 'none',
               color: 'var(--text-primary)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '24px',
               fontWeight: 600,
               padding: '2px 0',
@@ -260,7 +260,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                   borderRadius: '20px',
                   color: 'var(--accent)',
                   fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   padding: '2px 8px',
                   display: 'flex',
                   alignItems: 'center',
@@ -284,7 +284,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-secondary)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '12.5px',
                   outline: 'none',
                   minWidth: '90px',
@@ -298,7 +298,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: 'var(--text-muted)' }}>
               <FileText size={14} />
-              <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 500, letterSpacing: '0.3px', textTransform: 'uppercase' }}>Notes</span>
+              <span style={{ fontFamily: 'var(--font-main)', fontSize: '12px', fontWeight: 500, letterSpacing: '0.3px', textTransform: 'uppercase' }}>Notes</span>
             </div>
             <RichTextEditor
               value={localNotes}
@@ -331,7 +331,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               border: '1px solid rgba(36,119,198,0.2)',
               borderRadius: '8px',
               color: 'var(--accent)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '13px',
               padding: '8px 14px',
               cursor: 'pointer',
@@ -352,7 +352,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               border: isInDaily ? '1px solid rgba(48,209,88,0.25)' : '1px solid rgba(36,119,198,0.2)',
               borderRadius: '8px',
               color: isInDaily ? 'var(--accent-teal)' : 'var(--accent)',
-              fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+              fontFamily: 'var(--font-main)', fontSize: '13px',
               padding: '8px 14px', cursor: 'pointer', transition: 'background 0.15s',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = isInDaily ? 'rgba(48,209,88,0.14)' : 'rgba(36,119,198,0.14)')}
@@ -377,7 +377,7 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
               border: '1px solid rgba(248, 81, 73, 0.2)',
               borderRadius: '8px',
               color: '#f85149',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '13px',
               padding: '8px 14px',
               cursor: 'pointer',

@@ -12,7 +12,7 @@ const field: React.CSSProperties = {
   borderRadius: 8,
   color: 'var(--text-primary)',
   fontSize: 13,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   outline: 'none',
   transition: 'border-color 0.15s',
 };
@@ -30,7 +30,7 @@ const lbl: React.CSSProperties = {
   fontWeight: 500,
   display: 'block',
   marginBottom: 6,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
 };
 
 export default function ProfileSettings() {
@@ -92,7 +92,7 @@ export default function ProfileSettings() {
     (e.target.style.borderColor = 'var(--border)');
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {toast && (
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 999,

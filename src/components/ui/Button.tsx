@@ -42,7 +42,7 @@ export default function Button({
         padding: '8px 16px',
         borderRadius: '8px',
         fontSize: '14px',
-        fontFamily: 'Poppins, sans-serif',
+        fontFamily: 'var(--font-main)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'opacity 0.15s ease, transform 0.1s ease',

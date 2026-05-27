@@ -51,7 +51,7 @@ export default function DailyTaskItem({
         <div
           style={{
             color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontSize: '14px',
             textDecoration: isDone ? 'line-through' : 'none',
             overflow: 'hidden',
@@ -61,7 +61,7 @@ export default function DailyTaskItem({
         >
           {title}
         </div>
-        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', marginTop: '2px' }}>
+        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px', marginTop: '2px' }}>
           {listName}
         </div>
       </div>

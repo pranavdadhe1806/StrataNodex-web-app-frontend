@@ -54,7 +54,7 @@ export default function SidePanel() {
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '0 4px' }}>
-          <span style={{ color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', letterSpacing: '-0.3px' }}>
+          <span style={{ color: 'var(--accent)', fontFamily: 'var(--font-main)', fontWeight: 700, fontSize: '18px', letterSpacing: '-0.3px' }}>
             StrataNodex
           </span>
           <button
@@ -96,7 +96,7 @@ export default function SidePanel() {
                 <span
                   style={{
                     color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'var(--font-main)',
                     fontSize: '14px',
                     fontWeight: isActive ? 500 : 400,
                   }}

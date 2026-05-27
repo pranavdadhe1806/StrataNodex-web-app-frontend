@@ -64,7 +64,7 @@ export default function NodeCard({
   const hasChildren = (node.children?.length ?? 0) > 0;
 
   const textStyles: React.CSSProperties = {
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: 'var(--font-main)',
     fontSize: '14px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -102,7 +102,7 @@ export default function NodeCard({
         style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}
         onClick={(e) => { e.stopPropagation(); onTextClick(); }}
       >
-        <span style={{ fontSize: '12px', color: 'var(--node-numbering)', fontFamily: 'Poppins, sans-serif', flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', color: 'var(--node-numbering)', fontFamily: 'var(--font-main)', flexShrink: 0 }}>
           {numbering}
         </span>
         <span style={{ ...textStyles, flex: 1 }}>{node.title}</span>

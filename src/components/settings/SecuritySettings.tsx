@@ -81,7 +81,7 @@ export default function SecuritySettings() {
   };
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {/* toast */}
       {toast && (
         <div style={{
@@ -171,7 +171,7 @@ export default function SecuritySettings() {
                   onPaste={i === 0 ? handleOtpPaste : undefined}
                   style={{
                     width: 40, height: 44, textAlign: 'center', fontSize: 16, fontWeight: 600,
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'var(--font-main)',
                     background: '#25282E', border: '1px solid var(--border)', borderRadius: 8,
                     color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.15s',
                   }}
@@ -189,7 +189,7 @@ export default function SecuritySettings() {
                 style={{
                   width: '100%', boxSizing: 'border-box', padding: '10px 40px 10px 12px',
                   background: '#25282E', border: '1px solid var(--border)', borderRadius: 8,
-                  color: 'var(--text-primary)', fontSize: 13, fontFamily: 'Poppins, sans-serif', outline: 'none',
+                  color: 'var(--text-primary)', fontSize: 13, fontFamily: 'var(--font-main)', outline: 'none',
                 }}
                 onFocus={e => (e.target.style.borderColor = 'rgba(36,119,198,0.35)')}
                 onBlur={e => (e.target.style.borderColor = 'var(--border)')}
@@ -207,7 +207,7 @@ export default function SecuritySettings() {
               style={{
                 width: '100%', boxSizing: 'border-box', padding: '10px 12px',
                 background: '#25282E', border: '1px solid var(--border)', borderRadius: 8,
-                color: 'var(--text-primary)', fontSize: 13, fontFamily: 'Poppins, sans-serif', outline: 'none',
+                color: 'var(--text-primary)', fontSize: 13, fontFamily: 'var(--font-main)', outline: 'none',
                 marginBottom: 16,
               }}
               onFocus={e => (e.target.style.borderColor = 'rgba(36,119,198,0.35)')}

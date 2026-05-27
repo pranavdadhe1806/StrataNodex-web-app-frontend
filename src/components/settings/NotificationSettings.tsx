@@ -30,7 +30,7 @@ const labelStyle: React.CSSProperties = {
   color: '#9CA3AF',
   fontSize: '13px',
   fontWeight: 500,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   marginBottom: '8px',
   display: 'block',
 };
@@ -42,7 +42,7 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
   padding: '12px 14px',
   fontSize: '14px',
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   outline: 'none',
   width: '100%',
   boxSizing: 'border-box' as const,
@@ -52,7 +52,7 @@ const sectionTitleStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
   fontSize: '16px',
   fontWeight: 600,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   marginBottom: '0',
 };
 
@@ -210,7 +210,7 @@ export default function NotificationSettings() {
                 : 'rgba(248, 81, 73, 0.3)'
             }`,
             color: toast.type === 'success' ? 'var(--accent-teal)' : '#f85149',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontSize: '14px',
             fontWeight: 500,
           }}
@@ -307,7 +307,7 @@ export default function NotificationSettings() {
             <span
               style={{
                 color: 'var(--accent-teal)',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '14px',
                 fontWeight: 500,
               }}
@@ -321,7 +321,7 @@ export default function NotificationSettings() {
                 border: '1px solid rgba(248, 81, 73, 0.25)',
                 borderRadius: '8px',
                 color: '#f85149',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '13px',
                 padding: '8px 14px',
                 cursor: 'pointer',
@@ -352,7 +352,7 @@ export default function NotificationSettings() {
             <div
               style={{
                 color: '#9CA3AF',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '13px',
                 lineHeight: '1.8',
               }}
@@ -433,7 +433,7 @@ export default function NotificationSettings() {
                     border: '1px solid rgba(36, 119, 198, 0.25)',
                     borderRadius: '8px',
                     color: 'var(--accent)',
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'var(--font-main)',
                     fontSize: '13px',
                     padding: '8px 12px',
                     cursor: 'pointer',
@@ -460,7 +460,7 @@ export default function NotificationSettings() {
                   border: '1px solid rgba(36, 119, 198, 0.25)',
                   borderRadius: '8px',
                   color: 'var(--accent)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '13px',
                   padding: '8px 14px',
                   cursor: generateCodeMutation.isPending ? 'not-allowed' : 'pointer',
@@ -473,7 +473,7 @@ export default function NotificationSettings() {
                 <span
                   style={{
                     color: 'var(--text-placeholder)',
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'var(--font-main)',
                     fontSize: '12px',
                   }}
                 >
@@ -494,7 +494,7 @@ export default function NotificationSettings() {
           border: 'none',
           borderRadius: '10px',
           color: '#fff',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '14px',
           fontWeight: 600,
           padding: '12px 24px',

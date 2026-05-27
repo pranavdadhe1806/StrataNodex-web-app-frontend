@@ -187,7 +187,7 @@ html, body, #root {
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-main, 'Poppins', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -210,7 +210,7 @@ body {
 
 /* Remove default input/button styles */
 input, textarea, button, select {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-main, 'Poppins', sans-serif);
   outline: none;
 }
 

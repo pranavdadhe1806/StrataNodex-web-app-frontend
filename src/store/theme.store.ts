@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 
 export type Theme = 'dark' | 'white' | 'grey';
+export type Font = 'Poppins' | 'Inter' | 'JetBrains Mono' | 'Caveat';
 
 interface ThemeStore {
   theme: Theme;
+  font: Font;
   setTheme: (t: Theme) => void;
+  setFont: (f: Font) => void;
 }
 
 function applyTheme(t: Theme) {
@@ -12,14 +15,33 @@ function applyTheme(t: Theme) {
   localStorage.setItem('stratanodex-theme', t);
 }
 
-const stored = (localStorage.getItem('stratanodex-theme') as Theme) || 'dark';
-// Apply immediately so the first paint uses the correct theme
-applyTheme(stored);
+function applyFont(f: Font) {
+  const fontMap: Record<Font, string> = {
+    'Poppins': "'Poppins', sans-serif",
+    'Inter': "'Inter', sans-serif",
+    'JetBrains Mono': "'JetBrains Mono', monospace",
+    'Caveat': "'Caveat', cursive",
+  };
+  document.documentElement.style.setProperty('--font-main', fontMap[f]);
+  localStorage.setItem('stratanodex-font', f);
+}
+
+const storedTheme = (localStorage.getItem('stratanodex-theme') as Theme) || 'dark';
+const storedFont = (localStorage.getItem('stratanodex-font') as Font) || 'Poppins';
+
+// Apply immediately so the first paint uses the correct theme and font
+applyTheme(storedTheme);
+applyFont(storedFont);
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-  theme: stored,
+  theme: storedTheme,
+  font: storedFont,
   setTheme: (t) => {
     applyTheme(t);
     set({ theme: t });
+  },
+  setFont: (f) => {
+    applyFont(f);
+    set({ font: f });
   },
 }));

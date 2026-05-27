@@ -94,7 +94,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
           border: `1px solid ${open ? 'rgba(36, 119, 198, 0.4)' : 'var(--border)'}`,
           borderRadius: '8px',
           color: value ? 'var(--text-primary)' : 'var(--text-placeholder)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '13px',
           padding: '8px 12px',
           outline: 'none',
@@ -125,7 +125,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
         }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <div style={{ color: 'var(--text-primary)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 600 }}>
+            <div style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-main)', fontSize: '13px', fontWeight: 600 }}>
               {MONTHS[viewMonth]} {viewYear}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
@@ -138,7 +138,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
             {WEEKDAYS.map(w => (
               <div key={w} style={{
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '10px',
                 color: 'var(--text-placeholder)',
                 textAlign: 'center',
@@ -170,7 +170,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = 'Pick 
                       : c.outOfMonth ? '#4A4F57'
                       : isToday ? 'var(--accent)'
                       : 'var(--text-secondary)',
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'var(--font-main)',
                     fontSize: '12.5px',
                     fontWeight: isSelected || isToday ? 600 : 400,
                     padding: '8px 0',
@@ -227,7 +227,7 @@ const textBtn: React.CSSProperties = {
   background: 'none',
   border: 'none',
   color: 'var(--text-muted)',
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   fontSize: '12px',
   fontWeight: 500,
   cursor: 'pointer',

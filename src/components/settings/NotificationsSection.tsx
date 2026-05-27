@@ -35,7 +35,7 @@ const TIMEZONES = [
 const sectionLabel: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
   textTransform: 'uppercase' as const, color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif', marginBottom: 20,
+  fontFamily: 'var(--font-main)', marginBottom: 20,
 };
 
 const inputStyle: React.CSSProperties = {
@@ -43,7 +43,7 @@ const inputStyle: React.CSSProperties = {
   border: `1px solid ${DS.border}`,
   borderRadius: 8, padding: '9px 12px',
   fontSize: 13, color: DS.textPrimary,
-  fontFamily: 'Poppins, sans-serif', outline: 'none',
+  fontFamily: 'var(--font-main)', outline: 'none',
   width: '100%', boxSizing: 'border-box' as const,
   colorScheme: 'dark' as const,
 };
@@ -167,7 +167,7 @@ export default function NotificationsSection() {
   }
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {/* Toast */}
       {toast && (
         <div style={{
@@ -176,7 +176,7 @@ export default function NotificationsSection() {
           background: toast.type === 'success' ? 'rgba(48,209,88,0.15)' : 'rgba(255,77,77,0.15)',
           border: `1px solid ${toast.type === 'success' ? 'rgba(48,209,88,0.3)' : 'rgba(255,77,77,0.3)'}`,
           color: toast.type === 'success' ? DS.teal : DS.danger,
-          fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500,
+          fontFamily: 'var(--font-main)', fontSize: 13, fontWeight: 500,
         }}>
           {toast.message}
         </div>
@@ -265,7 +265,7 @@ export default function NotificationsSection() {
               onClick={handleUnlink}
               style={{
                 background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.25)',
-                borderRadius: 8, color: DS.danger, fontFamily: 'Poppins, sans-serif',
+                borderRadius: 8, color: DS.danger, fontFamily: 'var(--font-main)',
                 fontSize: 12, padding: '6px 12px', cursor: 'pointer', transition: 'background 0.15s',
               }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,77,77,0.15)')}
@@ -324,7 +324,7 @@ export default function NotificationsSection() {
                     }}
                     style={{
                       background: 'rgba(36,119,198,0.08)', border: '1px solid rgba(36,119,198,0.25)',
-                      borderRadius: 8, color: DS.accent, fontFamily: 'Poppins, sans-serif',
+                      borderRadius: 8, color: DS.accent, fontFamily: 'var(--font-main)',
                       fontSize: 12, padding: '8px 12px', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', gap: 5,
                     }}
@@ -340,7 +340,7 @@ export default function NotificationsSection() {
                   disabled={generateCodeMutation.isPending}
                   style={{
                     background: 'rgba(36,119,198,0.08)', border: '1px solid rgba(36,119,198,0.25)',
-                    borderRadius: 8, color: DS.accent, fontFamily: 'Poppins, sans-serif',
+                    borderRadius: 8, color: DS.accent, fontFamily: 'var(--font-main)',
                     fontSize: 12, padding: '7px 14px',
                     cursor: generateCodeMutation.isPending ? 'not-allowed' : 'pointer',
                     opacity: generateCodeMutation.isPending ? 0.6 : 1,
@@ -349,7 +349,7 @@ export default function NotificationsSection() {
                   {telegramCode ? 'Generate new code' : 'Generate code'}
                 </button>
                 {telegramCode && (
-                  <span style={{ color: DS.textMuted, fontSize: 11, fontFamily: 'Poppins, sans-serif' }}>
+                  <span style={{ color: DS.textMuted, fontSize: 11, fontFamily: 'var(--font-main)' }}>
                     Code expires in 15 minutes
                   </span>
                 )}
@@ -367,7 +367,7 @@ export default function NotificationsSection() {
         disabled={updateMutation.isPending}
         style={{
           background: DS.accent, border: 'none', borderRadius: 8,
-          color: 'var(--bg-base)', fontFamily: 'Poppins, sans-serif',
+          color: 'var(--bg-base)', fontFamily: 'var(--font-main)',
           fontSize: 13, fontWeight: 600,
           padding: '9px 24px',
           cursor: updateMutation.isPending ? 'not-allowed' : 'pointer',

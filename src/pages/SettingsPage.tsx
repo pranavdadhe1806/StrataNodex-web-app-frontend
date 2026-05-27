@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const [active, setActive] = useState<SectionId>('profile');
 
   return (
-    <div style={{ background: DS.bg, minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ background: DS.bg, minHeight: '100vh', fontFamily: 'var(--font-main)' }}>
       <Topbar title="Settings" />
       <SidePanel />
 
@@ -92,7 +92,7 @@ export default function SettingsPage() {
                   borderLeft: isActive ? `2px solid ${DS.accent}` : '2px solid transparent',
                   background: isActive ? 'rgba(36,119,198,0.06)' : 'transparent',
                   color: isActive ? DS.accent : DS.textMuted,
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: 13,
                   fontWeight: isActive ? 500 : 400,
                   cursor: 'pointer',
@@ -134,7 +134,7 @@ export default function SettingsPage() {
               fontSize: 20,
               fontWeight: 600,
               margin: 0,
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
             }}>
               {SECTION_TITLES[active]}
             </h1>

@@ -55,14 +55,14 @@ function DailyNode({ node }: { node: Node }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
           color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
-          fontFamily: 'Poppins, sans-serif', fontSize: '14px',
+          fontFamily: 'var(--font-main)', fontSize: '14px',
           textDecoration: isDone ? 'line-through' : 'none',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {node.title}
         </div>
         {isRef && node.source && (
-          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <ExternalLink size={10} />
             {node.source.list.name}
           </div>
@@ -109,10 +109,10 @@ export default function DailyPage() {
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '80px 24px 48px' }}>
         {/* Header */}
         <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '24px', fontWeight: 600, margin: 0 }}>
+          <h1 style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '24px', fontWeight: 600, margin: 0 }}>
             Daily Task List
           </h1>
-          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', marginTop: '4px' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', marginTop: '4px' }}>
             {today}
           </div>
         </div>
@@ -121,10 +121,10 @@ export default function DailyPage() {
         {total > 0 && (
           <div style={{ marginBottom: '28px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+              <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '12px' }}>
                 {done} / {total} tasks complete
               </span>
-              <span style={{ color: pct >= 90 ? 'var(--accent-teal)' : pct >= 60 ? 'rgba(36,119,198,0.9)' : 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 600 }}>
+              <span style={{ color: pct >= 90 ? 'var(--accent-teal)' : pct >= 60 ? 'rgba(36,119,198,0.9)' : 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '12px', fontWeight: 600 }}>
                 {pct}%
               </span>
             </div>
@@ -141,11 +141,11 @@ export default function DailyPage() {
         {/* Task list */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '16px', marginBottom: '24px' }}>
           {isLoading ? (
-            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               Loading…
             </div>
           ) : nodes.length === 0 && !adding ? (
-            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               No tasks yet — add one below or pin tasks from any list
             </div>
           ) : (
@@ -168,20 +168,20 @@ export default function DailyPage() {
                 style={{
                   flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(36,119,198,0.3)',
                   borderRadius: '8px', padding: '8px 12px', color: 'var(--text-secondary)',
-                  fontFamily: 'Poppins, sans-serif', fontSize: '13px', outline: 'none',
+                  fontFamily: 'var(--font-main)', fontSize: '13px', outline: 'none',
                 }}
               />
-              <button onClick={handleAddTask} style={{ background: 'rgba(36,119,198,0.15)', border: '1px solid rgba(36,119,198,0.3)', borderRadius: '8px', padding: '8px 14px', color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={handleAddTask} style={{ background: 'rgba(36,119,198,0.15)', border: '1px solid rgba(36,119,198,0.3)', borderRadius: '8px', padding: '8px 14px', color: 'var(--accent)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer' }}>
                 Add
               </button>
-              <button onClick={() => setAdding(false)} style={{ background: 'var(--divider)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 14px', color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={() => setAdding(false)} style={{ background: 'var(--divider)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 14px', color: 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer' }}>
                 Cancel
               </button>
             </div>
           ) : (
             <button
               onClick={() => setAdding(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: nodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: nodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-placeholder)')}
             >
@@ -190,7 +190,7 @@ export default function DailyPage() {
           )}
         </div>
 
-        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', textAlign: 'center' }}>
+        <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px', textAlign: 'center' }}>
           Pin tasks from any list using the <strong style={{ color: 'var(--text-muted)' }}>Add to Daily</strong> button in the task detail panel
         </div>
       </div>

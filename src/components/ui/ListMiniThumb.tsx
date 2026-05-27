@@ -52,7 +52,7 @@ export default function ListMiniThumb({ nodeCount, previewNodes = [] }: ListMini
         flexShrink: 0,
       }}>
         <span style={{
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '7px',
           color: nodeCount > 0 ? 'var(--text-muted)' : 'rgba(255,255,255,0.1)',
           fontWeight: 500,

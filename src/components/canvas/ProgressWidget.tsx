@@ -31,7 +31,7 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
       {/* Label */}
       <div
         style={{
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '13px',
           fontWeight: 500,
           color: 'var(--text-secondary)',
@@ -67,7 +67,7 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
       {/* Completed Count */}
       <div
         style={{
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '12px',
           color: 'var(--text-muted)',
           display: 'flex',

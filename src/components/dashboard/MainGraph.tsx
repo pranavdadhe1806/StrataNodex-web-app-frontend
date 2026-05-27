@@ -66,7 +66,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           color: 'var(--text-muted)',
           fontSize: 11,
           margin: '0 0 4px',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
         }}
       >
         {label}
@@ -77,7 +77,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           fontSize: 14,
           fontWeight: 600,
           margin: 0,
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
         }}
       >
         {payload[0].value > 0 ? '+' : ''}
@@ -102,7 +102,7 @@ export default function MainGraph() {
     padding: '4px 12px',
     borderRadius: '6px',
     fontSize: '12px',
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: 'var(--font-main)',
     fontWeight: 500,
     cursor: 'pointer',
     border: isActive ? '1px solid rgba(36,119,198,0.3)' : '1px solid transparent',
@@ -135,7 +135,7 @@ export default function MainGraph() {
         <span
           style={{
             color: 'var(--text-muted)',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontSize: '13px',
             fontWeight: 500,
           }}

@@ -17,7 +17,7 @@ const DS = {
 const sectionLabel: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
   textTransform: 'uppercase' as const, color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif', marginBottom: 20,
+  fontFamily: 'var(--font-main)', marginBottom: 20,
 };
 
 export default function DataSection() {
@@ -43,7 +43,7 @@ export default function DataSection() {
   };
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {/* Toast */}
       {toast && (
         <div style={{
@@ -73,7 +73,7 @@ export default function DataSection() {
             background: 'none', border: `1px solid ${DS.border}`,
             borderRadius: 8, color: DS.textSecondary, fontSize: 12, fontWeight: 500,
             padding: '7px 16px', cursor: exporting ? 'not-allowed' : 'pointer',
-            fontFamily: 'Poppins, sans-serif', flexShrink: 0,
+            fontFamily: 'var(--font-main)', flexShrink: 0,
             opacity: exporting ? 0.6 : 1,
             transition: 'border-color 0.15s',
           }}
@@ -109,7 +109,7 @@ export default function DataSection() {
             background: 'none', border: `1px solid ${DS.divider}`,
             borderRadius: 8, color: DS.textMuted, fontSize: 12, fontWeight: 500,
             padding: '7px 16px', cursor: 'not-allowed',
-            fontFamily: 'Poppins, sans-serif', flexShrink: 0, opacity: 0.5,
+            fontFamily: 'var(--font-main)', flexShrink: 0, opacity: 0.5,
           }}
         >
           <Upload size={13} />

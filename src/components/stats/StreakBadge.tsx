@@ -24,7 +24,7 @@ export default function StreakBadge({ streak, label = 'Day Streak' }: StreakBadg
       <span
         style={{
           color: 'var(--text-primary)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '24px',
           fontWeight: 700,
           lineHeight: 1,
@@ -35,7 +35,7 @@ export default function StreakBadge({ streak, label = 'Day Streak' }: StreakBadg
       <span
         style={{
           color: 'var(--text-muted)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '12px',
           fontWeight: 400,
         }}

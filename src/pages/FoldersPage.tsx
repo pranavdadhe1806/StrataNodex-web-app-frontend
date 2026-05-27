@@ -256,7 +256,7 @@ export default function FoldersPage() {
           <h1
             style={{
               color: 'var(--text-primary)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '26px',
               fontWeight: 600,
               margin: 0,
@@ -291,7 +291,7 @@ export default function FoldersPage() {
                   border: '1px solid rgba(255, 107, 53, 0.3)',
                   borderRadius: '10px',
                   color: '#FF6B35',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '14px',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -319,7 +319,7 @@ export default function FoldersPage() {
                   border: '1px solid var(--border-bright)',
                   borderRadius: '10px',
                   color: 'var(--text-muted)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '14px',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -398,7 +398,7 @@ export default function FoldersPage() {
                 border: '1px solid var(--border)',
                 borderRadius: '10px',
                 color: 'var(--text-primary)',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '14px',
                 fontWeight: 500,
                 cursor: 'pointer',
@@ -531,7 +531,7 @@ export default function FoldersPage() {
                             border: '1px solid rgba(36, 119, 198, 0.5)',
                             borderRadius: '6px',
                             color: 'var(--text-primary)',
-                            fontFamily: 'Poppins, sans-serif',
+                            fontFamily: 'var(--font-main)',
                             fontSize: '12px',
                             outline: 'none',
                             textAlign: 'center',
@@ -542,7 +542,7 @@ export default function FoldersPage() {
                       <span
                         style={{
                           color: folderIsSystem ? '#FF6B35' : 'var(--text-secondary)',
-                          fontFamily: 'Poppins, sans-serif',
+                          fontFamily: 'var(--font-main)',
                           fontSize: '13px',
                           fontWeight: 500,
                           textAlign: 'center',
@@ -561,7 +561,7 @@ export default function FoldersPage() {
                     <span
                       style={{
                         color: 'var(--text-muted)',
-                        fontFamily: 'Poppins, sans-serif',
+                        fontFamily: 'var(--font-main)',
                         fontSize: '11px',
                         textAlign: 'center',
                         marginTop: '4px',
@@ -649,7 +649,7 @@ export default function FoldersPage() {
                             border: '1px solid rgba(36, 119, 198, 0.5)',
                             borderRadius: '8px',
                             color: 'var(--text-primary)',
-                            fontFamily: 'Poppins, sans-serif',
+                            fontFamily: 'var(--font-main)',
                             fontSize: '14px',
                             outline: 'none',
                           }}
@@ -658,7 +658,7 @@ export default function FoldersPage() {
                         <div
                           style={{
                             color: folderIsSystem ? '#FF6B35' : 'var(--text-primary)',
-                            fontFamily: 'Poppins, sans-serif',
+                            fontFamily: 'var(--font-main)',
                             fontSize: '15px',
                             fontWeight: 500,
                             overflow: 'hidden',
@@ -675,7 +675,7 @@ export default function FoldersPage() {
                     <span
                       style={{
                         color: 'var(--text-muted)',
-                        fontFamily: 'Poppins, sans-serif',
+                        fontFamily: 'var(--font-main)',
                         fontSize: '13px',
                         flexShrink: 0,
                       }}
@@ -704,7 +704,7 @@ export default function FoldersPage() {
                 borderRadius: '8px',
                 cursor: 'pointer',
                 color: 'var(--text-secondary)',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '13px',
                 transition: 'all 0.15s ease',
               }}
@@ -731,7 +731,7 @@ export default function FoldersPage() {
                 borderRadius: '8px',
                 cursor: 'pointer',
                 color: 'var(--text-secondary)',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '13px',
                 transition: 'all 0.15s ease',
               }}
@@ -754,7 +754,7 @@ export default function FoldersPage() {
               style={{
                 padding: '10px 12px',
                 color: 'var(--text-muted)',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-main)',
                 fontSize: '12px',
                 fontStyle: 'italic',
               }}
@@ -780,7 +780,7 @@ export default function FoldersPage() {
               <h2
                 style={{
                   color: 'var(--text-primary)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '18px',
                   fontWeight: 600,
                   margin: 0,
@@ -813,7 +813,7 @@ export default function FoldersPage() {
                 style={{
                   display: 'block',
                   color: 'var(--text-muted)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '13px',
                   marginBottom: '8px',
                 }}
@@ -834,7 +834,7 @@ export default function FoldersPage() {
                   border: '1px solid var(--border-bright)',
                   borderRadius: '10px',
                   color: 'var(--text-primary)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '14px',
                   outline: 'none',
                   boxSizing: 'border-box',
@@ -861,7 +861,7 @@ export default function FoldersPage() {
                   border: '1px solid var(--border-bright)',
                   borderRadius: '10px',
                   color: 'var(--text-muted)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '14px',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -887,7 +887,7 @@ export default function FoldersPage() {
                   border: 'none',
                   borderRadius: '10px',
                   color: 'var(--bg-base)',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '14px',
                   fontWeight: 600,
                   cursor: newFolderName.trim() ? 'pointer' : 'not-allowed',

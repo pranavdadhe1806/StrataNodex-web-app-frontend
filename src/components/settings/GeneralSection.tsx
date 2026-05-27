@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { useThemeStore, Theme } from '../../store/theme.store';
+import { useThemeStore, Theme, Font } from '../../store/theme.store';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
@@ -15,7 +15,7 @@ const DS = {
 const sectionLabel: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
   textTransform: 'uppercase' as const, color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif', marginBottom: 16,
+  fontFamily: 'var(--font-main)', marginBottom: 16,
 };
 
 const divider = <div style={{ height: 1, background: DS.divider, margin: '24px 0' }} />;
@@ -51,18 +51,18 @@ const THEMES: { id: Theme; label: string; swatch: string[] }[] = [
 ];
 
 /* ─── Font pills ────────────────────────────────────────────── */
-const FONTS = [
-  { id: 'Poppins', label: 'Poppins', preview: 'Aa', style: 'Poppins, sans-serif' },
-  { id: 'Inter', label: 'Inter', preview: 'Aa', style: 'Inter, sans-serif' },
-  { id: 'JetBrains Mono', label: 'JetBrains Mono', preview: 'Aa', style: 'JetBrains Mono, monospace' },
+const FONTS: { id: Font; label: string; preview: string; style: string; size: number; weight: number }[] = [
+  { id: 'Poppins', label: 'Poppins', preview: 'Aa', style: "'Poppins', sans-serif", size: 16, weight: 400 },
+  { id: 'Inter', label: 'Inter', preview: 'Aa', style: "'Inter', sans-serif", size: 16, weight: 400 },
+  { id: 'JetBrains Mono', label: 'JetBrains Mono', preview: 'Aa', style: "'JetBrains Mono', monospace", size: 15, weight: 400 },
+  { id: 'Caveat', label: 'Caveat', preview: 'Aa', style: "'Caveat', cursive", size: 22, weight: 600 },
 ];
 
 /* ─── Date format options ───────────────────────────────────── */
 const DATE_FORMATS = ['DD/MM/YYYY', 'MM/DD/YYYY', 'Relative'];
 
 export default function GeneralSection() {
-  const { theme, setTheme } = useThemeStore();
-  const [font, setFont] = useState('Poppins');
+  const { theme, font, setTheme, setFont } = useThemeStore();
   const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
   const [timeFormat24, setTimeFormat24] = useState(true);
   const [weekStartsMonday, setWeekStartsMonday] = useState(true);
@@ -72,13 +72,13 @@ export default function GeneralSection() {
     border: `1px solid ${DS.border}`,
     borderRadius: 8, padding: '9px 12px',
     fontSize: 13, color: DS.textPrimary,
-    fontFamily: 'Poppins, sans-serif', outline: 'none',
+    fontFamily: 'var(--font-main)', outline: 'none',
     cursor: 'pointer', colorScheme: 'dark',
     width: 200, boxSizing: 'border-box',
   };
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
 
       {/* ── Appearance ── */}
       <div style={sectionLabel}>Appearance</div>
@@ -144,10 +144,10 @@ export default function GeneralSection() {
                 transition: 'all 0.15s',
               }}
             >
-              <span style={{ fontFamily: f.style, fontSize: 16, color: active ? DS.accent : DS.textMuted }}>
+              <span style={{ fontFamily: f.style, fontSize: f.size, fontWeight: f.weight, color: active ? DS.accent : DS.textMuted }}>
                 {f.preview}
               </span>
-              <span style={{ fontSize: 13, color: active ? DS.accent : DS.textMuted, fontFamily: 'Poppins, sans-serif', fontWeight: active ? 500 : 400 }}>
+              <span style={{ fontSize: 13, color: active ? DS.accent : DS.textMuted, fontFamily: 'var(--font-main)', fontWeight: active ? 500 : 400 }}>
                 {f.label}
               </span>
             </button>

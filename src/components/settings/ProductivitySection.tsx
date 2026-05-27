@@ -13,7 +13,7 @@ const DS = {
 const sectionLabel: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
   textTransform: 'uppercase' as const, color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif', marginBottom: 20,
+  fontFamily: 'var(--font-main)', marginBottom: 20,
 };
 
 const inputBase: React.CSSProperties = {
@@ -21,7 +21,7 @@ const inputBase: React.CSSProperties = {
   border: `1px solid ${DS.border}`,
   borderRadius: 8, padding: '9px 12px',
   fontSize: 13, color: DS.textPrimary,
-  fontFamily: 'Poppins, sans-serif', outline: 'none',
+  fontFamily: 'var(--font-main)', outline: 'none',
   cursor: 'pointer', colorScheme: 'dark' as const,
   boxSizing: 'border-box',
 };
@@ -63,10 +63,10 @@ function SettingRow({ label, subtitle, control, last }: SettingRowProps) {
         padding: '14px 0', gap: 16,
       }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, color: DS.textPrimary, fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
+          <div style={{ fontSize: 13, color: DS.textPrimary, fontWeight: 500, fontFamily: 'var(--font-main)' }}>
             {label}
           </div>
-          <div style={{ fontSize: 12, color: DS.textMuted, marginTop: 3, fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, color: DS.textMuted, marginTop: 3, fontFamily: 'var(--font-main)', lineHeight: 1.5 }}>
             {subtitle}
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function ProductivitySection() {
   const [resetTime, setResetTime] = useState('00:00');
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       <div style={sectionLabel}>Task behaviour</div>
 
       <SettingRow

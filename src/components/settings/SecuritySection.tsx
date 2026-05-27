@@ -19,20 +19,20 @@ const DS = {
 const sectionLabel: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
   textTransform: 'uppercase' as const, color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif', marginBottom: 20,
+  fontFamily: 'var(--font-main)', marginBottom: 20,
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%', boxSizing: 'border-box',
   padding: '9px 12px', background: DS.bg,
   border: `1px solid ${DS.border}`, borderRadius: 8,
-  color: DS.textPrimary, fontSize: 13, fontFamily: 'Poppins, sans-serif',
+  color: DS.textPrimary, fontSize: 13, fontFamily: 'var(--font-main)',
   outline: 'none', transition: 'border-color 0.15s',
 };
 
 const lblStyle: React.CSSProperties = {
   color: DS.textMuted, fontSize: 12, fontWeight: 500,
-  display: 'block', marginBottom: 6, fontFamily: 'Poppins, sans-serif',
+  display: 'block', marginBottom: 6, fontFamily: 'var(--font-main)',
 };
 
 function Toggle({ enabled, onToggle, disabled }: { enabled: boolean; onToggle: () => void; disabled?: boolean }) {
@@ -159,7 +159,7 @@ export default function SecuritySection() {
     (e.target.style.borderColor = DS.border);
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {/* Toast */}
       {toast && (
         <div style={{
@@ -215,7 +215,7 @@ export default function SecuritySection() {
                 background: 'none', border: `1px solid ${DS.border}`,
                 borderRadius: 8, color: DS.textSecondary, fontSize: 12, fontWeight: 500,
                 padding: '7px 14px', cursor: 'pointer', opacity: pwBusy ? 0.5 : 1,
-                fontFamily: 'Poppins, sans-serif', flexShrink: 0,
+                fontFamily: 'var(--font-main)', flexShrink: 0,
                 transition: 'border-color 0.15s',
               }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)')}
@@ -243,7 +243,7 @@ export default function SecuritySection() {
                   onPaste={i === 0 ? handleOtpPaste : undefined}
                   style={{
                     width: 40, height: 44, textAlign: 'center', fontSize: 16, fontWeight: 600,
-                    fontFamily: 'Poppins, sans-serif', boxSizing: 'border-box',
+                    fontFamily: 'var(--font-main)', boxSizing: 'border-box',
                     background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: 8,
                     color: DS.textPrimary, outline: 'none', transition: 'border-color 0.15s',
                   }}
@@ -274,7 +274,7 @@ export default function SecuritySection() {
               onFocus={focusBorder} onBlur={blurBorder}
             />
 
-            {pwErr && <p style={{ color: DS.danger, fontSize: 12, margin: '0 0 12px', fontFamily: 'Poppins, sans-serif' }}>{pwErr}</p>}
+            {pwErr && <p style={{ color: DS.danger, fontSize: 12, margin: '0 0 12px', fontFamily: 'var(--font-main)' }}>{pwErr}</p>}
 
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={submitReset} disabled={pwBusy}
@@ -282,7 +282,7 @@ export default function SecuritySection() {
                   background: DS.accent, border: 'none', borderRadius: 8,
                   color: 'var(--bg-base)', fontSize: 13, fontWeight: 600,
                   padding: '8px 18px', cursor: 'pointer', opacity: pwBusy ? 0.5 : 1,
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                 }}>
                 {pwBusy ? 'Updating...' : 'Update password'}
               </button>
@@ -290,7 +290,7 @@ export default function SecuritySection() {
                 style={{
                   background: 'none', border: `1px solid ${DS.border}`, borderRadius: 8,
                   color: DS.textMuted, fontSize: 13, padding: '8px 14px', cursor: 'pointer',
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                 }}>
                 Cancel
               </button>
@@ -333,11 +333,11 @@ export default function SecuritySection() {
                     : <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', flexShrink: 0 }} />
                   }
                   <div>
-                    <div style={{ fontSize: 12, color: DS.textPrimary, fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
+                    <div style={{ fontSize: 12, color: DS.textPrimary, fontWeight: 500, fontFamily: 'var(--font-main)' }}>
                       {session.device}
                       {session.current && <span style={{ marginLeft: 8, fontSize: 10, color: DS.teal, background: 'rgba(48,209,88,0.12)', padding: '1px 6px', borderRadius: 3 }}>Current</span>}
                     </div>
-                    <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: 'Poppins, sans-serif', marginTop: 1 }}>
+                    <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: 'var(--font-main)', marginTop: 1 }}>
                       {session.location} · {session.lastSeen}
                     </div>
                   </div>
@@ -348,7 +348,7 @@ export default function SecuritySection() {
                     style={{
                       background: 'none', border: `1px solid rgba(255,77,77,0.25)`,
                       borderRadius: 6, color: DS.danger, fontSize: 11, fontWeight: 500,
-                      padding: '4px 10px', cursor: 'pointer', fontFamily: 'Poppins, sans-serif',
+                      padding: '4px 10px', cursor: 'pointer', fontFamily: 'var(--font-main)',
                     }}
                   >
                     Revoke
@@ -365,7 +365,7 @@ export default function SecuritySection() {
       <div style={{
         fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
         textTransform: 'uppercase', color: DS.danger,
-        fontFamily: 'Poppins, sans-serif', marginBottom: 16,
+        fontFamily: 'var(--font-main)', marginBottom: 16,
         display: 'flex', alignItems: 'center', gap: 6,
       }}>
         <AlertTriangle size={12} /> Danger zone
@@ -383,7 +383,7 @@ export default function SecuritySection() {
           style={{
             background: 'rgba(255,77,77,0.08)', border: `1px solid rgba(255,77,77,0.25)`,
             borderRadius: 8, color: DS.danger, fontSize: 12, fontWeight: 500,
-            padding: '7px 16px', cursor: 'pointer', fontFamily: 'Poppins, sans-serif',
+            padding: '7px 16px', cursor: 'pointer', fontFamily: 'var(--font-main)',
             flexShrink: 0, marginLeft: 16,
           }}
         >

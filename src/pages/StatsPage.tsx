@@ -22,14 +22,14 @@ function StatCard({ icon, label, value, sub, color }: {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
         <div style={{ color, display: 'flex' }}>{icon}</div>
-        <span style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 500 }}>
+        <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '12px', fontWeight: 500 }}>
           {label}
         </span>
       </div>
-      <div style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '24px', fontWeight: 700 }}>
+      <div style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '24px', fontWeight: 700 }}>
         {value}
       </div>
-      {sub && <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', marginTop: '4px' }}>{sub}</div>}
+      {sub && <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px', marginTop: '4px' }}>{sub}</div>}
     </div>
   );
 }
@@ -56,11 +56,11 @@ function ListRow({ list }: { list: ListStat }) {
       padding: '9px 18px 9px 40px',
       borderTop: '1px solid rgba(255,255,255,0.04)',
     }}>
-      <span style={{ color: '#9CA3AF', fontFamily: 'Poppins, sans-serif', fontSize: '11px', flexShrink: 0 }}>
+      <span style={{ color: '#9CA3AF', fontFamily: 'var(--font-main)', fontSize: '11px', flexShrink: 0 }}>
         📋
       </span>
       <span style={{
-        color: '#9CA3AF', fontFamily: 'Poppins, sans-serif', fontSize: '13px',
+        color: '#9CA3AF', fontFamily: 'var(--font-main)', fontSize: '13px',
         flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {list.name}
@@ -68,10 +68,10 @@ function ListRow({ list }: { list: ListStat }) {
       <div style={{ width: '120px', flexShrink: 0 }}>
         <ProgressBar pct={list.completionPct} height={5} />
       </div>
-      <span style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', minWidth: '72px', textAlign: 'right' }}>
+      <span style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px', minWidth: '72px', textAlign: 'right' }}>
         {list.doneTasks}/{list.totalTasks}
       </span>
-      <span style={{ color: pctColor(list.completionPct), fontFamily: 'Poppins, sans-serif', fontSize: '12px', fontWeight: 600, minWidth: '38px', textAlign: 'right' }}>
+      <span style={{ color: pctColor(list.completionPct), fontFamily: 'var(--font-main)', fontSize: '12px', fontWeight: 600, minWidth: '38px', textAlign: 'right' }}>
         {list.completionPct}%
       </span>
     </div>
@@ -98,26 +98,26 @@ function FolderCard({ folder }: { folder: FolderStat }) {
         <span style={{ color: 'var(--text-placeholder)', display: 'flex', flexShrink: 0 }}>
           {empty || !open ? <ChevronRight size={15} /> : <ChevronDown size={15} />}
         </span>
-        <span style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '14px', fontWeight: 500 }}>
+        <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '14px', fontWeight: 500 }}>
           📁
         </span>
         <span style={{
-          color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '14px',
+          color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '14px',
           fontWeight: 500, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {folder.name}
         </span>
         {empty ? (
-          <span style={{ color: '#4A4F57', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>No tasks</span>
+          <span style={{ color: '#4A4F57', fontFamily: 'var(--font-main)', fontSize: '12px' }}>No tasks</span>
         ) : (
           <>
             <div style={{ width: '160px', flexShrink: 0 }}>
               <ProgressBar pct={folder.completionPct} height={6} />
             </div>
-            <span style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', minWidth: '72px', textAlign: 'right' }}>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '12px', minWidth: '72px', textAlign: 'right' }}>
               {folder.doneTasks}/{folder.totalTasks}
             </span>
-            <span style={{ color: pctColor(folder.completionPct), fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 700, minWidth: '42px', textAlign: 'right' }}>
+            <span style={{ color: pctColor(folder.completionPct), fontFamily: 'var(--font-main)', fontSize: '13px', fontWeight: 700, minWidth: '42px', textAlign: 'right' }}>
               {folder.completionPct}%
             </span>
           </>
@@ -162,7 +162,7 @@ export default function StatsPage() {
           position: 'fixed', top: 24, right: 24, zIndex: 1000,
           padding: '12px 20px', borderRadius: '10px',
           background: 'rgba(36,119,198,0.12)', border: '1px solid rgba(36,119,198,0.25)',
-          color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 500,
+          color: 'var(--accent)', fontFamily: 'var(--font-main)', fontSize: '13px', fontWeight: 500,
         }}>
           {toast}
         </div>
@@ -207,10 +207,10 @@ export default function StatsPage() {
           borderRadius: '12px',
         }}>
           <div>
-            <div style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 500 }}>
+            <div style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '13px', fontWeight: 500 }}>
               Lock in today's score
             </div>
-            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px', marginTop: '3px' }}>
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px', marginTop: '3px' }}>
               Scores are snapshots — compute once per day to record your progress on the chart
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function StatsPage() {
               display: 'flex', alignItems: 'center', gap: '7px',
               background: 'rgba(36,119,198,0.14)', border: '1px solid rgba(36,119,198,0.3)',
               borderRadius: '9px', padding: '9px 18px',
-              color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 500,
+              color: 'var(--accent)', fontFamily: 'var(--font-main)', fontSize: '13px', fontWeight: 500,
               cursor: computeScore.isPending ? 'not-allowed' : 'pointer',
               opacity: computeScore.isPending ? 0.6 : 1, transition: 'opacity 0.15s',
             }}
@@ -233,20 +233,20 @@ export default function StatsPage() {
 
         {/* ── Live breakdown ─────────────────────────────────────────────── */}
         <div style={{ marginBottom: '20px' }}>
-          <h2 style={{ color: 'var(--text-secondary)', fontFamily: 'Poppins, sans-serif', fontSize: '16px', fontWeight: 600, margin: '0 0 6px' }}>
+          <h2 style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-main)', fontSize: '16px', fontWeight: 600, margin: '0 0 6px' }}>
             Current Completion
           </h2>
-          <p style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', margin: 0 }}>
+          <p style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', margin: 0 }}>
             Live task completion across all folders and lists — click a folder to expand
           </p>
         </div>
 
         {summaryLoading ? (
-          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', padding: '32px 0', textAlign: 'center' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', padding: '32px 0', textAlign: 'center' }}>
             Loading…
           </div>
         ) : summary.length === 0 ? (
-          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '13px', padding: '32px 0', textAlign: 'center' }}>
+          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', padding: '32px 0', textAlign: 'center' }}>
             No folders yet — create some tasks to see stats here
           </div>
         ) : (

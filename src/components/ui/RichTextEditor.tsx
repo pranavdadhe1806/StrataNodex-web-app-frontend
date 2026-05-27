@@ -289,7 +289,7 @@ export default function RichTextEditor({
           maxHeight,
           overflowY: 'auto',
           padding: '12px 14px',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '13.5px',
           lineHeight: 1.6,
           color: 'var(--text-secondary)',

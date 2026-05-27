@@ -68,7 +68,7 @@ export default function FolderCard({ name, listCount = 0, onClick, onRename, onD
       <div
         style={{
           color: 'var(--text-primary)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '15px',
           fontWeight: 500,
           marginBottom: '4px',
@@ -81,7 +81,7 @@ export default function FolderCard({ name, listCount = 0, onClick, onRename, onD
       </div>
 
       {/* Subtext */}
-      <div style={{ color: 'var(--text-placeholder)', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>
+      <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '12px' }}>
         {listCount} {listCount === 1 ? 'list' : 'lists'}
       </div>
     </div>

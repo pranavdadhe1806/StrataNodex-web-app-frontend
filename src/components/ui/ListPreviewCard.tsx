@@ -80,7 +80,7 @@ export default function ListPreviewCard({
               {/* Title or placeholder bar */}
               {node ? (
                 <span style={{
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'var(--font-main)',
                   fontSize: '10px',
                   fontWeight: 500,
                   color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
@@ -110,7 +110,7 @@ export default function ListPreviewCard({
           <span style={{
             fontSize: '10px',
             color: nodeCount > 0 ? 'var(--text-muted)' : 'rgba(255,255,255,0.1)',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontWeight: 500,
           }}>
             {nodeCount > 0 ? `${nodeCount} task${nodeCount !== 1 ? 's' : ''}` : 'empty'}
@@ -136,7 +136,7 @@ export default function ListPreviewCard({
               border: '1px solid rgba(36, 119, 198, 0.5)',
               borderRadius: '6px',
               color: 'var(--text-primary)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '13px',
               outline: 'none',
               textAlign: 'center',
@@ -146,7 +146,7 @@ export default function ListPreviewCard({
         ) : (
           <p style={{
             color: 'var(--text-secondary)',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontSize: '13px',
             fontWeight: 500,
             margin: 0,

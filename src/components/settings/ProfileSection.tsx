@@ -26,7 +26,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8,
   color: DS.textPrimary,
   fontSize: 13,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   outline: 'none',
   transition: 'border-color 0.15s',
 };
@@ -43,7 +43,7 @@ const lblStyle: React.CSSProperties = {
   fontWeight: 500,
   display: 'block',
   marginBottom: 6,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -52,7 +52,7 @@ const sectionLabel: React.CSSProperties = {
   letterSpacing: '0.08em',
   textTransform: 'uppercase' as const,
   color: DS.textMuted,
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   marginBottom: 16,
 };
 
@@ -122,7 +122,7 @@ export default function ProfileSection() {
     .toUpperCase();
 
   return (
-    <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--font-main)' }}>
       {/* Toast */}
       {toast && (
         <div style={{
@@ -177,7 +177,7 @@ export default function ProfileSection() {
           fontSize: 12,
           padding: '6px 14px',
           cursor: 'pointer',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           flexShrink: 0,
         }}
           onClick={() => flash('Avatar upload coming soon', false)}
@@ -264,7 +264,7 @@ export default function ProfileSection() {
             fontSize: 12, fontWeight: 500,
             padding: '7px 14px',
             cursor: 'pointer',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
           }}
         >
           <Trash2 size={13} /> Delete account
@@ -282,7 +282,7 @@ export default function ProfileSection() {
             cursor: dirty && !saving ? 'pointer' : 'default',
             opacity: saving ? 0.6 : 1,
             transition: 'background 0.15s, color 0.15s',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
           }}
         >
           {saving ? 'Saving...' : 'Save changes'}

@@ -22,7 +22,7 @@ const menuItemStyle: React.CSSProperties = {
   borderRadius: '8px',
   cursor: 'pointer',
   color: 'var(--text-secondary)',
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   fontSize: '13px',
   fontWeight: 400,
   transition: 'background 0.15s ease',
@@ -54,7 +54,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           <div
             style={{
               color: 'var(--text-primary)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '15px',
               fontWeight: 600,
             }}
@@ -64,7 +64,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           <div
             style={{
               color: 'var(--text-placeholder)',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'var(--font-main)',
               fontSize: '12px',
               fontWeight: 400,
               marginTop: '2px',

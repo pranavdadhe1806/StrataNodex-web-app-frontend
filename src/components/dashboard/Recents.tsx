@@ -50,7 +50,7 @@ export default function Recents() {
       <h2
         style={{
           color: 'var(--text-primary)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '18px',
           fontWeight: 600,
           margin: '0 0 16px 0',
@@ -63,7 +63,7 @@ export default function Recents() {
         <p
           style={{
             color: 'var(--text-muted)',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
             fontSize: '14px',
             margin: 0,
             padding: '24px 0',
@@ -108,7 +108,7 @@ export default function Recents() {
             boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
             minWidth: 168,
             overflow: 'hidden',
-            fontFamily: 'Poppins, sans-serif',
+            fontFamily: 'var(--font-main)',
           }}
         >
           <button

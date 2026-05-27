@@ -42,7 +42,7 @@ const menuItemStyle: React.CSSProperties = {
   cursor: 'pointer',
   transition: 'all 0.15s ease',
   color: 'var(--text-secondary)',
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'var(--font-main)',
   fontSize: '14px',
   fontWeight: 500,
 };
@@ -268,7 +268,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
           color: 'var(--text-primary)',
           fontSize: 17,
           fontWeight: 400,
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           cursor: onTitleDoubleClick ? 'text' : undefined,
           userSelect: onTitleDoubleClick ? 'none' : undefined,
         }}

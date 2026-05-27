@@ -30,7 +30,7 @@ export default function WelcomeHeader({ userName, streak }: WelcomeHeaderProps) 
       <h1
         style={{
           color: 'var(--text-primary)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '26px',
           fontWeight: 600,
           margin: '0 0 6px 0',
@@ -41,7 +41,7 @@ export default function WelcomeHeader({ userName, streak }: WelcomeHeaderProps) 
       <p
         style={{
           color: 'var(--text-muted)',
-          fontFamily: 'Poppins, sans-serif',
+          fontFamily: 'var(--font-main)',
           fontSize: '14px',
           fontWeight: 400,
           margin: 0,
