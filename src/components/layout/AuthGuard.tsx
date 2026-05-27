@@ -85,7 +85,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (checking) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#1B1D21' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-base)' }}>
         <Spinner size={32} />
       </div>
     );
@@ -96,7 +96,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!user && !getToken()) return null;
   if (!user) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#1B1D21', color: 'white' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-base)', color: 'white' }}>
         <p>Could not connect to the server. Please check if the backend is running.</p>
       </div>
     );

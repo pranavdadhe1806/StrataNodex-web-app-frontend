@@ -10,7 +10,7 @@ interface ProfileMenuProps {
 
 const separatorStyle: React.CSSProperties = {
   height: '1px',
-  background: 'rgba(255, 255, 255, 0.06)',
+  background: 'var(--divider)',
   margin: '8px 0',
 };
 
@@ -21,7 +21,7 @@ const menuItemStyle: React.CSSProperties = {
   padding: '9px 10px',
   borderRadius: '8px',
   cursor: 'pointer',
-  color: '#D5D8DE',
+  color: 'var(--text-secondary)',
   fontFamily: 'Poppins, sans-serif',
   fontSize: '13px',
   fontWeight: 400,
@@ -40,10 +40,10 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           position: 'absolute',
           top: '48px',
           right: '12px',
-          background: '#32363C',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
           borderRadius: '12px',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+          boxShadow: 'var(--shadow-elevated)',
           minWidth: '220px',
           padding: '16px 8px 8px',
           zIndex: 100,
@@ -53,7 +53,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
         <div style={{ padding: '0 10px 4px' }}>
           <div
             style={{
-              color: '#EDEFF3',
+              color: 'var(--text-primary)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '15px',
               fontWeight: 600,
@@ -63,7 +63,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           </div>
           <div
             style={{
-              color: '#7D828B',
+              color: 'var(--text-placeholder)',
               fontFamily: 'Poppins, sans-serif',
               fontSize: '12px',
               fontWeight: 400,
@@ -80,10 +80,10 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
         <div
           onClick={() => onNavigate('/profile')}
           style={menuItemStyle}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--divider)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
         >
-          <UserDuotone size={18} weight="duotone" color="#8A8F98" />
+          <UserDuotone size={18} weight="duotone" style={{ color: 'var(--text-muted)' }} />
           <span>Profile Settings</span>
         </div>
 
@@ -91,10 +91,10 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
         <div
           onClick={() => onNavigate('/settings')}
           style={menuItemStyle}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--divider)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
         >
-          <GearDuotone size={18} weight="duotone" color="#8A8F98" />
+          <GearDuotone size={18} weight="duotone" style={{ color: 'var(--text-muted)' }} />
           <span>Settings</span>
         </div>
 
@@ -110,7 +110,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = '#D5D8DE';
+            e.currentTarget.style.color = 'var(--text-secondary)';
           }}
         >
           <LogOut size={18} color="#f85149" />

@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 
 const separatorStyle: React.CSSProperties = {
   height: '1px',
-  background: 'rgba(255, 255, 255, 0.07)',
+  background: 'var(--divider)',
   margin: '8px 0',
 };
 
@@ -42,8 +42,8 @@ export default function SidePanel() {
           position: 'fixed',
           top: 0, left: 0, bottom: 0,
           width: '280px',
-          background: '#32363C',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
           boxShadow: '4px 0 24px rgba(0,0,0,0.5)',
           zIndex: 201,
           padding: '20px 16px',
@@ -54,14 +54,14 @@ export default function SidePanel() {
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '0 4px' }}>
-          <span style={{ color: '#00bfff', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', letterSpacing: '-0.3px' }}>
+          <span style={{ color: 'var(--accent)', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', letterSpacing: '-0.3px' }}>
             StrataNodex
           </span>
           <button
             onClick={closeSidebar}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A8F98', display: 'flex', alignItems: 'center', padding: '4px' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '4px' }}
           >
-            <X size={18} color="#8A8F98" />
+            <X size={18} style={{ color: 'var(--text-muted)' }} />
           </button>
         </div>
 
@@ -82,20 +82,20 @@ export default function SidePanel() {
                   padding: '10px 12px',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  background: isActive ? 'rgba(0, 191, 255, 0.08)' : 'transparent',
+                  background: isActive ? 'rgba(36,119,198,0.08)' : 'transparent',
                   transition: 'background 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  if (!isActive) e.currentTarget.style.background = 'var(--divider)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = isActive ? 'rgba(0, 191, 255, 0.08)' : 'transparent';
+                  e.currentTarget.style.background = isActive ? 'rgba(36, 119, 198, 0.08)' : 'transparent';
                 }}
               >
-                <Icon size={22} weight="duotone" color="#00bfff" />
+                <Icon size={22} weight="duotone" style={{ color: 'var(--accent)' }} />
                 <span
                   style={{
-                    color: isActive ? '#EDEFF3' : '#D5D8DE',
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '14px',
                     fontWeight: isActive ? 500 : 400,

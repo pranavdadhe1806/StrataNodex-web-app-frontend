@@ -23,10 +23,10 @@ const glassMenuStyle: React.CSSProperties = {
   position: 'absolute',
   top: '48px',
   left: '12px',
-  background: '#32363C',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '14px',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+  boxShadow: 'var(--shadow-elevated)',
   padding: '8px',
   minWidth: '200px',
   zIndex: 100,
@@ -41,7 +41,7 @@ const menuItemStyle: React.CSSProperties = {
   borderRadius: '10px',
   cursor: 'pointer',
   transition: 'all 0.15s ease',
-  color: '#D5D8DE',
+  color: 'var(--text-secondary)',
   fontFamily: 'Poppins, sans-serif',
   fontSize: '14px',
   fontWeight: 500,
@@ -49,7 +49,7 @@ const menuItemStyle: React.CSSProperties = {
 
 const separatorStyle: React.CSSProperties = {
   height: '1px',
-  background: 'rgba(255, 255, 255, 0.08)',
+  background: 'var(--divider)',
   margin: '6px 8px',
 };
 
@@ -120,13 +120,15 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
   }
 
   return (
-    <header className="relative flex items-center justify-between h-[56px] w-full px-5 bg-[#1B1D21] shrink-0 z-50">
+    <header style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56, width: '100%', padding: '0 20px', background: 'var(--bg-base)', flexShrink: 0, zIndex: 50 }}>
       {/* Left — Hamburger Menu */}
       <div className="relative">
         <button
           ref={menuBtnRef}
           onClick={() => setMenuOpen(!menuOpen)}
-          className="text-[#EDEFF3] hover:opacity-80 transition-opacity flex items-center justify-center p-1.5"
+          style={{ color: 'var(--text-primary)', cursor: 'pointer', background: 'none', border: 'none', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 1, transition: 'opacity 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           aria-label="Menu"
         >
           <Menu size={20} strokeWidth={2} />
@@ -139,14 +141,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
             <div
               onClick={() => handleNavigate('/dashboard')}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                e.currentTarget.style.background = 'var(--divider)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
               style={menuItemStyle}
             >
-              <HouseDuotone size={18} weight="duotone" color="#00bfff" />
+              <HouseDuotone size={18} weight="duotone" style={{ color: 'var(--accent)' }} />
               <span>Dashboard</span>
             </div>
 
@@ -154,14 +156,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
             <div
               onClick={() => handleNavigate('/folders')}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                e.currentTarget.style.background = 'var(--divider)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
               style={menuItemStyle}
             >
-              <FolderDuotone size={18} weight="duotone" color="#00bfff" />
+              <FolderDuotone size={18} weight="duotone" style={{ color: 'var(--accent)' }} />
               <span>Your Folders</span>
             </div>
 
@@ -169,14 +171,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
             <div
               onClick={() => handleNavigate('/today')}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                e.currentTarget.style.background = 'var(--divider)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
               style={menuItemStyle}
             >
-              <CalendarDuotone size={18} weight="duotone" color="#00bfff" />
+              <CalendarDuotone size={18} weight="duotone" style={{ color: 'var(--accent)' }} />
               <span>Today</span>
             </div>
 
@@ -184,14 +186,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
             <div
               onClick={() => handleNavigate('/stats')}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                e.currentTarget.style.background = 'var(--divider)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
               style={menuItemStyle}
             >
-              <ChartLineUpDuotone size={18} weight="duotone" color="#00bfff" />
+              <ChartLineUpDuotone size={18} weight="duotone" style={{ color: 'var(--accent)' }} />
               <span>Stats</span>
             </div>
 
@@ -204,14 +206,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
                 <div
                   onClick={handleOpenFolder}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                    e.currentTarget.style.background = 'var(--divider)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
                   }}
                   style={menuItemStyle}
                 >
-                  <FolderDuotone size={18} weight="duotone" color="#8A8F98" />
+                  <FolderDuotone size={18} weight="duotone" style={{ color: 'var(--text-muted)' }} />
                   <span style={{ fontSize: '13px' }}>Open {activeFolderName || 'Folder'}</span>
                 </div>
 
@@ -226,7 +228,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#D5D8DE';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
                   }}
                   style={menuItemStyle}
                 >
@@ -242,14 +244,14 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
             <div
               onClick={() => handleNavigate('/settings')}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                e.currentTarget.style.background = 'var(--divider)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
               style={menuItemStyle}
             >
-              <GearDuotone size={18} weight="duotone" color="#8A8F98" />
+              <GearDuotone size={18} weight="duotone" style={{ color: 'var(--text-muted)' }} />
               <span>Settings</span>
             </div>
           </div>
@@ -259,7 +261,17 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
       {/* Center — List Name */}
       <div
         onDoubleClick={onTitleDoubleClick}
-        className={`absolute left-1/2 -translate-x-1/2 text-[#EDEFF3] text-[17px] font-normal font-['Poppins'] ${onTitleDoubleClick ? 'cursor-text select-none' : ''}`}
+        style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: 'var(--text-primary)',
+          fontSize: 17,
+          fontWeight: 400,
+          fontFamily: 'Poppins, sans-serif',
+          cursor: onTitleDoubleClick ? 'text' : undefined,
+          userSelect: onTitleDoubleClick ? 'none' : undefined,
+        }}
         title={onTitleDoubleClick ? "Double-click to rename" : undefined}
       >
         {titleSlot ?? title}
@@ -270,7 +282,9 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
         <button
           ref={profileBtnRef}
           onClick={handleProfileClick}
-          className="text-[#EDEFF3] hover:opacity-80 transition-opacity flex items-center justify-center p-1.5"
+          style={{ color: 'var(--text-primary)', cursor: 'pointer', background: 'none', border: 'none', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 1, transition: 'opacity 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           aria-label="Profile"
         >
           <User size={20} strokeWidth={2} />
