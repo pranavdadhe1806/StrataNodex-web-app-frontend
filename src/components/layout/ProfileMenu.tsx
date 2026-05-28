@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { LogOut } from '../ui/icons';
-import { UserDuotone, GearDuotone } from '../ui/icons';
+import { UserDuotone } from '../ui/icons';
 
 interface ProfileMenuProps {
   user: { name?: string | null; username?: string | null; email?: string | null } | null;
@@ -87,7 +87,6 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           <span>Profile Settings</span>
         </div>
 
-        </div>
 
         <div style={separatorStyle} />
 
