@@ -1,5 +1,6 @@
 import { ChevronRight } from '../ui/icons';
 import { CheckCircle } from '@phosphor-icons/react';
+import { motion, PanInfo } from 'framer-motion';
 import type { Node } from '../../types/node.types';
 
 interface NodeCardProps {
@@ -9,6 +10,9 @@ interface NodeCardProps {
   isExpanded?: boolean;
   onCircleClick: () => void;
   onTextClick: () => void;
+  onDragStart?: () => void;
+  onDrag?: (y: number, x: number) => void;
+  onDragEnd?: (y: number, x: number) => void;
   style?: React.CSSProperties;
 }
 
@@ -19,6 +23,9 @@ export default function NodeCard({
   isExpanded = true,
   onCircleClick,
   onTextClick,
+  onDragStart,
+  onDrag,
+  onDragEnd,
   style,
 }: NodeCardProps) {
   const isDone = node.status === 'DONE';
@@ -81,9 +88,31 @@ export default function NodeCard({
   }
 
   return (
-    <div
+    <motion.div
       style={{ ...getCardStyles(), ...style }}
-      onMouseDown={(e) => e.stopPropagation()}
+      whileDrag={{ 
+        scale: 1.02, 
+        boxShadow: 'var(--shadow-elevated)', 
+        zIndex: 9999,
+        cursor: 'grabbing' 
+      }}
+      drag
+      dragMomentum={false}
+      onDragStart={() => onDragStart?.()}
+      onDrag={(_e, info: PanInfo) => {
+        const startX = (style?.left as number) || 0;
+        const startY = (style?.top as number) || 0;
+        onDrag?.(startY + info.offset.y, startX + info.offset.x);
+      }}
+      onDragEnd={(_e, info: PanInfo) => {
+        const startX = (style?.left as number) || 0;
+        const startY = (style?.top as number) || 0;
+        onDragEnd?.(startY + info.offset.y, startX + info.offset.x);
+      }}
+      onPointerDown={(e: React.PointerEvent) => {
+        // Prevent pan on canvas
+        e.stopPropagation();
+      }}
     >
       {/* Status circle */}
       <div
@@ -119,6 +148,6 @@ export default function NodeCard({
           />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
