@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Node } from '../../types/node.types';
 import NodeCard from './NodeCard';
 import { computeNumbering } from '../../utils/numbering';
@@ -8,6 +8,7 @@ interface NodeTreeProps {
   selectedNodeId: string | null;
   onNodeCircleClick: (id: string) => void;
   onNodeTextClick: (id: string) => void;
+  onMoveNode?: (nodeId: string, targetParentId: string | null, insertBeforeNodeId: string | null) => void;
 }
 
 interface PositionedNode extends Node {
@@ -28,7 +29,12 @@ export default function NodeTree({
   selectedNodeId,
   onNodeCircleClick,
   onNodeTextClick,
+  onMoveNode,
 }: NodeTreeProps) {
+  // Drag state
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<{ y: number; x: number; targetParentId: string | null; insertBeforeNodeId: string | null } | null>(null);
+
   // Compute numbering
   const numbering = useMemo(() => computeNumbering(nodes), [nodes]);
 
@@ -79,11 +85,61 @@ export default function NodeTree({
 
   // Size the SVG to fit all node content so connectors never clip
   const NODE_CARD_WIDTH = 320; // matches NodeCard maxWidth
+  const VERTICAL_GAP = 70;
   const PADDING = 40;
   const contentWidth = positionedNodes.length === 0 ? 800
     : Math.max(...positionedNodes.map(n => n.x + NODE_CARD_WIDTH)) + PADDING;
   const contentHeight = positionedNodes.length === 0 ? 600
     : Math.max(...positionedNodes.map(n => n.y + 40)) + PADDING;
+
+  // Drag Handlers
+  const handleDragStart = (id: string) => {
+    setDraggingNodeId(id);
+  };
+
+  const handleDrag = (_id: string, y: number, _x: number) => {
+    // Determine target index in flattened list based on Y
+    const targetFlatIndex = Math.max(0, Math.min(positionedNodes.length, Math.round((y - 28) / VERTICAL_GAP)));
+    
+    let targetParentId: string | null = null;
+    let insertBeforeNodeId: string | null = null;
+    let dropY = 28 + targetFlatIndex * VERTICAL_GAP;
+    let dropX = 60;
+
+    if (targetFlatIndex === 0) {
+      targetParentId = null;
+      insertBeforeNodeId = positionedNodes.length > 0 ? positionedNodes[0].id : null;
+      dropX = 60;
+    } else if (targetFlatIndex < positionedNodes.length) {
+      const nextNode = positionedNodes[targetFlatIndex];
+      targetParentId = nextNode.parentId;
+      insertBeforeNodeId = nextNode.id;
+      dropX = nextNode.x;
+    } else {
+      const prevNode = positionedNodes[positionedNodes.length - 1];
+      targetParentId = prevNode.parentId;
+      insertBeforeNodeId = null;
+      dropX = prevNode.x;
+    }
+
+    setDropTarget({
+      y: dropY - 15, // Midpoint between nodes
+      x: dropX,
+      targetParentId,
+      insertBeforeNodeId,
+    });
+  };
+
+  const handleDragEnd = (id: string) => {
+    if (dropTarget && onMoveNode) {
+      // Don't move if we drop it on itself or right after itself (no-op)
+      if (dropTarget.insertBeforeNodeId !== id) {
+        onMoveNode(id, dropTarget.targetParentId, dropTarget.insertBeforeNodeId);
+      }
+    }
+    setDraggingNodeId(null);
+    setDropTarget(null);
+  };
 
   return (
     <div style={{ position: 'relative', width: contentWidth, height: contentHeight }}>
@@ -137,13 +193,46 @@ export default function NodeTree({
             numbering={numbering.get(node.id) || ''}
             onCircleClick={() => onNodeCircleClick(node.id)}
             onTextClick={() => onNodeTextClick(node.id)}
+            onDragStart={() => handleDragStart(node.id)}
+            onDrag={(y, x) => handleDrag(node.id, y, x)}
+            onDragEnd={() => handleDragEnd(node.id)}
             style={{
               left: node.x,
               top: node.y,
+              opacity: draggingNodeId === node.id ? 0.5 : 1, // Dim the original while dragging
             }}
           />
         ))}
       </div>
+
+      {/* Drop Indicator */}
+      {dropTarget && draggingNodeId && (
+        <div
+          style={{
+            position: 'absolute',
+            left: dropTarget.x,
+            top: dropTarget.y,
+            width: NODE_CARD_WIDTH,
+            height: '4px',
+            background: 'var(--accent)',
+            borderRadius: '2px',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          {/* A small dot on the left of the line */}
+          <div style={{
+            position: 'absolute',
+            left: '-6px',
+            top: '-3px',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            background: 'var(--accent)',
+            border: '2px solid var(--bg-base)'
+          }} />
+        </div>
+      )}
     </div>
   );
 }
