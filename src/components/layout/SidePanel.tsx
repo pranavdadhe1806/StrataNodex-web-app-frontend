@@ -6,7 +6,7 @@ import { useUIStore } from '../../store/ui.store';
 const NAV_ITEMS = [
   { path: '/dashboard', label: 'Dashboard', Icon: HouseDuotone },
   { path: '/folders',   label: 'Your Folders', Icon: FolderDuotone },
-  { path: '/today',     label: 'Today', Icon: CalendarDuotone },
+  { path: '/daily',     label: 'Today', Icon: CalendarDuotone },
   { path: '/stats',     label: 'Stats', Icon: ChartLineUpDuotone },
 ] as const;
 

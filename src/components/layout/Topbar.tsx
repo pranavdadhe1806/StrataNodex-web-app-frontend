@@ -169,7 +169,7 @@ export default function Topbar({ title, onTitleDoubleClick, titleSlot }: TopbarP
 
             {/* Today */}
             <div
-              onClick={() => handleNavigate('/today')}
+              onClick={() => handleNavigate('/daily')}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--divider)';
               }}
