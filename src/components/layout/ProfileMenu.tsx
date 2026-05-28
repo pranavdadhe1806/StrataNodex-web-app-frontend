@@ -78,7 +78,7 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
 
         {/* Profile Settings */}
         <div
-          onClick={() => onNavigate('/profile')}
+          onClick={() => onNavigate('/settings#profile')}
           style={menuItemStyle}
           onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--divider)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
@@ -87,15 +87,6 @@ const ProfileMenu = forwardRef<HTMLDivElement, ProfileMenuProps>(
           <span>Profile Settings</span>
         </div>
 
-        {/* Settings */}
-        <div
-          onClick={() => onNavigate('/settings')}
-          style={menuItemStyle}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--divider)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-        >
-          <GearDuotone size={18} weight="duotone" style={{ color: 'var(--text-muted)' }} />
-          <span>Settings</span>
         </div>
 
         <div style={separatorStyle} />

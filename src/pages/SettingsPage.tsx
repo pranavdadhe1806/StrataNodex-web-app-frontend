@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { User, Palette, LayoutGrid, Shield, Bell, HardDrive } from 'lucide-react';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
@@ -41,7 +42,17 @@ const SECTION_TITLES: Record<SectionId, string> = {
 };
 
 export default function SettingsPage() {
+  const location = useLocation();
   const [active, setActive] = useState<SectionId>('profile');
+
+  useEffect(() => {
+    if (location.hash) {
+      const tab = location.hash.replace('#', '') as SectionId;
+      if (SECTION_TITLES[tab]) {
+        setActive(tab);
+      }
+    }
+  }, [location.hash]);
 
   return (
     <div style={{ background: DS.bg, minHeight: '100vh', fontFamily: 'var(--font-main)' }}>
