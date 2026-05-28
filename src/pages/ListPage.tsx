@@ -12,7 +12,7 @@ import { flattenTree, buildTree, findNode } from '../utils/tree';
 import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
 import { useUIStore } from '../store/ui.store';
-import { useNodes, useCreateNode, useCreateSubNode, useUpdateNode, useDeleteNode } from '../hooks/useNodes';
+import { useNodes, useCreateNode, useCreateSubNode, useUpdateNode, useDeleteNode, useMoveNode } from '../hooks/useNodes';
 
 export default function ListPage() {
   const { listId } = useParams<{ listId: string }>();
@@ -44,6 +44,7 @@ export default function ListPage() {
   const createSubNodeMutation = useCreateSubNode();
   const updateNodeMutation = useUpdateNode();
   const deleteNodeMutation = useDeleteNode();
+  const moveNodeMutation = useMoveNode();
 
   // ── Local optimistic node tree ────────────────────────────────────────────
   // Seeded from server on first load, then updated locally for zero lag
@@ -375,6 +376,79 @@ export default function ListPage() {
     deleteNodeMutation.mutate(id);
   }
 
+  // ── Move node in tree (Drag & Drop) ───────────────────────────────────────
+  function moveNodeInTree(nodeId: string, targetParentId: string | null, insertBeforeNodeId: string | null) {
+    let movedNode: Node | null = null;
+    let computedPosition = 0;
+
+    setNodes(prev => {
+      // 1. Remove node
+      function removeNode(list: Node[]): Node[] {
+        return list.filter(n => {
+          if (n.id === nodeId) {
+            movedNode = n;
+            return false;
+          }
+          return true;
+        }).map(n => ({ ...n, children: removeNode(n.children ?? []) }));
+      }
+      
+      let newTree = removeNode(prev);
+      if (!movedNode) return prev; 
+
+      movedNode = { ...movedNode, parentId: targetParentId };
+      
+      // 2. Insert node
+      function insertNode(list: Node[], targetId: string | null): Node[] {
+        if (targetId === null) {
+          if (insertBeforeNodeId === null) {
+            computedPosition = list.length;
+            return [...list, movedNode!];
+          } else {
+            const index = list.findIndex(n => n.id === insertBeforeNodeId);
+            computedPosition = index === -1 ? list.length : index;
+            if (index === -1) return [...list, movedNode!];
+            return [...list.slice(0, index), movedNode!, ...list.slice(index)];
+          }
+        }
+        
+        return list.map(n => {
+          if (n.id === targetId) {
+            let newChildren = n.children ?? [];
+            if (insertBeforeNodeId === null) {
+              computedPosition = newChildren.length;
+              newChildren = [...newChildren, movedNode!];
+            } else {
+              const index = newChildren.findIndex(child => child.id === insertBeforeNodeId);
+              computedPosition = index === -1 ? newChildren.length : index;
+              if (index === -1) {
+                newChildren = [...newChildren, movedNode!];
+              } else {
+                newChildren = [...newChildren.slice(0, index), movedNode!, ...newChildren.slice(index)];
+              }
+            }
+            return { ...n, children: newChildren };
+          }
+          return { ...n, children: insertNode(n.children ?? [], targetId) };
+        });
+      }
+      
+      return insertNode(newTree, targetParentId);
+    });
+
+    // 3. Save to backend
+    // Since setNodes is async but the closure executes synchronously, we wait a tick to ensure computedPosition is populated
+    setTimeout(() => {
+      moveNodeMutation.mutate({
+        id: nodeId,
+        data: {
+          parentId: targetParentId,
+          position: computedPosition
+        }
+      });
+    }, 0);
+  }
+
   // ── Add subtask from popup ─────────────────────────────────────────────────
   function addSubtaskFromPopup(parentId: string) {
     // Set up input state to type a child of the clicked node
@@ -608,6 +682,7 @@ export default function ListPage() {
               nodes={nodes}
               selectedNodeId={selectedNodeId}
               onNodeCircleClick={toggleNodeStatus}
+              onMoveNode={moveNodeInTree}
               onNodeTextClick={(id) => {
                 // Close typing mode before opening the detail panel.
                 // If the textarea was active, its blur fires setIsTyping(false) anyway,
