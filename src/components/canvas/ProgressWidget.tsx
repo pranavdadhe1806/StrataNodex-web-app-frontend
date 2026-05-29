@@ -31,14 +31,32 @@ export default function ProgressWidget({ total, done }: ProgressWidgetProps) {
       {/* Label */}
       <div
         style={{
-          fontFamily: 'var(--font-main)',
-          fontSize: '13px',
-          fontWeight: 500,
-          color: 'var(--text-secondary)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: '8px',
         }}
       >
-        Total Progress:
+        <div
+          style={{
+            fontFamily: 'var(--font-main)',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          Total Progress:
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--font-main)',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+          }}
+        >
+          {percentage}%
+        </div>
       </div>
 
       {/* Progress Bar Track */}
