@@ -460,26 +460,56 @@ export default function ListPage() {
 
   // ── Toggle status: optimistic + background save ───────────────────────────
   function toggleNodeStatus(id: string) {
+    const targetNode = flatNodes.find(n => n.id === id);
+    if (!targetNode) return;
+
+    const newStatus = targetNode.status === 'DONE' ? 'TODO' : 'DONE';
+    const idsToUpdate = [id];
+
+    // If marking as DONE, cascade to all unfinished descendants
+    if (newStatus === 'DONE') {
+      const getDescendants = (node: Node): string[] => {
+        let descendantIds: string[] = [];
+        for (const child of (node.children || [])) {
+          descendantIds.push(child.id);
+          descendantIds.push(...getDescendants(child));
+        }
+        return descendantIds;
+      };
+      
+      const nestedTargetNode = (function findNested(list: Node[]): Node | null {
+        for (const n of list) {
+          if (n.id === id) return n;
+          const found = findNested(n.children || []);
+          if (found) return found;
+        }
+        return null;
+      })(nodes);
+
+      if (nestedTargetNode) {
+         const descendants = getDescendants(nestedTargetNode);
+         const flatDescendants = flatNodes.filter(n => descendants.includes(n.id) && n.status !== 'DONE');
+         idsToUpdate.push(...flatDescendants.map(n => n.id));
+      }
+    }
+
     // Optimistic update immediately
     setNodes(prev => {
       function updateStatus(list: Node[]): Node[] {
         return list.map(node => {
-          if (node.id === id) {
-            const newStatus = node.status === 'DONE' ? 'TODO' : 'DONE';
-            return { ...node, status: newStatus };
+          if (idsToUpdate.includes(node.id)) {
+            return { ...node, status: newStatus, children: updateStatus(node.children ?? []) };
           }
           return { ...node, children: updateStatus(node.children ?? []) };
         });
       }
       return updateStatus(prev);
     });
+
     // Save to server in background
-    const flat = flattenTree(nodes);
-    const node = flat.find(n => n.id === id);
-    if (node) {
-      const newStatus = node.status === 'DONE' ? 'TODO' : 'DONE';
-      updateNodeMutation.mutate({ id, data: { status: newStatus } });
-    }
+    idsToUpdate.forEach(nodeId => {
+      updateNodeMutation.mutate({ id: nodeId, data: { status: newStatus } });
+    });
   }
 
   // Compute input position
