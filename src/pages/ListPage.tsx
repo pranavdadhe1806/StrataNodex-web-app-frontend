@@ -466,31 +466,29 @@ export default function ListPage() {
     const newStatus = targetNode.status === 'DONE' ? 'TODO' : 'DONE';
     const idsToUpdate = [id];
 
-    // If marking as DONE, cascade to all unfinished descendants
-    if (newStatus === 'DONE') {
-      const getDescendants = (node: Node): string[] => {
-        let descendantIds: string[] = [];
-        for (const child of (node.children || [])) {
-          descendantIds.push(child.id);
-          descendantIds.push(...getDescendants(child));
-        }
-        return descendantIds;
-      };
-      
-      const nestedTargetNode = (function findNested(list: Node[]): Node | null {
-        for (const n of list) {
-          if (n.id === id) return n;
-          const found = findNested(n.children || []);
-          if (found) return found;
-        }
-        return null;
-      })(nodes);
-
-      if (nestedTargetNode) {
-         const descendants = getDescendants(nestedTargetNode);
-         const flatDescendants = flatNodes.filter(n => descendants.includes(n.id) && n.status !== 'DONE');
-         idsToUpdate.push(...flatDescendants.map(n => n.id));
+    // Cascade to all descendants (only those that actually need changing)
+    const getDescendants = (node: Node): string[] => {
+      let descendantIds: string[] = [];
+      for (const child of (node.children || [])) {
+        descendantIds.push(child.id);
+        descendantIds.push(...getDescendants(child));
       }
+      return descendantIds;
+    };
+    
+    const nestedTargetNode = (function findNested(list: Node[]): Node | null {
+      for (const n of list) {
+        if (n.id === id) return n;
+        const found = findNested(n.children || []);
+        if (found) return found;
+      }
+      return null;
+    })(nodes);
+
+    if (nestedTargetNode) {
+       const descendants = getDescendants(nestedTargetNode);
+       const flatDescendants = flatNodes.filter(n => descendants.includes(n.id) && n.status !== newStatus);
+       idsToUpdate.push(...flatDescendants.map(n => n.id));
     }
 
     // Optimistic update immediately
