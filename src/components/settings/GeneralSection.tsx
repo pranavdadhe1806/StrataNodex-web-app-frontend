@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { useThemeStore, Theme, Font } from '../../store/theme.store';
+import { useThemeStore, Theme, Font, DateFormat, WeekStartDay } from '../../store/theme.store';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
@@ -59,22 +58,37 @@ const FONTS: { id: Font; label: string; preview: string; style: string; size: nu
 ];
 
 /* ─── Date format options ───────────────────────────────────── */
-const DATE_FORMATS = ['DD/MM/YYYY', 'MM/DD/YYYY', 'Relative'];
+const DATE_FORMATS: { value: DateFormat; label: string }[] = [
+  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY  (31/05/2025)' },
+  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY  (05/31/2025)' },
+  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD  (2025-05-31)' },
+];
+
+/* ─── Week-start options ────────────────────────────────────── */
+const WEEK_DAYS: { value: WeekStartDay; label: string }[] = [
+  { value: 0, label: 'Sunday' },
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+  { value: 6, label: 'Saturday' },
+];
 
 export default function GeneralSection() {
-  const { theme, font, setTheme, setFont } = useThemeStore();
-  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
-  const [timeFormat24, setTimeFormat24] = useState(true);
-  const [weekStartsMonday, setWeekStartsMonday] = useState(true);
+  const {
+    theme, font, dateFormat, timeFormat24, weekStartDay,
+    setTheme, setFont, setDateFormat, setTimeFormat24, setWeekStartDay,
+  } = useThemeStore();
 
-  const inputStyle: React.CSSProperties = {
+  const selectStyle: React.CSSProperties = {
     background: DS.bg,
     border: `1px solid ${DS.border}`,
     borderRadius: 8, padding: '9px 12px',
     fontSize: 13, color: DS.textPrimary,
     fontFamily: 'var(--font-main)', outline: 'none',
     cursor: 'pointer', colorScheme: 'dark',
-    width: 200, boxSizing: 'border-box',
+    width: 220, boxSizing: 'border-box',
   };
 
   return (
@@ -161,6 +175,7 @@ export default function GeneralSection() {
       <div style={sectionLabel}>Date & Time</div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+
         {/* Date format */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0' }}>
           <div>
@@ -169,10 +184,10 @@ export default function GeneralSection() {
           </div>
           <select
             value={dateFormat}
-            onChange={e => setDateFormat(e.target.value)}
-            style={inputStyle}
+            onChange={e => setDateFormat(e.target.value as DateFormat)}
+            style={selectStyle}
           >
-            {DATE_FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+            {DATE_FORMATS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
           </select>
         </div>
 
@@ -186,7 +201,7 @@ export default function GeneralSection() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 12, color: timeFormat24 ? DS.textMuted : DS.accent, fontWeight: timeFormat24 ? 400 : 600 }}>12h</span>
-            <Toggle enabled={timeFormat24} onToggle={() => setTimeFormat24(v => !v)} />
+            <Toggle enabled={timeFormat24} onToggle={() => setTimeFormat24(!timeFormat24)} />
             <span style={{ fontSize: 12, color: timeFormat24 ? DS.accent : DS.textMuted, fontWeight: timeFormat24 ? 600 : 400 }}>24h</span>
           </div>
         </div>
@@ -197,14 +212,17 @@ export default function GeneralSection() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0' }}>
           <div>
             <div style={{ fontSize: 13, color: DS.textPrimary, fontWeight: 500 }}>Week starts on</div>
-            <div style={{ fontSize: 12, color: DS.textMuted, marginTop: 2 }}>First day shown in weekly views</div>
+            <div style={{ fontSize: 12, color: DS.textMuted, marginTop: 2 }}>First day shown in weekly and calendar views</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 12, color: !weekStartsMonday ? DS.textMuted : DS.accent, fontWeight: !weekStartsMonday ? 400 : 600 }}>Mon</span>
-            <Toggle enabled={weekStartsMonday} onToggle={() => setWeekStartsMonday(v => !v)} />
-            <span style={{ fontSize: 12, color: !weekStartsMonday ? DS.accent : DS.textMuted, fontWeight: !weekStartsMonday ? 600 : 400 }}>Sun</span>
-          </div>
+          <select
+            value={weekStartDay}
+            onChange={e => setWeekStartDay(parseInt(e.target.value, 10) as WeekStartDay)}
+            style={selectStyle}
+          >
+            {WEEK_DAYS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
         </div>
+
       </div>
     </div>
   );
