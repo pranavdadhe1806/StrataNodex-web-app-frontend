@@ -10,6 +10,6 @@ export const authApi = {
     client.post('/auth/forgot-password', { email }).then(r => r.data),
   resetPassword: (email: string, code: string, newPassword: string) =>
     client.post('/auth/reset-password', { email, code, newPassword }).then(r => r.data),
-  updateProfile: (data: { name?: string; username?: string | null; phone?: string | null; dayStartTime?: string; dayEndTime?: string }) =>
+  updateProfile: (data: { username?: string | null; phone?: string | null; dayStartTime?: string; dayEndTime?: string }) =>
     client.patch<User>('/auth/me', data).then(r => r.data),
 };

@@ -59,7 +59,6 @@ const sectionLabel: React.CSSProperties = {
 export default function ProfileSection() {
   const { user, setUser } = useAuthStore();
 
-  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [dayStart, setDayStart] = useState('00:00');
@@ -69,7 +68,6 @@ export default function ProfileSection() {
 
   useEffect(() => {
     if (!user) return;
-    setName(user.name ?? '');
     setUsername(user.username ?? '');
     setPhone(user.phone ?? '');
     setDayStart(user.dayStartTime ?? '00:00');
@@ -85,7 +83,6 @@ export default function ProfileSection() {
     setSaving(true);
     try {
       const updated = await authApi.updateProfile({
-        name: name || undefined,
         username: username || null,
         phone: phone || null,
         dayStartTime: dayStart,
@@ -103,7 +100,6 @@ export default function ProfileSection() {
   };
 
   const dirty =
-    name !== (user?.name ?? '') ||
     username !== (user?.username ?? '') ||
     phone !== (user?.phone ?? '') ||
     dayStart !== (user?.dayStartTime ?? '00:00') ||
@@ -190,11 +186,12 @@ export default function ProfileSection() {
       <div style={sectionLabel}>Account info</div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 20px', marginBottom: 28 }}>
-        {/* Display name */}
+        {/* Display name — read-only */}
         <div>
-          <label style={lblStyle}>Display name</label>
-          <input value={name} onChange={e => setName(e.target.value)} style={inputStyle}
-            onFocus={focusBorder} onBlur={blurBorder} placeholder="Your name" />
+          <label style={lblStyle}>
+            Display name&ensp;<Lock size={11} style={{ verticalAlign: 'middle', color: DS.textMuted }} />
+          </label>
+          <input value={user?.name ?? ''} readOnly style={readonlyStyle} tabIndex={-1} />
         </div>
 
         {/* Username */}

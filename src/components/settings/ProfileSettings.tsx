@@ -36,7 +36,6 @@ const lbl: React.CSSProperties = {
 export default function ProfileSettings() {
   const { user, setUser } = useAuthStore();
 
-  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [dayStart, setDayStart] = useState('00:00');
@@ -47,7 +46,6 @@ export default function ProfileSettings() {
 
   useEffect(() => {
     if (!user) return;
-    setName(user.name ?? '');
     setUsername(user.username ?? '');
     setPhone(user.phone ?? '');
     setDayStart(user.dayStartTime ?? '00:00');
@@ -63,7 +61,6 @@ export default function ProfileSettings() {
     setSaving(true);
     try {
       const updated = await authApi.updateProfile({
-        name: name || undefined,
         username: username || null,
         phone: phone || null,
         dayStartTime: dayStart,
@@ -80,7 +77,6 @@ export default function ProfileSettings() {
   };
 
   const dirty =
-    name !== (user?.name ?? '') ||
     username !== (user?.username ?? '') ||
     phone !== (user?.phone ?? '') ||
     dayStart !== (user?.dayStartTime ?? '00:00') ||
@@ -133,11 +129,10 @@ export default function ProfileSettings() {
 
       {/* form grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 20px', maxWidth: 480 }}>
-        {/* Name */}
+        {/* Name — read-only */}
         <div>
           <label style={lbl}>Display name</label>
-          <input value={name} onChange={e => setName(e.target.value)} style={field}
-            onFocus={focusBorder} onBlur={blurBorder} placeholder="Your name" />
+          <input value={user?.name ?? ''} readOnly style={readOnly} tabIndex={-1} />
         </div>
 
         {/* Username */}
