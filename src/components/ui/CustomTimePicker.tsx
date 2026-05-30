@@ -33,7 +33,6 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Derive current selection
   const initialHh = value ? parseInt(value.split(':')[0], 10) : 9;
   const initialMm = value ? parseInt(value.split(':')[1], 10) : 0;
   const init12 = to12h(isNaN(initialHh) ? 9 : initialHh);
@@ -58,123 +57,161 @@ export default function CustomTimePicker({ value, onChange, placeholder = '--:--
     onChange(`${pad(hh24)}:${pad(minute)}`);
   }
 
-  function selectHour(h: number) { setHour(h); }
-  function selectMinute(m: number) { setMinute(m); }
-  function selectPeriod(p: 'AM' | 'PM') { setPeriod(p); }
-
-  const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1..12
-  const minutes = Array.from({ length: 60 }, (_, i) => i);   // 0..59
+  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+  const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
+      {/* Trigger button */}
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%',
-          background: 'var(--divider)',
-          border: `1px solid ${open ? 'rgba(36, 119, 198, 0.4)' : 'var(--border)'}`,
+          background: 'var(--bg-input)',
+          border: `1px solid ${open ? 'var(--accent)' : 'var(--border)'}`,
           borderRadius: '8px',
           color: value ? 'var(--text-primary)' : 'var(--text-placeholder)',
           fontFamily: 'var(--font-main)',
           fontSize: '13px',
-          padding: '8px 12px',
+          padding: '9px 12px',
           outline: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '8px',
-          transition: 'border-color 0.15s',
+          transition: 'border-color 0.15s, box-shadow 0.15s',
+          boxShadow: open ? '0 0 0 3px rgba(36,119,198,0.12)' : 'none',
         }}
       >
-        <span>{value ? formatDisplay(value) : placeholder}</span>
-        <Clock size={14} color="var(--text-muted)" />
+        <span style={{ fontWeight: value ? 500 : 400 }}>
+          {value ? formatDisplay(value) : placeholder}
+        </span>
+        <Clock
+          size={14}
+          color="var(--text-muted)"
+          style={{ flexShrink: 0, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
       </button>
 
+      {/* Dropdown panel */}
       {open && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(100% + 6px)',
-          left: 0,
-          background: '#23262B',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '12px',
-          padding: '12px',
-          zIndex: 100,
-          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04)',
-          display: 'flex',
-          gap: '8px',
-          width: '260px',
-        }}>
-          {/* Hour column */}
-          <ScrollColumn
-            items={hours.map(h => ({ value: h, label: pad(h) }))}
-            selected={hour}
-            onSelect={selectHour}
-          />
-          <ScrollColumn
-            items={minutes.map(m => ({ value: m, label: pad(m) }))}
-            selected={minute}
-            onSelect={selectMinute}
-          />
-          {/* AM/PM */}
-          <div style={{
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            left: 0,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: '12px',
+            zIndex: 200,
+            boxShadow: 'var(--shadow-elevated)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
-            justifyContent: 'flex-start',
-            paddingTop: '4px',
+            gap: '10px',
+            width: '220px',
+          }}
+        >
+          {/* Time display */}
+          <div style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-main)',
+            fontSize: '22px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            letterSpacing: '0.04em',
+            padding: '4px 0 8px',
+            borderBottom: '1px solid var(--divider)',
           }}>
-            {(['AM','PM'] as const).map(p => {
-              const isActive = period === p;
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => selectPeriod(p)}
-                  style={{
-                    background: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    color: isActive ? 'var(--bg-base)' : 'var(--text-secondary)',
-                    fontFamily: 'var(--font-main)',
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                    padding: '10px 14px',
-                    cursor: 'pointer',
-                    minWidth: '52px',
-                  }}
-                >
-                  {p}
-                </button>
-              );
-            })}
+            {pad(hour)}:{pad(minute)} <span style={{ color: 'var(--accent)', fontSize: '14px', fontWeight: 500 }}>{period}</span>
           </div>
 
-          {/* Done */}
-          <div style={{
-            position: 'absolute',
-            bottom: '8px',
-            right: '12px',
-          }}>
-            <button
-              type="button"
-              onClick={() => { commit(); setOpen(false); }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontFamily: 'var(--font-main)',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                padding: '4px 6px',
-              }}
-            >
-              Done
-            </button>
+          {/* Columns */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+            {/* Hours */}
+            <ScrollColumn
+              items={hours.map(h => ({ value: h, label: pad(h) }))}
+              selected={hour}
+              onSelect={setHour}
+            />
+
+            {/* Separator */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '18px',
+              padding: '0 2px',
+            }}>:</div>
+
+            {/* Minutes */}
+            <ScrollColumn
+              items={minutes.map(m => ({ value: m, label: pad(m) }))}
+              selected={minute}
+              onSelect={setMinute}
+            />
+
+            {/* AM/PM */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              justifyContent: 'center',
+              paddingLeft: '4px',
+            }}>
+              {(['AM', 'PM'] as const).map(p => {
+                const isActive = period === p;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    style={{
+                      background: isActive ? 'var(--accent)' : 'var(--bg-elevated)',
+                      border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
+                      borderRadius: '6px',
+                      color: isActive ? '#fff' : 'var(--text-secondary)',
+                      fontFamily: 'var(--font-main)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '7px 10px',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s, color 0.15s',
+                      minWidth: '44px',
+                    }}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {/* Done button */}
+          <button
+            type="button"
+            onClick={() => { commit(); setOpen(false); }}
+            style={{
+              background: 'var(--accent)',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+              fontFamily: 'var(--font-main)',
+              fontSize: '13px',
+              fontWeight: 600,
+              padding: '8px',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            Done
+          </button>
         </div>
       )}
     </div>
@@ -192,7 +229,6 @@ function ScrollColumn({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Center selected on open
   useEffect(() => {
     if (!ref.current) return;
     const el = ref.current.querySelector(`[data-val="${selected}"]`) as HTMLElement | null;
@@ -204,10 +240,14 @@ function ScrollColumn({
     <div
       ref={ref}
       style={{
-        height: '180px',
+        height: '140px',
         overflowY: 'auto',
         flex: 1,
         scrollbarWidth: 'thin',
+        scrollbarColor: 'var(--scrollbar-thumb) transparent',
+        borderRadius: '6px',
+        background: 'var(--bg-elevated)',
+        border: '1px solid var(--border)',
       }}
     >
       {items.map(it => {
@@ -222,21 +262,27 @@ function ScrollColumn({
               width: '100%',
               background: isActive ? 'var(--accent)' : 'transparent',
               border: 'none',
-              borderRadius: '6px',
-              color: isActive ? 'var(--bg-base)' : 'var(--text-secondary)',
+              borderRadius: '4px',
+              color: isActive ? '#fff' : 'var(--text-secondary)',
               fontFamily: 'var(--font-main)',
               fontSize: '13px',
-              fontWeight: isActive ? 600 : 500,
-              padding: '6px 0',
+              fontWeight: isActive ? 600 : 400,
+              padding: '5px 0',
               cursor: 'pointer',
               textAlign: 'center',
-              marginBottom: '2px',
+              transition: 'background 0.1s, color 0.1s',
             }}
             onMouseEnter={e => {
-              if (!isActive) e.currentTarget.style.background = 'var(--divider)';
+              if (!isActive) {
+                e.currentTarget.style.background = 'var(--divider)';
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
             }}
             onMouseLeave={e => {
-              if (!isActive) e.currentTarget.style.background = 'transparent';
+              if (!isActive) {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
             }}
           >
             {it.label}
