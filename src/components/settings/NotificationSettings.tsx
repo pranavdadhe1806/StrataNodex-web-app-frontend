@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../store/auth.store';
+import CustomTimePicker from '../ui/CustomTimePicker';
 import {
   useNotificationPreferences,
   useUpdatePreferences,
@@ -225,12 +226,7 @@ export default function NotificationSettings() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label style={labelStyle}>Time</label>
-            <input
-              type="time"
-              value={reminderTime}
-              onChange={(e) => setReminderTime(e.target.value)}
-              style={{ ...inputStyle, colorScheme: 'dark' }}
-            />
+            <CustomTimePicker value={reminderTime} onChange={setReminderTime} />
           </div>
           <div>
             <label style={labelStyle}>Timezone</label>

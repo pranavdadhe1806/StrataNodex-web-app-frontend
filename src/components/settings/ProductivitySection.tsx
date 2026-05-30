@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import CustomTimePicker from '../ui/CustomTimePicker';
 
 const DS = {
   bg: 'var(--bg-base)',
@@ -131,14 +132,7 @@ export default function ProductivitySection() {
         label="Daily reset time"
         subtitle="When today's task list rolls over"
         last
-        control={
-          <input
-            type="time"
-            value={resetTime}
-            onChange={e => setResetTime(e.target.value)}
-            style={{ ...inputBase, width: 140 }}
-          />
-        }
+        control={<CustomTimePicker value={resetTime} onChange={setResetTime} />}
       />
     </div>
   );

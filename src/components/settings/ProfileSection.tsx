@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Lock, Trash2, Check } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
+import CustomTimePicker from '../ui/CustomTimePicker';
 
 /* ─── Design tokens ────────────────────────────────────────── */
 const DS = {
@@ -233,15 +234,11 @@ export default function ProfileSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 20px', marginBottom: 32 }}>
         <div>
           <label style={lblStyle}>Start of day</label>
-          <input type="time" value={dayStart} onChange={e => setDayStart(e.target.value)}
-            style={{ ...inputStyle, colorScheme: 'dark' }}
-            onFocus={focusBorder} onBlur={blurBorder} />
+          <CustomTimePicker value={dayStart} onChange={setDayStart} />
         </div>
         <div>
           <label style={lblStyle}>End of day</label>
-          <input type="time" value={dayEnd} onChange={e => setDayEnd(e.target.value)}
-            style={{ ...inputStyle, colorScheme: 'dark' }}
-            onFocus={focusBorder} onBlur={blurBorder} />
+          <CustomTimePicker value={dayEnd} onChange={setDayEnd} />
         </div>
       </div>
 

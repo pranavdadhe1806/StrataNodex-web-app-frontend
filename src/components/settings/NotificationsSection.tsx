@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bell, Mail, Send, Copy } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
+import CustomTimePicker from '../ui/CustomTimePicker';
 import {
   useNotificationPreferences,
   useUpdatePreferences,
@@ -188,12 +189,7 @@ export default function NotificationsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 20px', marginBottom: 4 }}>
         <div>
           <label style={{ color: DS.textMuted, fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 6 }}>Time</label>
-          <input
-            type="time"
-            value={reminderTime}
-            onChange={e => setReminderTime(e.target.value)}
-            style={inputStyle}
-          />
+          <CustomTimePicker value={reminderTime} onChange={setReminderTime} />
         </div>
         <div>
           <label style={{ color: DS.textMuted, fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 6 }}>Timezone</label>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Check, Mail } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
+import CustomTimePicker from '../ui/CustomTimePicker';
 
 const field: React.CSSProperties = {
   width: '100%',
@@ -173,13 +174,11 @@ export default function ProfileSettings() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 480 }}>
         <div>
           <label style={lbl}>Start of day</label>
-          <input type="time" value={dayStart} onChange={e => setDayStart(e.target.value)}
-            style={{ ...field, colorScheme: 'dark' }} onFocus={focusBorder} onBlur={blurBorder} />
+          <CustomTimePicker value={dayStart} onChange={setDayStart} />
         </div>
         <div>
           <label style={lbl}>End of day</label>
-          <input type="time" value={dayEnd} onChange={e => setDayEnd(e.target.value)}
-            style={{ ...field, colorScheme: 'dark' }} onFocus={focusBorder} onBlur={blurBorder} />
+          <CustomTimePicker value={dayEnd} onChange={setDayEnd} />
         </div>
       </div>
 
