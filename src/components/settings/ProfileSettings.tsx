@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, Mail } from 'lucide-react';
+import { Check, Lock, Mail } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
 import CustomTimePicker from '../ui/CustomTimePicker';
@@ -29,7 +29,9 @@ const lbl: React.CSSProperties = {
   color: '#9CA3AF',
   fontSize: 12,
   fontWeight: 500,
-  display: 'block',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
   marginBottom: 6,
   fontFamily: 'var(--font-main)',
 };
@@ -130,9 +132,8 @@ export default function ProfileSettings() {
 
       {/* form grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 20px', maxWidth: 480 }}>
-        {/* Name — read-only */}
         <div>
-          <label style={lbl}>Display name</label>
+          <label style={lbl}>Display name <Lock size={11} style={{ color: '#9CA3AF' }} /></label>
           <input value={user?.name ?? ''} readOnly style={readOnly} tabIndex={-1} />
         </div>
 
@@ -147,9 +148,8 @@ export default function ProfileSettings() {
           />
         </div>
 
-        {/* Email — read-only */}
         <div>
-          <label style={lbl}>Email</label>
+          <label style={lbl}>Email <Lock size={11} style={{ color: '#9CA3AF' }} /></label>
           <input value={user?.email ?? ''} readOnly style={readOnly} tabIndex={-1} />
         </div>
 

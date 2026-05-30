@@ -42,7 +42,9 @@ const lblStyle: React.CSSProperties = {
   color: DS.textMuted,
   fontSize: 12,
   fontWeight: 500,
-  display: 'block',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
   marginBottom: 6,
   fontFamily: 'var(--font-main)',
 };
@@ -190,7 +192,7 @@ export default function ProfileSection() {
         {/* Display name — read-only */}
         <div>
           <label style={lblStyle}>
-            Display name&ensp;<Lock size={11} style={{ verticalAlign: 'middle', color: DS.textMuted }} />
+            Display name <Lock size={11} style={{ color: DS.textMuted }} />
           </label>
           <input value={user?.name ?? ''} readOnly style={readonlyStyle} tabIndex={-1} />
         </div>
@@ -209,7 +211,7 @@ export default function ProfileSection() {
         {/* Email — read-only */}
         <div>
           <label style={lblStyle}>
-            Email&ensp;<Lock size={11} style={{ verticalAlign: 'middle', color: DS.textMuted }} />
+            Email <Lock size={11} style={{ color: DS.textMuted }} />
           </label>
           <input value={user?.email ?? ''} readOnly style={readonlyStyle} tabIndex={-1} />
         </div>
