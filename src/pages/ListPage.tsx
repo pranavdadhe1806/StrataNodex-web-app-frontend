@@ -873,12 +873,11 @@ export default function ListPage() {
               selectedNodeId={selectedNodeId}
               onNodeCircleClick={toggleNodeStatus}
               onMoveNode={moveNodeInTree}
-              onNodeDoubleClick={handleNodeDoubleClick}
               onNodeTextClick={(id) => {
                 const now = Date.now();
                 const last = lastNodeClickRef.current;
-                // Two clicks on the same node within 300ms = double-click → insert-after mode
-                if (last && last.id === id && now - last.time < 300) {
+                // Two taps on the same node within 400ms = double-tap → insert-after mode
+                if (last && last.id === id && now - last.time < 400) {
                   lastNodeClickRef.current = null;
                   // Cancel the pending single-click action
                   if (clickTimerRef.current) {
@@ -896,7 +895,7 @@ export default function ListPage() {
                   setInsertAfterNodeId(null);
                   setDetailNodeId(id);
                   clickTimerRef.current = null;
-                }, 300);
+                }, 400);
               }}
             />
           )}

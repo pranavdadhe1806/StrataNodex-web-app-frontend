@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { ChevronRight } from '../ui/icons';
 import { CheckCircle } from '@phosphor-icons/react';
 import { motion, PanInfo } from 'framer-motion';
@@ -10,7 +11,6 @@ interface NodeCardProps {
   isExpanded?: boolean;
   onCircleClick: () => void;
   onTextClick: () => void;
-  onDoubleClick?: () => void;
   onDragStart?: () => void;
   onDrag?: (y: number, x: number) => void;
   onDragEnd?: (y: number, x: number) => void;
@@ -24,13 +24,14 @@ export default function NodeCard({
   isExpanded = true,
   onCircleClick,
   onTextClick,
-  onDoubleClick,
   onDragStart,
   onDrag,
   onDragEnd,
   style,
 }: NodeCardProps) {
   const isDone = node.status === 'DONE';
+  // Track the pointerdown target so onTap knows if the circle was tapped
+  const tapStartTarget = useRef<EventTarget | null>(null);
 
   const getCardStyles = (): React.CSSProperties => {
     const base: React.CSSProperties = {
@@ -112,12 +113,24 @@ export default function NodeCard({
         onDragEnd?.(startY + info.offset.y, startX + info.offset.x);
       }}
       onPointerDown={(e: React.PointerEvent) => {
+        // Save the actual element that was clicked (before pointer capture redirects)
+        tapStartTarget.current = e.target;
         // Prevent pan on canvas
         e.stopPropagation();
+      }}
+      // Use Framer Motion's onTap instead of onClick — it fires reliably
+      // even with drag enabled (pointer capture doesn't suppress it)
+      onTap={() => {
+        const target = tapStartTarget.current as HTMLElement | null;
+        tapStartTarget.current = null;
+        // If the tap started on the status circle, ignore (circle handles its own event)
+        if (target && target.closest('[data-role="status-circle"]')) return;
+        onTextClick();
       }}
     >
       {/* Status circle */}
       <div
+        data-role="status-circle"
         style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         onClick={(e) => { e.stopPropagation(); onCircleClick(); }}
       >
@@ -128,11 +141,9 @@ export default function NodeCard({
         )}
       </div>
 
-      {/* Text area */}
+      {/* Text area — no click handlers here, onTap on motion.div handles it */}
       <div
         style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}
-        onClick={(e) => { e.stopPropagation(); onTextClick(); }}
-        onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick?.(); }}
       >
         <span style={{ fontSize: '12px', color: 'var(--node-numbering)', fontFamily: 'var(--font-main)', flexShrink: 0 }}>
           {numbering}
