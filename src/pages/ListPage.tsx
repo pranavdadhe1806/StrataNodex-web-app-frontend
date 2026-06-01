@@ -96,6 +96,7 @@ export default function ListPage() {
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
   // Timer ref for detecting double-clicks on node cards (Framer Motion suppresses dblclick)
   const lastNodeClickRef = useRef<{ id: string; time: number } | null>(null);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Canvas panning state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -594,9 +595,10 @@ export default function ListPage() {
   // ── Undo / Redo: Ctrl+Z / Ctrl+Y ─────────────────────────────────────────
   useEffect(() => {
     function handleUndoRedo(e: KeyboardEvent) {
-      // Don't intercept when user is typing in an input/textarea/contenteditable
+      // Allow undo/redo when our canvas textarea is focused, but block for other inputs
       const tag = (e.target as HTMLElement).tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return;
+      const isCanvasInput = e.target === inputRef.current;
+      if (!isCanvasInput && (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable)) return;
 
       const isUndo = (e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey;
       const isRedo = (e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey));
@@ -878,13 +880,23 @@ export default function ListPage() {
                 // Two clicks on the same node within 300ms = double-click → insert-after mode
                 if (last && last.id === id && now - last.time < 300) {
                   lastNodeClickRef.current = null;
+                  // Cancel the pending single-click action
+                  if (clickTimerRef.current) {
+                    clearTimeout(clickTimerRef.current);
+                    clickTimerRef.current = null;
+                  }
                   handleNodeDoubleClick(id);
                   return;
                 }
                 lastNodeClickRef.current = { id, time: now };
-                setIsTyping(false);
-                setInsertAfterNodeId(null);
-                setDetailNodeId(id);
+                // Delay single-click action so double-click can cancel it
+                if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+                clickTimerRef.current = setTimeout(() => {
+                  setIsTyping(false);
+                  setInsertAfterNodeId(null);
+                  setDetailNodeId(id);
+                  clickTimerRef.current = null;
+                }, 300);
               }}
             />
           )}
