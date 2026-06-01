@@ -694,11 +694,14 @@ export default function ListPage() {
               lineHeight: '30px',
               resize: 'none',
               caretColor: 'var(--accent)',
-              width: '200px',
+              width: `calc(100vw - ${computeInputX(currentDepth)}px - 80px)`,
               minHeight: '24px',
               padding: 0,
               margin: 0,
               zIndex: 100,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              wordBreak: 'keep-all',
             }}
             rows={1}
           />
