@@ -91,6 +91,11 @@ export default function ListPage() {
   // Insert-after mode: double-clicking a node sets this to insert NEW nodes right after it
   const [insertAfterNodeId, setInsertAfterNodeId] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Mirror of nodes for use in event-handler closures (avoids stale closure + side-effects in updaters)
+  const nodesRef = useRef<Node[]>([]);
+  useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+  // Timer ref for detecting double-clicks on node cards (Framer Motion suppresses dblclick)
+  const lastNodeClickRef = useRef<{ id: string; time: number } | null>(null);
 
   // Canvas panning state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -294,9 +299,9 @@ export default function ListPage() {
       updatedAt: new Date().toISOString(),
     };
 
-    // 1. Show instantly in local tree — push snapshot first for undo
+    // 1. Show instantly in local tree — push snapshot for undo BEFORE mutating
+    pushHistory(nodesRef.current);
     setNodes(prev => {
-      pushHistory(prev);
       if (insertAfterNodeId) {
         return insertAfterInTree(prev, newNode, insertAfterNodeId);
       }
@@ -419,8 +424,8 @@ export default function ListPage() {
 
   // ── Update node in local tree ─────────────────────────────────────────────
   function updateNodeInTree(updated: Node) {
+    pushHistory(nodesRef.current);
     setNodes(prev => {
-      pushHistory(prev);
       function walk(list: Node[]): Node[] {
         return list.map(n => {
           if (n.id === updated.id) return { ...updated, children: n.children };
@@ -442,8 +447,8 @@ export default function ListPage() {
 
   // ── Delete node + all children from local tree ────────────────────────────
   function deleteNodeFromTree(id: string) {
+    pushHistory(nodesRef.current);
     setNodes(prev => {
-      pushHistory(prev);
       function walk(list: Node[]): Node[] {
         return list.filter(n => n.id !== id).map(n => ({ ...n, children: walk(n.children ?? []) }));
       }
@@ -457,7 +462,8 @@ export default function ListPage() {
   function moveNodeInTree(nodeId: string, targetParentId: string | null, insertBeforeNodeId: string | null) {
     let movedNode: Node | null = null;
     let computedPosition = 0;
-    let didPushHistory = false;
+
+    pushHistory(nodesRef.current);
 
     setNodes(prev => {
       // 1. Remove node
@@ -473,7 +479,6 @@ export default function ListPage() {
       
       let newTree = removeNode(prev);
       if (!movedNode) return prev;
-      if (!didPushHistory) { pushHistory(prev); didPushHistory = true; } 
 
       movedNode = { ...movedNode, parentId: targetParentId };
       
@@ -516,14 +521,10 @@ export default function ListPage() {
     });
 
     // 3. Save to backend
-    // Since setNodes is async but the closure executes synchronously, we wait a tick to ensure computedPosition is populated
     setTimeout(() => {
       moveNodeMutation.mutate({
         id: nodeId,
-        data: {
-          parentId: targetParentId,
-          position: computedPosition
-        }
+        data: { parentId: targetParentId, position: computedPosition }
       });
     }, 0);
   }
@@ -571,8 +572,8 @@ export default function ListPage() {
     }
 
     // Optimistic update immediately
+    pushHistory(nodesRef.current);
     setNodes(prev => {
-      pushHistory(prev);
       function updateStatus(list: Node[]): Node[] {
         return list.map(node => {
           if (idsToUpdate.includes(node.id)) {
@@ -592,57 +593,52 @@ export default function ListPage() {
 
   // ── Undo / Redo: Ctrl+Z / Ctrl+Y ─────────────────────────────────────────
   useEffect(() => {
-    async function handleUndoRedo(e: KeyboardEvent) {
+    function handleUndoRedo(e: KeyboardEvent) {
       // Don't intercept when user is typing in an input/textarea/contenteditable
       const tag = (e.target as HTMLElement).tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return;
 
       const isUndo = (e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey;
       const isRedo = (e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey));
-
       if (!isUndo && !isRedo) return;
       e.preventDefault();
 
-      setNodes(current => {
-        const target = isUndo ? undoHistory(current) : redoHistory(current);
-        if (!target) return current; // nothing to undo/redo
+      // Read current nodes from ref (NOT inside setNodes to avoid side-effects in updater)
+      const current = nodesRef.current;
+      const target = isUndo ? undoHistory(current) : redoHistory(current);
+      if (!target) return;
 
-        const flatCurrent = flattenTree(current);
-        const flatTarget  = flattenTree(target);
+      // Diff to sync backend
+      const flatCurrent = flattenTree(current);
+      const flatTarget  = flattenTree(target);
+      const currentMap  = new Map(flatCurrent.map(n => [n.id, n]));
+      const targetMap   = new Map(flatTarget.map(n => [n.id, n]));
 
-        const currentMap = new Map(flatCurrent.map(n => [n.id, n]));
-        const targetMap  = new Map(flatTarget.map(n  => [n.id, n]));
-
-        // Nodes added in current but absent in target → undo creation → delete
-        const toDelete = flatCurrent.filter(n => !targetMap.has(n.id));
-        // Nodes in target but absent in current → undo deletion → recreate
-        const toCreate = flatTarget.filter(n => !currentMap.has(n.id));
-        // Nodes in both but changed → update with target values
-        const toUpdate = flatTarget.filter(n => {
-          const c = currentMap.get(n.id);
-          return c && (c.title !== n.title || c.status !== n.status || c.priority !== n.priority ||
-            c.parentId !== n.parentId || c.position !== n.position);
-        });
-
-        // Fire backend sync asynchronously (don't block state update)
-        setTimeout(async () => {
-          for (const n of toDelete) {
-            nodeApi.delete(n.id).catch(() => {});
-          }
-          for (const n of toCreate) {
-            if (n.parentId) {
-              nodeApi.createChild(n.parentId, { title: n.title, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
-            } else if (listId) {
-              nodeApi.create(listId, { title: n.title, listId, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
-            }
-          }
-          for (const n of toUpdate) {
-            nodeApi.update(n.id, { title: n.title, status: n.status, priority: n.priority, parentId: n.parentId, position: n.position }).catch(() => {});
-          }
-        }, 0);
-
-        return target;
+      const toDelete = flatCurrent.filter(n => !targetMap.has(n.id));
+      const toCreate = flatTarget.filter(n => !currentMap.has(n.id));
+      const toUpdate = flatTarget.filter(n => {
+        const c = currentMap.get(n.id);
+        return c && (c.title !== n.title || c.status !== n.status || c.priority !== n.priority ||
+          c.parentId !== n.parentId || c.position !== n.position);
       });
+
+      // Apply state immediately
+      setNodes(target);
+
+      // Sync backend asynchronously
+      setTimeout(async () => {
+        for (const n of toDelete) nodeApi.delete(n.id).catch(() => {});
+        for (const n of toCreate) {
+          if (n.parentId) {
+            nodeApi.createChild(n.parentId, { title: n.title, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
+          } else if (listId) {
+            nodeApi.create(listId, { title: n.title, listId, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
+          }
+        }
+        for (const n of toUpdate) {
+          nodeApi.update(n.id, { title: n.title, status: n.status, priority: n.priority, parentId: n.parentId, position: n.position }).catch(() => {});
+        }
+      }, 0);
     }
 
     window.addEventListener('keydown', handleUndoRedo);
@@ -877,10 +873,15 @@ export default function ListPage() {
               onMoveNode={moveNodeInTree}
               onNodeDoubleClick={handleNodeDoubleClick}
               onNodeTextClick={(id) => {
-                // Close typing mode before opening the detail panel.
-                // If the textarea was active, its blur fires setIsTyping(false) anyway,
-                // but doing it explicitly here prevents any intermediate render with isTyping=true
-                // that could trigger a Chrome scroll to the textarea position.
+                const now = Date.now();
+                const last = lastNodeClickRef.current;
+                // Two clicks on the same node within 300ms = double-click → insert-after mode
+                if (last && last.id === id && now - last.time < 300) {
+                  lastNodeClickRef.current = null;
+                  handleNodeDoubleClick(id);
+                  return;
+                }
+                lastNodeClickRef.current = { id, time: now };
                 setIsTyping(false);
                 setInsertAfterNodeId(null);
                 setDetailNodeId(id);
