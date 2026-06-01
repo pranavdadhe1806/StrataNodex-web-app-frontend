@@ -31,7 +31,7 @@ function StatusCircle({ status, onClick }: { status: Node['status']; onClick: ()
   );
 }
 
-function DailyNode({ node }: { node: Node }) {
+function DailyNode({ node, depth = 0 }: { node: Node; depth?: number }) {
   const updateNode = useUpdateNode();
   const removeFromDaily = useRemoveFromDaily();
 
@@ -44,40 +44,55 @@ function DailyNode({ node }: { node: Node }) {
   const isDone = node.status === 'DONE';
 
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: '12px',
-      padding: '12px 16px', background: 'var(--bg-elevated)',
-      border: '1px solid var(--divider)',
-      borderRadius: '10px', transition: 'border-color 0.15s ease',
-    }}>
-      <StatusCircle status={node.status} onClick={cycleStatus} />
+    <div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '12px',
+        padding: '10px 16px',
+        marginLeft: depth > 0 ? `${depth * 20}px` : 0,
+        background: depth === 0 ? 'var(--bg-elevated)' : 'var(--bg-surface)',
+        border: '1px solid var(--divider)',
+        borderRadius: '10px', transition: 'border-color 0.15s ease',
+      }}>
+        <StatusCircle status={node.status} onClick={cycleStatus} />
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
-          fontFamily: 'var(--font-main)', fontSize: '14px',
-          textDecoration: isDone ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {node.title}
-        </div>
-        {isRef && node.source && (
-          <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <ExternalLink size={10} />
-            {node.source.list.name}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            color: isDone ? 'var(--text-muted)' : 'var(--text-secondary)',
+            fontFamily: 'var(--font-main)', fontSize: depth === 0 ? '14px' : '13px',
+            textDecoration: isDone ? 'line-through' : 'none',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {node.title}
           </div>
+          {isRef && node.source && (
+            <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '11px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <ExternalLink size={10} />
+              {node.source.list.name}
+            </div>
+          )}
+        </div>
+
+        {depth === 0 && (
+          <button
+            onClick={() => removeFromDaily.mutate(node.id)}
+            style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: 'var(--text-placeholder)', display: 'flex', alignItems: 'center', opacity: 0.6, transition: 'opacity 0.15s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+            title="Remove from daily"
+          >
+            <Trash2 size={14} />
+          </button>
         )}
       </div>
 
-      <button
-        onClick={() => removeFromDaily.mutate(node.id)}
-        style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: 'var(--text-placeholder)', display: 'flex', alignItems: 'center', opacity: 0.6, transition: 'opacity 0.15s' }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
-        title="Remove from daily"
-      >
-        <Trash2 size={14} />
-      </button>
+      {/* Render children recursively */}
+      {(node.children ?? []).length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
+          {(node.children ?? []).map(child => (
+            <DailyNode key={child.id} node={child} depth={depth + 1} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -90,8 +105,13 @@ export default function DailyPage() {
 
   const nodes = data?.nodes ?? [];
   const dailyListId = data?.list?.id ?? '';
-  const done = nodes.filter(n => n.status === 'DONE').length;
-  const total = nodes.length;
+
+  // Flatten tree for progress counting
+  const flattenNodes = (list: Node[]): Node[] =>
+    list.flatMap(n => [n, ...flattenNodes(n.children ?? [])]);
+  const allNodes = flattenNodes(nodes);
+  const done = allNodes.filter(n => n.status === 'DONE').length;
+  const total = allNodes.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const handleAddTask = () => {
