@@ -8,6 +8,7 @@ interface NodeTreeProps {
   selectedNodeId: string | null;
   onNodeCircleClick: (id: string) => void;
   onNodeTextClick: (id: string) => void;
+  onNodeDoubleClick?: (id: string) => void;
   onMoveNode?: (nodeId: string, targetParentId: string | null, insertBeforeNodeId: string | null) => void;
 }
 
@@ -29,6 +30,7 @@ export default function NodeTree({
   selectedNodeId,
   onNodeCircleClick,
   onNodeTextClick,
+  onNodeDoubleClick,
   onMoveNode,
 }: NodeTreeProps) {
   // Drag state
@@ -193,6 +195,7 @@ export default function NodeTree({
             numbering={numbering.get(node.id) || ''}
             onCircleClick={() => onNodeCircleClick(node.id)}
             onTextClick={() => onNodeTextClick(node.id)}
+            onDoubleClick={() => onNodeDoubleClick?.(node.id)}
             onDragStart={() => handleDragStart(node.id)}
             onDrag={(y, x) => handleDrag(node.id, y, x)}
             onDragEnd={() => handleDragEnd(node.id)}

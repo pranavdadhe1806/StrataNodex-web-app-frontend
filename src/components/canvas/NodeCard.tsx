@@ -10,6 +10,7 @@ interface NodeCardProps {
   isExpanded?: boolean;
   onCircleClick: () => void;
   onTextClick: () => void;
+  onDoubleClick?: () => void;
   onDragStart?: () => void;
   onDrag?: (y: number, x: number) => void;
   onDragEnd?: (y: number, x: number) => void;
@@ -23,6 +24,7 @@ export default function NodeCard({
   isExpanded = true,
   onCircleClick,
   onTextClick,
+  onDoubleClick,
   onDragStart,
   onDrag,
   onDragEnd,
@@ -130,6 +132,7 @@ export default function NodeCard({
       <div
         style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}
         onClick={(e) => { e.stopPropagation(); onTextClick(); }}
+        onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick?.(); }}
       >
         <span style={{ fontSize: '12px', color: 'var(--node-numbering)', fontFamily: 'var(--font-main)', flexShrink: 0 }}>
           {numbering}

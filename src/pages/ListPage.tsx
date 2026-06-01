@@ -88,6 +88,8 @@ export default function ListPage() {
   const [currentDepth, setCurrentDepth] = useState(0);
   const [currentParentId, setCurrentParentId] = useState<string | null>(null);
   const [lastCreatedNodeId, setLastCreatedNodeId] = useState<string | null>(null);
+  // Insert-after mode: double-clicking a node sets this to insert NEW nodes right after it
+  const [insertAfterNodeId, setInsertAfterNodeId] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Canvas panning state
@@ -172,7 +174,7 @@ export default function ListPage() {
     }
   }
 
-  // ── Tree helpers (same as original) ──────────────────────────────────────
+  // ── Tree helpers ─────────────────────────────────────────────────────────
   function addNodeToTree(tree: Node[], newNode: Node, parentId: string | null): Node[] {
     if (parentId === null) return [...tree, newNode];
     return tree.map(node => {
@@ -181,6 +183,46 @@ export default function ListPage() {
       }
       return { ...node, children: addNodeToTree(node.children ?? [], newNode, parentId) };
     });
+  }
+
+  // Insert newNode immediately after the node with afterId (at same depth level)
+  function insertAfterInTree(tree: Node[], newNode: Node, afterId: string): Node[] {
+    const rootIdx = tree.findIndex(n => n.id === afterId);
+    if (rootIdx !== -1) {
+      return [...tree.slice(0, rootIdx + 1), newNode, ...tree.slice(rootIdx + 1)];
+    }
+    return tree.map(n => ({
+      ...n,
+      children: insertAfterInTree(n.children ?? [], newNode, afterId),
+    }));
+  }
+
+  // Compute the position index for a node inserted after afterId
+  function computeInsertAfterPosition(tree: Node[], afterId: string): number {
+    const flat = flattenTree(tree);
+    const node = flat.find(n => n.id === afterId);
+    if (!node) return 0;
+    if (node.parentId === null) {
+      const rootIdx = tree.findIndex(n => n.id === afterId);
+      return rootIdx + 1;
+    }
+    const parent = flat.find(n => n.id === node.parentId);
+    const childIdx = (parent?.children ?? []).findIndex(n => n.id === afterId);
+    return childIdx + 1;
+  }
+
+  // Walk up parentId chain to compute depth
+  function getNodeDepth(nodeId: string): number {
+    const flat = flattenTree(nodes);
+    let depth = 0;
+    let id: string | null = nodeId;
+    while (id) {
+      const n = flat.find(x => x.id === id);
+      if (!n || !n.parentId) break;
+      depth++;
+      id = n.parentId;
+    }
+    return depth;
   }
 
   function findParentAtDepth(tree: Node[], targetDepth: number, depth: number = 0): string | null {
@@ -226,7 +268,9 @@ export default function ListPage() {
     if (!listId) return;
 
     const tempId = crypto.randomUUID();
-    const position = computePosition(nodes, currentParentId);
+    const position = insertAfterNodeId
+      ? computeInsertAfterPosition(nodes, insertAfterNodeId)
+      : computePosition(nodes, currentParentId);
 
     const newNode: Node = {
       id: tempId,
@@ -253,9 +297,14 @@ export default function ListPage() {
     // 1. Show instantly in local tree — push snapshot first for undo
     setNodes(prev => {
       pushHistory(prev);
+      if (insertAfterNodeId) {
+        return insertAfterInTree(prev, newNode, insertAfterNodeId);
+      }
       return addNodeToTree(prev, newNode, currentParentId);
     });
     setLastCreatedNodeId(tempId);
+    // After creating, the next node should go after this one
+    setInsertAfterNodeId(tempId);
 
     // 2. Build a Promise<realId> for this node and store it
     //    Sub-nodes will await this promise so they always have the real parent ID
@@ -305,8 +354,8 @@ export default function ListPage() {
     };
 
     saveToServer().catch(rollback);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listId, nodes, currentParentId, currentDepth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listId, nodes, currentParentId, currentDepth, insertAfterNodeId]);
 
   // Handle keyboard in textarea
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -323,11 +372,18 @@ export default function ListPage() {
           const newDepth = currentDepth - 1;
           setCurrentDepth(newDepth);
           setCurrentParentId(findParentAtDepth(nodes, newDepth));
+          setInsertAfterNodeId(null);
         }
       } else {
         const newDepth = currentDepth + 1;
         setCurrentDepth(newDepth);
-        setCurrentParentId(lastCreatedNodeId ?? findParentAtDepth(nodes, newDepth));
+        // First Tab in insert-after mode → make child of the double-clicked node
+        if (insertAfterNodeId && !lastCreatedNodeId) {
+          setCurrentParentId(insertAfterNodeId);
+          setInsertAfterNodeId(null);
+        } else {
+          setCurrentParentId(lastCreatedNodeId ?? findParentAtDepth(nodes, newDepth));
+        }
       }
     }
     if (e.key === 'Escape') {
@@ -336,14 +392,27 @@ export default function ListPage() {
       setCurrentDepth(0);
       setCurrentParentId(null);
       setLastCreatedNodeId(null);
+      setInsertAfterNodeId(null);
     }
     if (e.key === 'Backspace') {
       const textarea = e.target as HTMLTextAreaElement;
-      if (textarea.selectionStart === 0 && textarea.selectionEnd === 0 && currentDepth > 0) {
-        e.preventDefault();
-        const newDepth = currentDepth - 1;
-        setCurrentDepth(newDepth);
-        setCurrentParentId(findParentAtDepth(nodes, newDepth));
+      if (textarea.selectionStart === 0 && textarea.selectionEnd === 0) {
+        if (currentDepth > 0) {
+          e.preventDefault();
+          const newDepth = currentDepth - 1;
+          setCurrentDepth(newDepth);
+          setCurrentParentId(findParentAtDepth(nodes, newDepth));
+          setInsertAfterNodeId(null);
+        } else if (insertAfterNodeId && !currentInput.trim()) {
+          // Backspace on empty input at depth 0 in insert-after mode → cancel
+          e.preventDefault();
+          setIsTyping(false);
+          setCurrentInput('');
+          setCurrentDepth(0);
+          setCurrentParentId(null);
+          setLastCreatedNodeId(null);
+          setInsertAfterNodeId(null);
+        }
       }
     }
   }
@@ -583,7 +652,28 @@ export default function ListPage() {
 
   // Compute input position
   function computeInputX(depth: number): number { return 60 + depth * 90; }
-  function computeInputY(): number { return 28 + flatNodes.length * 70; }
+  function computeInputY(): number {
+    if (insertAfterNodeId) {
+      const idx = flatNodes.findIndex(n => n.id === insertAfterNodeId);
+      if (idx !== -1) return 28 + (idx + 1) * 70;
+    }
+    return 28 + flatNodes.length * 70;
+  }
+
+  // ── Double-click a node: activate insert-after mode ──────────────────────────
+  function handleNodeDoubleClick(id: string) {
+    const depth = getNodeDepth(id);
+    const flat = flattenTree(nodes);
+    const node = flat.find(n => n.id === id);
+    setDetailNodeId(null);
+    setIsTyping(true);
+    setCurrentInput('');
+    setCurrentDepth(depth);
+    setCurrentParentId(node?.parentId ?? null);
+    setLastCreatedNodeId(null);
+    setInsertAfterNodeId(id);
+    requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
+  }
 
   // Canvas pan handlers
   function handleMouseDown(e: React.MouseEvent) {
@@ -785,12 +875,14 @@ export default function ListPage() {
               selectedNodeId={selectedNodeId}
               onNodeCircleClick={toggleNodeStatus}
               onMoveNode={moveNodeInTree}
+              onNodeDoubleClick={handleNodeDoubleClick}
               onNodeTextClick={(id) => {
                 // Close typing mode before opening the detail panel.
                 // If the textarea was active, its blur fires setIsTyping(false) anyway,
                 // but doing it explicitly here prevents any intermediate render with isTyping=true
                 // that could trigger a Chrome scroll to the textarea position.
                 setIsTyping(false);
+                setInsertAfterNodeId(null);
                 setDetailNodeId(id);
               }}
             />
