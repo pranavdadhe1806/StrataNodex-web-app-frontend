@@ -13,6 +13,8 @@ import { useRecordRecent } from '../hooks/useRecordRecent';
 import { useRecentsStore } from '../store/recents.store';
 import { useUIStore } from '../store/ui.store';
 import { useNodes, useCreateNode, useCreateSubNode, useUpdateNode, useDeleteNode, useMoveNode } from '../hooks/useNodes';
+import { useUndoRedo } from '../hooks/useUndoRedo';
+import { nodeApi } from '../api/node.api';
 
 export default function ListPage() {
   const { listId } = useParams<{ listId: string }>();
@@ -45,6 +47,7 @@ export default function ListPage() {
   const updateNodeMutation = useUpdateNode();
   const deleteNodeMutation = useDeleteNode();
   const moveNodeMutation = useMoveNode();
+  const { push: pushHistory, undo: undoHistory, redo: redoHistory } = useUndoRedo();
 
   // ── Local optimistic node tree ────────────────────────────────────────────
   // Seeded from server on first load, then updated locally for zero lag
@@ -247,8 +250,11 @@ export default function ListPage() {
       updatedAt: new Date().toISOString(),
     };
 
-    // 1. Show instantly in local tree
-    setNodes(prev => addNodeToTree(prev, newNode, currentParentId));
+    // 1. Show instantly in local tree — push snapshot first for undo
+    setNodes(prev => {
+      pushHistory(prev);
+      return addNodeToTree(prev, newNode, currentParentId);
+    });
     setLastCreatedNodeId(tempId);
 
     // 2. Build a Promise<realId> for this node and store it
@@ -345,6 +351,7 @@ export default function ListPage() {
   // ── Update node in local tree ─────────────────────────────────────────────
   function updateNodeInTree(updated: Node) {
     setNodes(prev => {
+      pushHistory(prev);
       function walk(list: Node[]): Node[] {
         return list.map(n => {
           if (n.id === updated.id) return { ...updated, children: n.children };
@@ -367,6 +374,7 @@ export default function ListPage() {
   // ── Delete node + all children from local tree ────────────────────────────
   function deleteNodeFromTree(id: string) {
     setNodes(prev => {
+      pushHistory(prev);
       function walk(list: Node[]): Node[] {
         return list.filter(n => n.id !== id).map(n => ({ ...n, children: walk(n.children ?? []) }));
       }
@@ -380,6 +388,7 @@ export default function ListPage() {
   function moveNodeInTree(nodeId: string, targetParentId: string | null, insertBeforeNodeId: string | null) {
     let movedNode: Node | null = null;
     let computedPosition = 0;
+    let didPushHistory = false;
 
     setNodes(prev => {
       // 1. Remove node
@@ -394,7 +403,8 @@ export default function ListPage() {
       }
       
       let newTree = removeNode(prev);
-      if (!movedNode) return prev; 
+      if (!movedNode) return prev;
+      if (!didPushHistory) { pushHistory(prev); didPushHistory = true; } 
 
       movedNode = { ...movedNode, parentId: targetParentId };
       
@@ -493,6 +503,7 @@ export default function ListPage() {
 
     // Optimistic update immediately
     setNodes(prev => {
+      pushHistory(prev);
       function updateStatus(list: Node[]): Node[] {
         return list.map(node => {
           if (idsToUpdate.includes(node.id)) {
@@ -509,6 +520,66 @@ export default function ListPage() {
       updateNodeMutation.mutate({ id: nodeId, data: { status: newStatus } });
     });
   }
+
+  // ── Undo / Redo: Ctrl+Z / Ctrl+Y ─────────────────────────────────────────
+  useEffect(() => {
+    async function handleUndoRedo(e: KeyboardEvent) {
+      // Don't intercept when user is typing in an input/textarea/contenteditable
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return;
+
+      const isUndo = (e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey;
+      const isRedo = (e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey));
+
+      if (!isUndo && !isRedo) return;
+      e.preventDefault();
+
+      setNodes(current => {
+        const target = isUndo ? undoHistory(current) : redoHistory(current);
+        if (!target) return current; // nothing to undo/redo
+
+        const flatCurrent = flattenTree(current);
+        const flatTarget  = flattenTree(target);
+
+        const currentMap = new Map(flatCurrent.map(n => [n.id, n]));
+        const targetMap  = new Map(flatTarget.map(n  => [n.id, n]));
+
+        // Nodes added in current but absent in target → undo creation → delete
+        const toDelete = flatCurrent.filter(n => !targetMap.has(n.id));
+        // Nodes in target but absent in current → undo deletion → recreate
+        const toCreate = flatTarget.filter(n => !currentMap.has(n.id));
+        // Nodes in both but changed → update with target values
+        const toUpdate = flatTarget.filter(n => {
+          const c = currentMap.get(n.id);
+          return c && (c.title !== n.title || c.status !== n.status || c.priority !== n.priority ||
+            c.parentId !== n.parentId || c.position !== n.position);
+        });
+
+        // Fire backend sync asynchronously (don't block state update)
+        setTimeout(async () => {
+          for (const n of toDelete) {
+            nodeApi.delete(n.id).catch(() => {});
+          }
+          for (const n of toCreate) {
+            if (n.parentId) {
+              nodeApi.createChild(n.parentId, { title: n.title, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
+            } else if (listId) {
+              nodeApi.create(listId, { title: n.title, listId, status: n.status, priority: n.priority ?? undefined, notes: n.notes ?? undefined, position: n.position }).catch(() => {});
+            }
+          }
+          for (const n of toUpdate) {
+            nodeApi.update(n.id, { title: n.title, status: n.status, priority: n.priority, parentId: n.parentId, position: n.position }).catch(() => {});
+          }
+        }, 0);
+
+        return target;
+      });
+    }
+
+    window.addEventListener('keydown', handleUndoRedo);
+    return () => window.removeEventListener('keydown', handleUndoRedo);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listId, undoHistory, redoHistory]);
 
   // Compute input position
   function computeInputX(depth: number): number { return 60 + depth * 90; }
