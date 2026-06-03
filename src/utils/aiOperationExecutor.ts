@@ -26,9 +26,22 @@ function resolvePlaceholders(
   return resolved;
 }
 
+/** Collect optional node fields from an operation object */
+function pickNodeExtras(op: AiOperation): Record<string, unknown> {
+  const extras: Record<string, unknown> = {};
+  if (op.status !== undefined) extras.status = op.status;
+  if (op.priority !== undefined) extras.priority = op.priority;
+  if (op.startAt !== undefined) extras.startAt = op.startAt;
+  if (op.endAt !== undefined) extras.endAt = op.endAt;
+  if (op.reminderAt !== undefined) extras.reminderAt = op.reminderAt;
+  if (op.notes !== undefined) extras.notes = op.notes;
+  if (op.position !== undefined) extras.position = op.position;
+  if (op.tagIds !== undefined) extras.tagIds = op.tagIds;
+  return extras;
+}
+
 /**
  * Execute AI operations sequentially using existing API calls.
- * Returns a map of created title → real ID for reference.
  */
 export async function executeOperations(
   ops: AiOperation[],
@@ -58,17 +71,10 @@ export async function executeOperations(
       case 'createNode': {
         const parentId = (op.parentId as string | null) ?? null;
         const listId = op.listId as string;
-
-        // Build optional properties
-        const extras: Record<string, unknown> = {};
-        if (op.status) extras.status = op.status;
-        if (op.priority) extras.priority = op.priority;
-        if (op.startAt) extras.startAt = op.startAt;
-        if (op.endAt) extras.endAt = op.endAt;
-        if (op.notes) extras.notes = op.notes;
-        if (op.position !== undefined) extras.position = op.position;
+        const extras = pickNodeExtras(op);
 
         if (parentId) {
+          // If parentId is specified, use the createChild endpoint
           const node = await nodeApi.createChild(parentId, {
             title: op.title as string,
             ...extras,
@@ -85,6 +91,16 @@ export async function executeOperations(
         break;
       }
 
+      case 'createSubNode': {
+        const extras = pickNodeExtras(op);
+        const node = await nodeApi.createChild(op.parentId as string, {
+          title: op.title as string,
+          ...extras,
+        });
+        idMap.set(op.title as string, node.id);
+        break;
+      }
+
       case 'updateNode': {
         const data: Record<string, unknown> = {};
         if (op.title !== undefined) data.title = op.title;
@@ -92,7 +108,11 @@ export async function executeOperations(
         if (op.priority !== undefined) data.priority = op.priority;
         if (op.startAt !== undefined) data.startAt = op.startAt;
         if (op.endAt !== undefined) data.endAt = op.endAt;
+        if (op.reminderAt !== undefined) data.reminderAt = op.reminderAt;
         if (op.notes !== undefined) data.notes = op.notes;
+        if (op.position !== undefined) data.position = op.position;
+        if (op.parentId !== undefined) data.parentId = op.parentId;
+        if (op.tagIds !== undefined) data.tagIds = op.tagIds;
         await nodeApi.update(op.nodeId as string, data);
         break;
       }
@@ -103,28 +123,34 @@ export async function executeOperations(
       }
 
       case 'moveNode': {
-        const moveData: Record<string, unknown> = {};
-        if (op.newParentId !== undefined) moveData.parentId = op.newParentId;
-        if (op.newListId !== undefined) moveData.listId = op.newListId;
-        await nodeApi.update(op.nodeId as string, moveData);
+        await nodeApi.move(op.nodeId as string, {
+          parentId: (op.parentId as string | null) ?? null,
+          position: (op.position as number) ?? 0,
+        });
         break;
       }
 
       case 'createTag': {
-        const tag = await tagApi.create({
+        const tagData: { name: string; color?: string; listId?: string | null } = {
           name: op.name as string,
-          listId: (op.listId as string | undefined) ?? undefined,
-        });
+        };
+        if (op.color) tagData.color = op.color as string;
+        if (op.listId !== undefined) tagData.listId = op.listId as string | null;
+        const tag = await tagApi.create(tagData);
         idMap.set(op.name as string, tag.id);
         break;
       }
 
-      case 'assignTag': {
-        // Resolve tag by name from idMap or use tagId directly
-        const tagId = (op.tagId as string) || idMap.get(op.tagName as string);
+      case 'attachTag': {
+        const tagId = (op.tagId as string) || idMap.get(op.tagName as string || '');
         if (tagId) {
           await nodeApi.attachTag(op.nodeId as string, tagId);
         }
+        break;
+      }
+
+      case 'detachTag': {
+        await nodeApi.detachTag(op.nodeId as string, op.tagId as string);
         break;
       }
 
