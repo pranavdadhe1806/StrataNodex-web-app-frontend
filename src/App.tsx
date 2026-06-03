@@ -20,6 +20,8 @@ const queryClient = new QueryClient({
   },
 });
 
+import AiChatPanel from './components/AiChat/AiChatPanel';
+
 function GuardedRoutes() {
   return (
     <AuthGuard>
@@ -33,6 +35,7 @@ function GuardedRoutes() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      <AiChatPanel />
     </AuthGuard>
   );
 }
