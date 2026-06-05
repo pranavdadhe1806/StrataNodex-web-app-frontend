@@ -47,13 +47,23 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
   const isInDaily = dailyData?.nodes.some(
     n => n.id === node.id || n.sourceNodeId === node.id
   ) ?? false;
+  // Helper: convert a stored UTC ISO string to local date "YYYY-MM-DD" and time "HH:MM"
+  function isoToLocalParts(iso: string | null | undefined): { date: string; time: string } {
+    if (!iso) return { date: '', time: '' };
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return { date, time };
+  }
+
   const [localTitle, setLocalTitle] = useState(node.title);
   const [localStatus, setLocalStatus] = useState<NodeStatus>(node.status);
   const [localPriority, setLocalPriority] = useState<Priority | ''>(node.priority ?? '');
-  const [localStartDate, setLocalStartDate] = useState(node.startAt?.split('T')[0] ?? '');
-  const [localStartTime, setLocalStartTime] = useState(node.startAt ? (node.startAt.split('T')[1]?.slice(0, 5) ?? '') : '');
-  const [localEndDate, setLocalEndDate] = useState(node.endAt?.split('T')[0] ?? '');
-  const [localEndTime, setLocalEndTime] = useState(node.endAt ? (node.endAt.split('T')[1]?.slice(0, 5) ?? '') : '');
+  const [localStartDate, setLocalStartDate] = useState(isoToLocalParts(node.startAt).date);
+  const [localStartTime, setLocalStartTime] = useState(isoToLocalParts(node.startAt).time);
+  const [localEndDate, setLocalEndDate] = useState(isoToLocalParts(node.endAt).date);
+  const [localEndTime, setLocalEndTime] = useState(isoToLocalParts(node.endAt).time);
   const [localNotes, setLocalNotes] = useState(node.notes ?? '');
   const [localTags, setLocalTags] = useState<string[]>(node.tags?.map(t => t.name) ?? []);
   const [tagInput, setTagInput] = useState('');
@@ -64,10 +74,10 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
     setLocalPriority(node.priority ?? '');
     setLocalNotes(node.notes ?? '');
     setLocalTags(node.tags?.map(t => t.name) ?? []);
-    setLocalStartDate(node.startAt?.split('T')[0] ?? '');
-    setLocalStartTime(node.startAt ? (node.startAt.split('T')[1]?.slice(0, 5) ?? '') : '');
-    setLocalEndDate(node.endAt?.split('T')[0] ?? '');
-    setLocalEndTime(node.endAt ? (node.endAt.split('T')[1]?.slice(0, 5) ?? '') : '');
+    setLocalStartDate(isoToLocalParts(node.startAt).date);
+    setLocalStartTime(isoToLocalParts(node.startAt).time);
+    setLocalEndDate(isoToLocalParts(node.endAt).date);
+    setLocalEndTime(isoToLocalParts(node.endAt).time);
   }, [node.id]);
 
   useEffect(() => {
@@ -76,9 +86,11 @@ export default function NodeDetailPanel({ node, onClose, onUpdate, onDelete, onA
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  // Helper: convert local date string "YYYY-MM-DD" + time "HH:MM" to a UTC ISO string
   function buildDateTimeString(date: string, time: string): string | null {
     if (!date) return null;
-    return time ? `${date}T${time}:00.000Z` : `${date}T00:00:00.000Z`;
+    const localIso = time ? `${date}T${time}:00` : `${date}T00:00:00`;
+    return new Date(localIso).toISOString();
   }
 
   function handleStatusChange(status: NodeStatus) {
