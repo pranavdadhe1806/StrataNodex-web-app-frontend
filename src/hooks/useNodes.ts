@@ -10,6 +10,7 @@ import type { Node } from '../types/node.types';
 
 const NODES_KEY = 'nodes';
 const LISTS_KEY = 'lists';
+const DAILY_KEY = 'daily';
 
 export function useNodes(listId: string | null) {
   return useQuery<Node[], Error>({
@@ -38,9 +39,13 @@ export function useCreateNode() {
 
   return useMutation<Node, Error, { listId: string; data: CreateNodeInput }>({
     mutationFn: ({ listId, data }) => nodeApi.create(listId, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (savedNode, variables) => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY, variables.listId] });
       queryClient.invalidateQueries({ queryKey: [LISTS_KEY] });
+      // If startAt is today, backend auto-syncs to daily — invalidate so UI refreshes
+      if (savedNode.startAt) {
+        queryClient.invalidateQueries({ queryKey: [DAILY_KEY, 'list'] });
+      }
     },
   });
 }
@@ -50,9 +55,12 @@ export function useCreateSubNode() {
 
   return useMutation<Node, Error, { parentId: string; data: CreateSubNodeInput }>({
     mutationFn: ({ parentId, data }) => nodeApi.createChild(parentId, data),
-    onSuccess: () => {
+    onSuccess: (savedNode) => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY] });
       queryClient.invalidateQueries({ queryKey: [LISTS_KEY] });
+      if (savedNode.startAt) {
+        queryClient.invalidateQueries({ queryKey: [DAILY_KEY, 'list'] });
+      }
     },
   });
 }
@@ -62,8 +70,12 @@ export function useUpdateNode() {
 
   return useMutation<Node, Error, { id: string; data: UpdateNodeInput }>({
     mutationFn: ({ id, data }) => nodeApi.update(id, data),
-    onSuccess: () => {
+    onSuccess: (savedNode) => {
       queryClient.invalidateQueries({ queryKey: [NODES_KEY] });
+      // If startAt is today, backend auto-syncs to daily — invalidate so UI refreshes
+      if (savedNode.startAt) {
+        queryClient.invalidateQueries({ queryKey: [DAILY_KEY, 'list'] });
+      }
     },
   });
 }
