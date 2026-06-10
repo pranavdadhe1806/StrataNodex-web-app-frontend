@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import Topbar from '../components/layout/Topbar';
 import SidePanel from '../components/layout/SidePanel';
 import { useDailyList, useRemoveFromDaily } from '../hooks/useDaily';
-import { useUpdateNode, useCreateNode } from '../hooks/useNodes';
+import { useUpdateNode, useCreateNode, useCreateSubNode } from '../hooks/useNodes';
 import type { Node } from '../types/node.types';
 
 const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -99,27 +99,214 @@ function DailyNode({ node, depth = 0 }: { node: Node; depth?: number }) {
 
 export default function DailyPage() {
   const { data, isLoading } = useDailyList();
-  const createNode = useCreateNode();
-  const [newTitle, setNewTitle] = useState('');
-  const [adding, setAdding] = useState(false);
+  const createNodeMutation = useCreateNode();
+  const createSubNodeMutation = useCreateSubNode();
+
+  // ── Inline-add state (mirrors ListPage) ───────────────────────────────────
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentInput, setCurrentInput] = useState('');
+  const [currentDepth, setCurrentDepth] = useState(0);
+  const [currentParentId, setCurrentParentId] = useState<string | null>(null);
+  const [lastCreatedNodeId, setLastCreatedNodeId] = useState<string | null>(null);
+  const [localNodes, setLocalNodes] = useState<Node[]>([]);
+
+  // Promise map so sub-nodes always get the real server parent ID
+  const idPromises = useRef<Map<string, Promise<string>>>(new Map());
 
   const nodes = data?.nodes ?? [];
   const dailyListId = data?.list?.id ?? '';
 
+  // Sync server nodes into local state (but don't blow away optimistic nodes mid-flight)
+  useEffect(() => {
+    if (!isTyping) setLocalNodes(nodes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
   // Flatten tree for progress counting
   const flattenNodes = (list: Node[]): Node[] =>
     list.flatMap(n => [n, ...flattenNodes(n.children ?? [])]);
-  const allNodes = flattenNodes(nodes);
+  const allNodes = flattenNodes(localNodes);
   const done = allNodes.filter(n => n.status === 'DONE').length;
   const total = allNodes.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
-  const handleAddTask = () => {
-    if (!newTitle.trim() || !dailyListId) return;
-    createNode.mutate({ listId: dailyListId, data: { title: newTitle.trim(), listId: dailyListId, status: 'TODO', priority: 'MEDIUM' } });
-    setNewTitle('');
-    setAdding(false);
-  };
+  // ── Tree helpers ──────────────────────────────────────────────────────────
+  function addNodeToTree(tree: Node[], newNode: Node, parentId: string | null): Node[] {
+    if (parentId === null) return [...tree, newNode];
+    return tree.map(node => {
+      if (node.id === parentId) {
+        return { ...node, children: [...(node.children ?? []), newNode] };
+      }
+      return { ...node, children: addNodeToTree(node.children ?? [], newNode, parentId) };
+    });
+  }
+
+  function replaceTempId(tree: Node[], tempId: string, realId: string): Node[] {
+    return tree.map(node => {
+      const updatedChildren = replaceTempId(node.children ?? [], tempId, realId);
+      if (node.id === tempId) return { ...node, id: realId, listId: dailyListId, children: updatedChildren };
+      if (node.parentId === tempId) return { ...node, parentId: realId, children: updatedChildren };
+      return { ...node, children: updatedChildren };
+    });
+  }
+
+  function findParentAtDepth(tree: Node[], targetDepth: number, depth: number = 0): string | null {
+    if (targetDepth === 0) return null;
+    for (let i = tree.length - 1; i >= 0; i--) {
+      const node = tree[i];
+      if (depth === targetDepth - 1) return node.id;
+      if (node.children?.length > 0) {
+        const found = findParentAtDepth(node.children, targetDepth, depth + 1);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function computePosition(tree: Node[], parentId: string | null): number {
+    if (parentId === null) return tree.length;
+    const findParent = (list: Node[]): Node | null => {
+      for (const node of list) {
+        if (node.id === parentId) return node;
+        const found = findParent(node.children ?? []);
+        if (found) return found;
+      }
+      return null;
+    };
+    const parent = findParent(tree);
+    return parent ? (parent.children?.length ?? 0) : 0;
+  }
+
+  // ── Create node (optimistic) ──────────────────────────────────────────────
+  const createNode = useCallback((title: string) => {
+    if (!dailyListId) return;
+
+    const tempId = crypto.randomUUID();
+    const position = computePosition(localNodes, currentParentId);
+
+    const newNode: Node = {
+      id: tempId,
+      title,
+      status: 'TODO',
+      priority: 'MEDIUM',
+      notes: null,
+      startAt: null,
+      endAt: null,
+      reminderAt: null,
+      canvasX: null,
+      canvasY: null,
+      position,
+      listId: dailyListId,
+      parentId: currentParentId,
+      sourceNodeId: null,
+      source: null,
+      children: [],
+      tags: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setLocalNodes(prev => addNodeToTree(prev, newNode, currentParentId));
+    setLastCreatedNodeId(tempId);
+
+    // Promise so nested sub-nodes wait for the real parent ID
+    let resolveRealId!: (id: string) => void;
+    let rejectRealId!: (e: unknown) => void;
+    const realIdPromise = new Promise<string>((res, rej) => {
+      resolveRealId = res;
+      rejectRealId = rej;
+    });
+    idPromises.current.set(tempId, realIdPromise);
+
+    const onSaved = (savedId: string) => {
+      resolveRealId(savedId);
+      setLocalNodes(prev => replaceTempId(prev, tempId, savedId));
+      setLastCreatedNodeId(prev => (prev === tempId ? savedId : prev));
+      setCurrentParentId(prev => (prev === tempId ? savedId : prev));
+    };
+
+    const rollback = (e: unknown) => {
+      console.error('Failed to save node', e);
+      rejectRealId(e);
+      idPromises.current.delete(tempId);
+      setLocalNodes(prev => {
+        const remove = (tree: Node[]): Node[] =>
+          tree.filter(n => n.id !== tempId).map(n => ({ ...n, children: remove(n.children ?? []) }));
+        return remove(prev);
+      });
+    };
+
+    const saveToServer = async () => {
+      if (currentParentId === null) {
+        const saved = await createNodeMutation.mutateAsync({
+          listId: dailyListId,
+          data: { title, listId: dailyListId, position },
+        });
+        onSaved(saved.id);
+      } else {
+        const parentPromise = idPromises.current.get(currentParentId);
+        const realParentId = parentPromise ? await parentPromise : currentParentId;
+        const saved = await createSubNodeMutation.mutateAsync({
+          parentId: realParentId,
+          data: { title, position },
+        });
+        onSaved(saved.id);
+      }
+    };
+
+    saveToServer().catch(rollback);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dailyListId, localNodes, currentParentId]);
+
+  // ── Keyboard handler ──────────────────────────────────────────────────────
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!currentInput.trim()) return;
+      createNode(currentInput.trim());
+      setCurrentInput('');
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (e.shiftKey) {
+        // Shift+Tab: dedent
+        if (currentDepth > 0) {
+          const newDepth = currentDepth - 1;
+          setCurrentDepth(newDepth);
+          setCurrentParentId(findParentAtDepth(localNodes, newDepth));
+        }
+      } else {
+        // Tab: indent one level deeper under the last created node
+        const newDepth = currentDepth + 1;
+        setCurrentDepth(newDepth);
+        setCurrentParentId(lastCreatedNodeId ?? findParentAtDepth(localNodes, newDepth));
+      }
+    }
+
+    if (e.key === 'Escape') {
+      setIsTyping(false);
+      setCurrentInput('');
+      setCurrentDepth(0);
+      setCurrentParentId(null);
+      setLastCreatedNodeId(null);
+    }
+
+    if (e.key === 'Backspace') {
+      const ta = e.target as HTMLTextAreaElement;
+      if (ta.selectionStart === 0 && ta.selectionEnd === 0 && currentDepth > 0) {
+        e.preventDefault();
+        const newDepth = currentDepth - 1;
+        setCurrentDepth(newDepth);
+        setCurrentParentId(findParentAtDepth(localNodes, newDepth));
+      }
+    }
+  }
+
+  // ── Depth indicator (mirrors ListPage bullet style) ────────────────────────
+  const DEPTH_COLORS = ['var(--accent)', '#00bfff', '#00c896', '#f7b955', '#f85149'];
+  const depthColor = DEPTH_COLORS[Math.min(currentDepth, DEPTH_COLORS.length - 1)];
+  const depthLabel = currentDepth === 0 ? 'root task' : `sub-task (depth ${currentDepth})`;
 
   return (
     <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
@@ -164,44 +351,53 @@ export default function DailyPage() {
             <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               Loading…
             </div>
-          ) : nodes.length === 0 && !adding ? (
+          ) : localNodes.length === 0 && !isTyping ? (
             <div style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
               No tasks yet — add one below or pin tasks from any list
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {nodes.map(node => (
+              {localNodes.map(node => (
                 <DailyNode key={node.id} node={node} />
               ))}
             </div>
           )}
 
-          {/* Inline add */}
-          {adding ? (
-            <div style={{ display: 'flex', gap: '8px', marginTop: nodes.length > 0 ? '10px' : '0' }}>
-              <input
-                autoFocus
-                value={newTitle}
-                onChange={e => setNewTitle(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleAddTask(); if (e.key === 'Escape') setAdding(false); }}
-                placeholder="Task title…"
-                style={{
-                  flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(36,119,198,0.3)',
-                  borderRadius: '8px', padding: '8px 12px', color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-main)', fontSize: '13px', outline: 'none',
-                }}
-              />
-              <button onClick={handleAddTask} style={{ background: 'rgba(36,119,198,0.15)', border: '1px solid rgba(36,119,198,0.3)', borderRadius: '8px', padding: '8px 14px', color: 'var(--accent)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer' }}>
-                Add
-              </button>
-              <button onClick={() => setAdding(false)} style={{ background: 'var(--divider)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 14px', color: 'var(--text-muted)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer' }}>
-                Cancel
-              </button>
+          {/* ── Inline add ── */}
+          {isTyping ? (
+            <div style={{ marginTop: localNodes.length > 0 ? '12px' : '0' }}>
+              {/* Depth indicator */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', paddingLeft: `${currentDepth * 20}px` }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: depthColor, flexShrink: 0 }} />
+                <span style={{ color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '11px' }}>
+                  {depthLabel} · Tab to indent · Shift+Tab to dedent · Enter to add · Esc to cancel
+                </span>
+              </div>
+
+              {/* Textarea input */}
+              <div style={{ paddingLeft: `${currentDepth * 20}px`, display: 'flex', gap: '8px' }}>
+                <textarea
+                  autoFocus
+                  rows={1}
+                  value={currentInput}
+                  onChange={e => setCurrentInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Task title…"
+                  style={{
+                    flex: 1, resize: 'none', overflow: 'hidden',
+                    background: 'var(--bg-card)', border: `1px solid ${depthColor}44`,
+                    borderRadius: '8px', padding: '8px 12px',
+                    color: 'var(--text-secondary)', fontFamily: 'var(--font-main)',
+                    fontSize: '13px', outline: 'none', lineHeight: '1.4',
+                    boxShadow: `0 0 0 2px ${depthColor}22`,
+                  }}
+                />
+              </div>
             </div>
           ) : (
             <button
-              onClick={() => setAdding(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: nodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
+              onClick={() => { setIsTyping(true); setLocalNodes(nodes); }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: localNodes.length > 0 ? '10px' : '0', background: 'none', border: 'none', color: 'var(--text-placeholder)', fontFamily: 'var(--font-main)', fontSize: '13px', cursor: 'pointer', padding: '4px 0' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-placeholder)')}
             >
